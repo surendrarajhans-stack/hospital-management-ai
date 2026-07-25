@@ -1,0 +1,19 @@
+{
+  "name": "medsphere-hospital-ai",
+  "version": "1.0.0",
+  "description": "An interactive, responsive, role-based dashboard simulating the comprehensive MedSphere AI Hospital Management System. Designed with modern Teal Glassmorphism aesthetics, dynamic SVG medical charts, checkouts, and a personalized localized Conversational AI Chatbot.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongodb": "^7.5.0"
+  }
+}

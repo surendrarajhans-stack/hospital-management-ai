@@ -1,0 +1,1384 @@
+// ==========================================================================
+// MedSphere AI - Clinical Dashboard & Operations Controller
+// ==========================================================================
+
+const API_BASE_URL = window.location.origin;
+
+// 1. Unified Application State
+const state = {
+    userName: "",
+    userId: "",
+    userRole: "", // "Doctor", "Nurse", "Pharmacist", "Patient", "IT Admin", "Super Admin"
+    roleClearance: 0, // 1=Doctor, 2=Nurse, 3=Pharmacist, 4=Patient, 14=IT Admin, 15=Super Admin
+    onboardingStep: 0, // 0=Role Select, 1=Credentials, 2=Dashboard
+    activeDashboardView: "",
+    chatLanguage: "en",
+    localization: {
+        country: "India",
+        currency: "INR",
+        currencySymbol: "₹",
+        timezone: "Asia/Kolkata",
+        taxName: "GST",
+        taxRate: 18
+    }
+};
+
+// 2. Mock Database Definition
+const MOCK_DB = {
+    admissions: [],
+    doctors: [
+        { id: "DOC-001", name: "Dr. Surendra Rajhans", specialty: "Cardiology", room: "OPD 101", shift: "Morning", phone: "+91 94394 98158" },
+        { id: "DOC-002", name: "Dr. Lakshmi Prasad", specialty: "Pediatrics", room: "OPD 105", shift: "Afternoon", phone: "+91 98765 00002" },
+        { id: "DOC-003", name: "Dr. Vikas Sharma", specialty: "Neurology", room: "OPD 202", shift: "Night", phone: "+91 98765 00003" }
+    ],
+    patients: [
+        { id: "PAT-001", name: "Ramesh Kumar", age: 45, triage: "Stable", bed: "ICU-02", bill: 12500, paid: false, complaint: "Chronic hypertension" },
+        { id: "PAT-002", name: "Sita Devi", age: 32, triage: "Under Observation", bed: "GW-05", bill: 4500, paid: false, complaint: "Post-op care, mild fever" },
+        { id: "PAT-003", name: "Kabir Khan", age: 8, triage: "Stable", bed: "PED-01", bill: 1800, paid: true, complaint: "Acute bronchitis checkup" }
+    ],
+    wards: [
+        { id: "ICU-01", type: "ICU", occupied: false, patientId: "" },
+        { id: "ICU-02", type: "ICU", occupied: true, patientId: "PAT-001" },
+        { id: "GW-01", type: "General Ward", occupied: false, patientId: "" },
+        { id: "GW-05", type: "General Ward", occupied: true, patientId: "PAT-002" },
+        { id: "PED-01", type: "Pediatrics", occupied: true, patientId: "PAT-003" }
+    ],
+    staff: [
+        { id: "NURSE-01", name: "Sister Anjali", dept: "ICU", shift: "Day" },
+        { id: "NURSE-02", name: "Sister Mary", dept: "General Ward", shift: "Night" }
+    ],
+    pharmacy: [
+        { id: "DRUG-01", name: "Paracetamol 650mg", stock: 1200, price: 15 },
+        { id: "DRUG-02", name: "Amoxicillin 500mg", stock: 500, price: 80 },
+        { id: "DRUG-03", name: "Atorvastatin 10mg", stock: 350, price: 45 },
+        { id: "DRUG-04", name: "Pantoprazole 40mg", stock: 800, price: 25 }
+    ],
+    prescriptions: []
+};
+
+// Demo Account Reference Mapping
+const DEMO_ACCOUNTS = {
+    "superadmin": { name: "Global Admin", id: "SUPERADMIN", role: "Super Admin", clearance: 15 },
+    "itadmin": { name: "IT Director", id: "IT-ADMIN-01", role: "IT Admin", clearance: 14 },
+    "doc01": { name: "Dr. Surendra Rajhans", id: "DOC-001", role: "Doctor", clearance: 1 },
+    "nurse01": { name: "Sister Anjali", id: "NURSE-01", role: "Nurse", clearance: 2 },
+    "pharm01": { name: "Pharmacy Desk", id: "PHARM-01", role: "Pharmacist", clearance: 3 },
+    "pat01": { name: "Ramesh Kumar", id: "PAT-001", role: "Patient", clearance: 4 }
+};
+
+// 3. UI DOM Caching
+window.AppElements = {};
+function cacheDOM() {
+    window.AppElements = {
+        sidebar: document.getElementById("main-sidebar"),
+        header: document.getElementById("main-header"),
+        viewContainer: document.getElementById("view-container"),
+        chatMessages: document.getElementById("chatMessages"),
+        chatForm: document.getElementById("chatForm"),
+        chatInput: document.getElementById("chatInput")
+    };
+}
+
+// 4. Initialize & State restore
+window.addEventListener("DOMContentLoaded", () => {
+    cacheDOM();
+    if (window.lucide) window.lucide.createIcons();
+    
+    // Check if license is active
+    const savedState = localStorage.getItem("medsphere_state");
+    if (savedState) {
+        try {
+            const parsed = JSON.parse(savedState);
+            Object.assign(state, parsed);
+        } catch (e) {}
+    }
+    
+    loadDatabaseState();
+    if (typeof window.applyRegionalUI === 'function') window.applyRegionalUI();
+    
+    // Switch to initial state
+    if (state.onboardingStep === 2 && state.userId) {
+        switchRole(state.roleClearance, state.userName, state.userId);
+    } else {
+        resetToOnboarding();
+    }
+});
+
+// 5. Onboarding / Role switching flows
+window.resetToOnboarding = function() {
+    state.onboardingStep = 0;
+    saveLocalState();
+    
+    if (window.AppElements.sidebar) window.AppElements.sidebar.classList.add("hidden");
+    if (window.AppElements.header) window.AppElements.header.classList.add("hidden");
+    
+    document.getElementById("onboarding-role-select").classList.remove("hidden");
+    document.getElementById("onboarding-credentials").classList.add("hidden");
+    
+    // Hide all dashboards
+    document.querySelectorAll("section[id^='view-']").forEach(sec => sec.classList.add("hidden"));
+};
+
+window.selectRoleOnboarding = function(clearance, roleLabel) {
+    state.roleClearance = clearance;
+    state.userRole = roleLabel;
+    state.onboardingStep = 1;
+    saveLocalState();
+    
+    document.getElementById("selected-role-label").innerText = roleLabel;
+    document.getElementById("onboarding-role-select").classList.add("hidden");
+    document.getElementById("onboarding-credentials").classList.remove("hidden");
+    
+    // Prefill demo credentials for testing ease
+    const nameInput = document.getElementById("user-input-name");
+    const idInput = document.getElementById("user-input-id");
+    
+    if (clearance === 15) { nameInput.value = "Global Admin"; idInput.value = "SUPERADMIN"; }
+    else if (clearance === 14) { nameInput.value = "IT Director"; idInput.value = "IT-ADMIN-01"; }
+    else if (clearance === 1) { nameInput.value = "Dr. Surendra Rajhans"; idInput.value = "DOC-001"; }
+    else if (clearance === 2) { nameInput.value = "Sister Anjali"; idInput.value = "NURSE-01"; }
+    else if (clearance === 3) { nameInput.value = "Pharmacy Desk"; idInput.value = "PHARM-01"; }
+    else if (clearance === 4) { nameInput.value = "Ramesh Kumar"; idInput.value = "PAT-001"; }
+};
+
+window.onboardingBackToRoles = function() {
+    resetToOnboarding();
+};
+
+window.submitOnboardingCredentials = function(e) {
+    e.preventDefault();
+    const name = document.getElementById("user-input-name").value.trim();
+    const id = document.getElementById("user-input-id").value.trim().toUpperCase();
+    
+    if (!name || !id) return;
+    
+    // Verify Demo records
+    let isMatched = false;
+    for (let k in DEMO_ACCOUNTS) {
+        const acc = DEMO_ACCOUNTS[k];
+        if (acc.id === id && acc.clearance === state.roleClearance) {
+            isMatched = true;
+            break;
+        }
+    }
+    
+    // In demo environment, allow any name/id if not matching demo records
+    switchRole(state.roleClearance, name, id);
+};
+
+window.switchRole = function(clearance, name, id) {
+    state.userName = name;
+    state.userId = id;
+    state.roleClearance = clearance;
+    state.onboardingStep = 2;
+    saveLocalState();
+    
+    // Show navigation layouts
+    if (window.AppElements.sidebar) window.AppElements.sidebar.classList.remove("hidden");
+    if (window.AppElements.header) window.AppElements.header.classList.remove("hidden");
+    document.getElementById("onboarding-credentials").classList.add("hidden");
+    
+    // Update sidebar badges
+    document.getElementById("sidebar-user-name").innerText = name;
+    document.getElementById("sidebar-user-role").innerText = state.userRole;
+    document.getElementById("user-badge-avatar").innerText = name.charAt(0).toUpperCase();
+    
+    // Update theme body color
+    document.body.className = "bg-[#0b0f19] text-[#f3f4f6] font-sans antialiased overflow-x-hidden";
+    if (clearance === 15) {
+        document.body.classList.add("theme-super-admin");
+        switchDashboardView("view-super-admin");
+    } else if (clearance === 14) {
+        document.body.classList.add("theme-it-administrator");
+        switchDashboardView("view-it-administrator");
+    } else if (clearance === 1) {
+        document.body.classList.add("theme-doctor");
+        switchDashboardView("view-doctor");
+    } else if (clearance === 2) {
+        document.body.classList.add("theme-nurse");
+        switchDashboardView("view-nurse");
+    } else if (clearance === 3) {
+        document.body.classList.add("theme-pharmacist");
+        switchDashboardView("view-pharmacist");
+    } else if (clearance === 4) {
+        document.body.classList.add("theme-patient");
+        switchDashboardView("view-patient");
+    }
+    
+    addSystemLog(`User ${name} authenticated successfully as ${state.userRole}.`, "Success");
+};
+
+// 6. Navigation View Switching
+window.switchDashboardView = function(viewId, elementLink = null) {
+    // Hide all dashboards
+    document.querySelectorAll("section[id^='view-']").forEach(sec => sec.classList.add("hidden"));
+    
+    // Show active dashboard
+    const target = document.getElementById(viewId);
+    if (target) target.classList.remove("hidden");
+    
+    state.activeDashboardView = viewId;
+    saveLocalState();
+    
+    // Update header label
+    let label = "Operations Control";
+    if (viewId === "view-super-admin") label = "Licensing and Setup Console";
+    else if (viewId === "view-it-administrator") label = "IT Cloud Importer & Audit";
+    else if (viewId === "view-doctor") label = "Clinical Diagnosis Desk";
+    else if (viewId === "view-nurse") label = "Ward Monitoring & Vitals";
+    else if (viewId === "view-pharmacist") label = "Pharmacy Dispensing & Invoices";
+    else if (viewId === "view-patient") label = "Your Care & AI Assistant";
+    
+    document.getElementById("current-view-title").innerText = label;
+    
+    // Update active nav link classes
+    document.querySelectorAll(".sidebar-link").forEach(lnk => lnk.classList.remove("active"));
+    if (elementLink) {
+        elementLink.classList.add("active");
+    } else {
+        // Fallback matching
+        const links = document.querySelectorAll(".sidebar-link");
+        links.forEach(l => {
+            const clickAttr = l.getAttribute("onclick");
+            if (clickAttr && clickAttr.includes(viewId)) {
+                l.classList.add("active");
+            }
+        });
+    }
+    
+    // Load and populate corresponding dashboard views
+    if (viewId === "view-super-admin") populateSuperAdminDashboard();
+    else if (viewId === "view-it-administrator") populateITDashboard();
+    else if (viewId === "view-doctor") populateDoctorDashboard();
+    else if (viewId === "view-nurse") populateNurseDashboard();
+    else if (viewId === "view-pharmacist") populatePharmacistDashboard();
+    else if (viewId === "view-patient") populatePatientPortal();
+};
+
+function saveLocalState() {
+    localStorage.setItem("medsphere_state", JSON.stringify(state));
+}
+
+// 7. Database State Sync (MongoDB cloud & Local storage)
+function saveDatabaseState() {
+    localStorage.setItem("medsphere_db_local", JSON.stringify(MOCK_DB));
+    
+    fetch(API_BASE_URL + "/api/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(MOCK_DB)
+    })
+    .then(r => r.json())
+    .then(d => console.log("MedSphere database synced successfully to cloud:", d))
+    .catch(err => console.error("Cloud database sync error:", err));
+}
+
+function loadDatabaseState() {
+    // 1. Check local storage copy
+    const cached = localStorage.getItem("medsphere_db_local");
+    if (cached) {
+        try {
+            const parsed = JSON.parse(cached);
+            Object.assign(MOCK_DB, parsed);
+        } catch (e) {}
+    }
+    
+    // 2. Fetch fresh cloud state
+    fetch(API_BASE_URL + "/api/load")
+    .then(r => r.json())
+    .then(cloudDb => {
+        if (cloudDb && cloudDb.patients) {
+            Object.assign(MOCK_DB, cloudDb);
+            console.log("MedSphere state synced from cloud successfully.");
+            
+            // Re-render active view
+            if (state.activeDashboardView) {
+                switchDashboardView(state.activeDashboardView);
+            }
+            if (typeof window.applyRegionalUI === 'function') window.applyRegionalUI();
+        }
+    })
+    .catch(err => console.log("Failed loading cloud state, using local copy:", err));
+}
+
+// 8. Super Admin Controllers
+function populateSuperAdminDashboard() {
+    document.getElementById("stat-active-clinics").innerText = MOCK_DB.admissions.length || 0;
+    document.getElementById("stat-issued-licenses").innerText = (MOCK_DB.admissions.length + 3) || 3;
+    
+    // Render licenses registry
+    const container = document.getElementById("licenseRegistryList");
+    container.innerHTML = "";
+    
+    if (!MOCK_DB.admissions || MOCK_DB.admissions.length === 0) {
+        container.innerHTML = `<span class="text-xs text-[#6b7280]">No licenses active. Use the form to generate one.</span>`;
+        return;
+    }
+    
+    MOCK_DB.admissions.forEach((adm) => {
+        const div = document.createElement("div");
+        div.className = "p-3 bg-white/5 rounded-xl border border-white/5 flex items-center justify-between text-xs";
+        div.innerHTML = `
+            <div>
+                <h4 class="font-bold text-white">${escapeHtml(adm.schoolName)}</h4>
+                <span class="text-[#9ca3af] block mt-0.5">${adm.adminName} | ${adm.mobile}</span>
+            </div>
+            <div class="text-right">
+                <code class="text-teal-300 font-bold block font-mono">${adm.licenseKey}</code>
+                <span class="text-[10px] text-emerald-400 font-semibold uppercase mt-0.5 block">${adm.plan}</span>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+window.generateHospitalLicenseKey = function() {
+    const hosp = document.getElementById("genHospitalName").value.trim();
+    const tier = document.getElementById("genLicenseTier").value;
+    const country = document.getElementById("genHospitalCountry").value;
+    
+    if (!hosp) {
+        alert("Please enter a clinic/hospital name.");
+        return;
+    }
+    
+    const randNum = Math.floor(1000 + Math.random() * 9000);
+    const key = `MED-LIC-${randNum}-${hosp.substring(0, 4).toUpperCase().replace(/\s/g, '')}`;
+    
+    MOCK_DB.admissions.push({
+        schoolName: hosp,
+        adminName: "Assigned License",
+        email: "hello@technocons.com",
+        mobile: "+91 94394 98158",
+        plan: tier,
+        licenseKey: key,
+        createdAt: new Date().toISOString()
+    });
+    
+    saveDatabaseState();
+    populateSuperAdminDashboard();
+    addSystemLog(`Generated new license key ${key} for "${hosp}"`, "Success");
+    
+    document.getElementById("genHospitalName").value = "";
+};
+
+// 9. IT Admin Controllers
+function populateITDashboard() {
+    // Render Doctor Table
+    const dBody = document.getElementById("doctorsTableBody");
+    dBody.innerHTML = "";
+    
+    MOCK_DB.doctors.forEach(doc => {
+        const tr = document.createElement("tr");
+        tr.className = "border-b border-white/5 text-[#f3f4f6]";
+        tr.innerHTML = `
+            <td class="py-2.5 font-medium">${doc.name}</td>
+            <td>${doc.specialty}</td>
+            <td class="font-mono text-xs">${doc.room}</td>
+            <td><span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-400">${doc.shift}</span></td>
+        `;
+        dBody.appendChild(tr);
+    });
+    
+    // Render Ward beds registry
+    const wReg = document.getElementById("wardMapRegistry");
+    wReg.innerHTML = "";
+    
+    MOCK_DB.wards.forEach(bed => {
+        const patient = MOCK_DB.patients.find(p => p.id === bed.patientId);
+        const div = document.createElement("div");
+        div.className = "p-3 bg-white/5 rounded-xl border border-white/5 flex items-center justify-between text-xs";
+        
+        const statusHtml = bed.occupied 
+            ? `<span class="font-semibold text-red-400">Occupied (${patient ? patient.name : 'Unknown'})</span>`
+            : `<span class="font-semibold text-emerald-400">Empty</span>`;
+            
+        div.innerHTML = `
+            <div>
+                <span class="font-bold text-white">${bed.id} (${bed.type})</span>
+            </div>
+            <div>${statusHtml}</div>
+        `;
+        wReg.appendChild(div);
+    });
+    
+    // Update stats
+    const totalBeds = MOCK_DB.wards.length;
+    const occupied = MOCK_DB.wards.filter(b => b.occupied).length;
+    document.getElementById("statOccupiedBeds").innerText = `${occupied} / ${totalBeds}`;
+    document.getElementById("statIcuRate").innerText = `${Math.round((occupied / totalBeds) * 100)}%`;
+}
+
+// IT Cloud Import handler
+window.processLocalFileImport = function() {
+    const select = document.getElementById("importSheetSelect");
+    const fileInput = document.getElementById("importFileInput");
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        alert("Please select a valid CSV or Excel file first.");
+        return;
+    }
+    
+    addSystemLog(`Executing cloud CSV import for collection: ${select.value}...`, "Warning");
+    
+    // Simulate sheet importing process by parsing dummy headers
+    setTimeout(() => {
+        addSystemLog(`Import complete! Loaded data successfully to MongoDB collection.`, "Success");
+        addNotification("Import Successful", "Dynamic sheets records synced successfully to cloud.", "success");
+        saveDatabaseState();
+        populateITDashboard();
+    }, 1200);
+};
+
+// 10. Doctor Portal Controllers
+let activePatientId = "";
+let currentPrescriptionMeds = [];
+
+function populateDoctorDashboard() {
+    const queue = document.getElementById("doctorPatientQueue");
+    queue.innerHTML = "";
+    
+    MOCK_DB.patients.forEach(pat => {
+        const div = document.createElement("div");
+        div.className = `p-3 rounded-xl border cursor-pointer transition text-xs flex justify-between items-center ${activePatientId === pat.id ? 'bg-teal-500/10 border-teal-500/30' : 'bg-white/5 border-white/5 hover:bg-white/10'}`;
+        
+        let triageColor = "bg-emerald-500/20 text-emerald-400";
+        if (pat.triage === "Critical") triageColor = "bg-red-500/20 text-red-400";
+        else if (pat.triage === "Under Observation") triageColor = "bg-amber-500/20 text-amber-400";
+        
+        div.innerHTML = `
+            <div>
+                <h4 class="font-bold text-white">${pat.name}</h4>
+                <span class="text-[#9ca3af] block mt-0.5">ID: ${pat.id} | Bed: ${pat.bed}</span>
+            </div>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${triageColor}">${pat.triage}</span>
+        `;
+        
+        div.onclick = () => {
+            activePatientId = pat.id;
+            currentPrescriptionMeds = [];
+            document.getElementById("addedMedsContainer").innerHTML = `<span class="text-xs text-[#6b7280]">No medication added yet.</span>`;
+            document.getElementById("compSymptoms").value = pat.complaint || "";
+            document.getElementById("compTriage").value = pat.triage;
+            document.getElementById("activePatientBadge").innerText = pat.name;
+            populateDoctorDashboard();
+        };
+        
+        queue.appendChild(div);
+    });
+}
+
+window.addMedicationToPrescription = function() {
+    const medName = document.getElementById("prescMedName").value.trim();
+    const dosage = document.getElementById("prescDosage").value.trim();
+    const duration = document.getElementById("prescDuration").value.trim();
+    
+    if (!medName || !dosage) return;
+    
+    currentPrescriptionMeds.push({ name: medName, dosage, duration });
+    
+    // Clear inputs
+    document.getElementById("prescMedName").value = "";
+    document.getElementById("prescDosage").value = "";
+    document.getElementById("prescDuration").value = "";
+    
+    // Render added meds list
+    const container = document.getElementById("addedMedsContainer");
+    container.innerHTML = "";
+    
+    currentPrescriptionMeds.forEach((m, idx) => {
+        const div = document.createElement("div");
+        div.className = "flex justify-between items-center text-xs text-[#f3f4f6]";
+        div.innerHTML = `
+            <span>💊 <strong>${m.name}</strong> - ${m.dosage} (${m.duration})</span>
+            <button class="text-red-400 hover:text-red-300" onclick="removeMedFromPrescription(${idx})">Remove</button>
+        `;
+        container.appendChild(div);
+    });
+};
+
+window.removeMedFromPrescription = function(idx) {
+    currentPrescriptionMeds.splice(idx, 1);
+    const container = document.getElementById("addedMedsContainer");
+    container.innerHTML = "";
+    
+    if (currentPrescriptionMeds.length === 0) {
+        container.innerHTML = `<span class="text-xs text-[#6b7280]">No medication added yet.</span>`;
+        return;
+    }
+    
+    currentPrescriptionMeds.forEach((m, i) => {
+        const div = document.createElement("div");
+        div.className = "flex justify-between items-center text-xs text-[#f3f4f6]";
+        div.innerHTML = `
+            <span>💊 <strong>${m.name}</strong> - ${m.dosage} (${m.duration})</span>
+            <button class="text-red-400 hover:text-red-300" onclick="removeMedFromPrescription(${i})">Remove</button>
+        `;
+        container.appendChild(div);
+    });
+};
+
+window.submitDoctorConsultationFile = function() {
+    if (!activePatientId) {
+        alert("Please select a patient from the queue first.");
+        return;
+    }
+    
+    const p = MOCK_DB.patients.find(x => x.id === activePatientId);
+    if (!p) return;
+    
+    const comp = document.getElementById("compSymptoms").value.trim();
+    const tri = document.getElementById("compTriage").value;
+    
+    p.complaint = comp;
+    p.triage = tri;
+    
+    // Create new prescription
+    if (currentPrescriptionMeds.length > 0) {
+        MOCK_DB.prescriptions.push({
+            id: `PRES-${Math.floor(1000 + Math.random() * 9000)}`,
+            patientId: activePatientId,
+            doctorName: state.userName,
+            meds: [...currentPrescriptionMeds],
+            dispatched: false
+        });
+        
+        // Calculate pharmacy costs to add to invoice
+        let medBill = currentPrescriptionMeds.length * 150; // Flat estimate
+        p.bill += medBill;
+    }
+    
+    addSystemLog(`Diagnosis completed for patient "${p.name}" (Triage: ${tri})`, "Success");
+    addNotification("Diagnosis Complete", `Prescription dispatched successfully for patient ${p.name}.`, "success");
+    
+    // Clear select
+    activePatientId = "";
+    currentPrescriptionMeds = [];
+    document.getElementById("addedMedsContainer").innerHTML = `<span class="text-xs text-[#6b7280]">No medication added yet.</span>`;
+    document.getElementById("activePatientBadge").innerText = "No Patient Selected";
+    document.getElementById("compSymptoms").value = "";
+    
+    saveDatabaseState();
+    populateDoctorDashboard();
+};
+
+// 11. Nurse & Ward Panel Controllers
+let selectedBedId = "";
+function populateNurseDashboard() {
+    const grid = document.getElementById("nurseBedVisualGrid");
+    grid.innerHTML = "";
+    
+    MOCK_DB.wards.forEach(bed => {
+        const btn = document.createElement("button");
+        btn.className = `p-4 rounded-xl border flex flex-col items-center justify-center transition font-bold ${bed.occupied ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'} ${selectedBedId === bed.id ? 'ring-2 ring-teal-500 border-transparent' : ''}`;
+        
+        btn.innerHTML = `
+            <i data-lucide="bed" class="w-5 h-5 mb-1"></i>
+            <span class="text-[10px] font-semibold">${bed.id}</span>
+        `;
+        
+        btn.onclick = () => {
+            selectedBedId = bed.id;
+            document.getElementById("vitalsBedNumberLabel").innerText = `Bed: ${bed.id} (${bed.occupied ? 'Occupied' : 'Empty'})`;
+            populateNurseDashboard();
+        };
+        
+        grid.appendChild(btn);
+    });
+    
+    if (window.lucide) window.lucide.createIcons();
+}
+
+window.saveVitalsLog = function() {
+    if (!selectedBedId) {
+        alert("Please click and select a Bed node from the grid first.");
+        return;
+    }
+    
+    const bed = MOCK_DB.wards.find(b => b.id === selectedBedId);
+    if (!bed) return;
+    
+    const temp = document.getElementById("vitalTemp").value;
+    const spo2 = document.getElementById("vitalSpo2").value;
+    const hr = document.getElementById("vitalHeartRate").value;
+    const bp = document.getElementById("vitalBp").value;
+    
+    if (!temp || !spo2) {
+        alert("Vitals parameters (Temperature & SpO2) are required.");
+        return;
+    }
+    
+    // Log message
+    let statusMsg = `Vitals logged for ${selectedBedId}: Temp=${temp}°F, SpO2=${spo2}%, HeartRate=${hr} bpm, BP=${bp}`;
+    addSystemLog(statusMsg, "Success");
+    
+    // Critical Alert trigger (SpO2 falls below 93% or Temp above 103F)
+    if (parseInt(spo2) < 93 || parseFloat(temp) > 103) {
+        sendAdminWhatsAppNotification(`⚠️ *EMERGENCY CRITICAL ALARM!*\n🏥 *Bed:* ${selectedBedId}\n🌡️ *Temp:* ${temp}°F\n🫁 *SpO2:* ${spo2}%\n💓 *Heart Rate:* ${hr} bpm\n🚨 *Status:* Critical clinical triage required!`);
+        addNotification("Emergency Alert", `Critical vitals triggered for ${selectedBedId}! Alert sent to Twilio.`, "danger");
+        addSystemLog(`CRITICAL SYSTEM ALARM: Patient in ${selectedBedId} requires emergency resuscitation!`, "Error");
+    } else {
+        addNotification("Vitals Updated", `Vitals recorded successfully for ${selectedBedId}.`, "success");
+    }
+    
+    // Clear inputs
+    document.getElementById("vitalTemp").value = "";
+    document.getElementById("vitalSpo2").value = "";
+    document.getElementById("vitalHeartRate").value = "";
+    document.getElementById("vitalBp").value = "";
+    
+    selectedBedId = "";
+    document.getElementById("vitalsBedNumberLabel").innerText = "Select a Bed to log vitals";
+    
+    saveDatabaseState();
+    populateNurseDashboard();
+};
+
+// 12. Pharmacist & Billing Desk Controllers
+let billingSelectedPatientId = "";
+
+function populatePharmacistDashboard() {
+    const list = document.getElementById("pharmacyPrescriptionsList");
+    list.innerHTML = "";
+    
+    const activePresc = MOCK_DB.prescriptions.filter(p => !p.dispatched);
+    if (activePresc.length === 0) {
+        list.innerHTML = `<span class="text-xs text-[#6b7280]">No active pending prescriptions.</span>`;
+    } else {
+        activePresc.forEach(pr => {
+            const patient = MOCK_DB.patients.find(x => x.id === pr.patientId);
+            const div = document.createElement("div");
+            div.className = "p-3 bg-white/5 rounded-xl border border-white/5 text-xs space-y-2";
+            
+            let medsText = pr.meds.map(m => `<li>💊 ${m.name} (${m.dosage})</li>`).join("");
+            
+            div.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-white">${patient ? patient.name : 'Unknown Patient'}</span>
+                    <span class="text-teal-400 font-mono text-[10px]">${pr.id}</span>
+                </div>
+                <ul class="text-[#9ca3af] space-y-0.5 list-disc pl-4">${medsText}</ul>
+                <button class="w-full btn btn-secondary py-1 text-xs" onclick="dispenseMedicationPrescription('${pr.id}')">Dispense Medicine</button>
+            `;
+            list.appendChild(div);
+        });
+    }
+    
+    // Populate active patient billing dropdown
+    const pSelect = document.getElementById("billingPatientSelect");
+    pSelect.innerHTML = `<option value="">Choose Patient...</option>`;
+    
+    MOCK_DB.patients.forEach(pat => {
+        const opt = document.createElement("option");
+        opt.value = pat.id;
+        opt.innerText = `${pat.name} (ID: ${pat.id})`;
+        if (pat.id === billingSelectedPatientId) {
+            opt.selected = true;
+        }
+        pSelect.appendChild(opt);
+    });
+}
+
+window.dispenseMedicationPrescription = function(prescId) {
+    const pr = MOCK_DB.prescriptions.find(x => x.id === prescId);
+    if (!pr) return;
+    
+    pr.dispatched = true;
+    addSystemLog(`Dispensed prescription medications for ID: ${prescId}`, "Success");
+    addNotification("Drugs Dispensed", `Medication ${prescId} has been billed and cleared.`, "success");
+    
+    saveDatabaseState();
+    populatePharmacistDashboard();
+};
+
+window.loadPatientBillingInvoice = function() {
+    const select = document.getElementById("billingPatientSelect");
+    billingSelectedPatientId = select.value;
+    
+    const p = MOCK_DB.patients.find(x => x.id === billingSelectedPatientId);
+    const badge = document.getElementById("billingPaymentStatusBadge");
+    
+    if (!p) {
+        document.getElementById("invoiceConsultFees").innerText = `${state.localization.currencySymbol}0`;
+        document.getElementById("invoiceRoomCharges").innerText = `${state.localization.currencySymbol}0`;
+        document.getElementById("invoicePharmacyCharges").innerText = `${state.localization.currencySymbol}0`;
+        document.getElementById("invoiceTotalAmount").innerText = `${state.localization.currencySymbol}0`;
+        badge.className = "inline-block text-xs font-bold bg-[#ef4444]/20 text-[#ef4444] px-3 py-1.5 rounded-full mt-1";
+        badge.innerText = "Select Patient";
+        return;
+    }
+    
+    // Calculate estimates
+    const consultVal = 1500;
+    const roomVal = p.bed ? 4000 : 0;
+    const pharmacyVal = p.bill - (consultVal + roomVal);
+    
+    document.getElementById("invoiceConsultFees").innerText = formatCurrency(consultVal);
+    document.getElementById("invoiceRoomCharges").innerText = formatCurrency(roomVal);
+    document.getElementById("invoicePharmacyCharges").innerText = formatCurrency(pharmacyVal > 0 ? pharmacyVal : 0);
+    
+    const baseAmount = p.bill;
+    const taxValue = Math.round(baseAmount * (state.localization.taxRate / 100));
+    const totalAmount = baseAmount + taxValue;
+    
+    document.getElementById("invoiceTotalAmount").innerText = formatCurrency(totalAmount);
+    
+    if (p.paid) {
+        badge.className = "inline-block text-xs font-bold bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-full mt-1";
+        badge.innerText = "Settled / Paid";
+    } else {
+        badge.className = "inline-block text-xs font-bold bg-rose-500/20 text-rose-400 px-3 py-1.5 rounded-full mt-1";
+        badge.innerText = "Payment Outstanding";
+    }
+};
+
+window.printPatientReceipt = function() {
+    if (!billingSelectedPatientId) {
+        alert("Please select a patient to print invoice.");
+        return;
+    }
+    const p = MOCK_DB.patients.find(x => x.id === billingSelectedPatientId);
+    if (!p) return;
+    
+    addSystemLog(`Printed billing receipt for Patient ${p.name} (${billingSelectedPatientId})`, "Success");
+    alert(`PRINT SYSTEM INTERCEPT:\n========================\nMEDSPHERE CLINIC OUTPATIENT RECEIPT\n========================\nPatient: ${p.name}\nTotal Charge (Tax Inc.): ${document.getElementById("invoiceTotalAmount").innerText}\nStatus: ${p.paid ? 'Settled' : 'Unpaid'}\n========================`);
+};
+
+// 13. Patient Portal Controllers
+function populatePatientPortal() {
+    const patientProfile = MOCK_DB.patients.find(p => p.id === state.userId) || MOCK_DB.patients[0];
+    
+    // Update outstanding bill
+    const baseAmount = patientProfile.bill;
+    const taxValue = Math.round(baseAmount * (state.localization.taxRate / 100));
+    const totalDue = patientProfile.paid ? 0 : (baseAmount + taxValue);
+    
+    document.getElementById("patientOutstandingBill").innerText = formatCurrency(totalDue);
+    
+    const payBtn = document.getElementById("patientPayBillBtn");
+    if (totalDue > 0) {
+        payBtn.classList.remove("hidden");
+    } else {
+        payBtn.classList.add("hidden");
+    }
+    
+    // Populate doctors dropdown
+    const dSelect = document.getElementById("patientChooseDoctor");
+    dSelect.innerHTML = "";
+    MOCK_DB.doctors.forEach(d => {
+        const opt = document.createElement("option");
+        opt.value = d.id;
+        opt.innerText = `${d.name} (${d.specialty})`;
+        dSelect.appendChild(opt);
+    });
+}
+
+window.bookPatientAppointment = function() {
+    const docId = document.getElementById("patientChooseDoctor").value;
+    const doc = MOCK_DB.doctors.find(d => d.id === docId);
+    const date = document.getElementById("patientChooseDate").value;
+    const time = document.getElementById("patientChooseTime").value;
+    
+    if (!date) {
+        alert("Please select a date for the appointment.");
+        return;
+    }
+    
+    addSystemLog(`Appointment requested with ${doc ? doc.name : 'Doctor'} on ${date} at ${time}`, "Success");
+    addNotification("Appointment Requested", `Your visit on ${date} at ${time} has been registered.`, "success");
+    
+    // Reset date input
+    document.getElementById("patientChooseDate").value = "";
+};
+
+window.triggerPatientBillCheckout = function() {
+    const valText = document.getElementById("patientOutstandingBill").innerText;
+    document.getElementById("razorpayAmountLabel").innerText = valText;
+    document.getElementById("razorpayPaymentModal").classList.remove("hidden");
+};
+
+window.closeRazorpayPaymentModal = function() {
+    document.getElementById("razorpayPaymentModal").classList.add("hidden");
+};
+
+window.completeSimulatedBillPayment = function(isSuccess) {
+    closeRazorpayPaymentModal();
+    const p = MOCK_DB.patients.find(x => x.id === state.userId) || MOCK_DB.patients[0];
+    
+    if (isSuccess) {
+        p.paid = true;
+        addSystemLog(`Payment of ${formatCurrency(p.bill)} successfully completed via Razorpay for ${p.name}`, "Success");
+        addNotification("Payment Settled", "Thank you! Your bill has been settled successfully.", "success");
+        saveDatabaseState();
+        populatePatientPortal();
+    } else {
+        addSystemLog(`Payment failed or canceled via Razorpay checkout for ${p.name}`, "Warning");
+        addNotification("Payment Failed", "Transaction declined. Please try again.", "warning");
+    }
+};
+
+// 14. Multilingual Symptoms Voice Chatbot Engine
+const CHAT_TRANSLATIONS = {
+    hi: {
+        "Welcome back": "वापसी पर स्वागत है",
+        "clearance.": "निकासी स्तर।",
+        "What can I help you with today?": "आज मैं आपकी क्या मदद कर सकता हूँ?",
+        "Authentication complete!": "प्रमाणीकरण पूरा हुआ!",
+        "Your clearance level is": "आपका सुरक्षा निकासी स्तर है",
+        "How can I assist you in your school duties today?": "आज मैं आपकी क्या सहायता कर सकता हूँ?",
+        "Hello! Language switched to English.": "नमस्ते! भाषा हिन्दी में बदल दी गई है।"
+    },
+    ne: {
+        "Welcome back": "फिर्ता स्वागत छ",
+        "clearance.": "निकासी स्तर।",
+        "What can I help you with today?": "आज म तपाईंलाई कसरी मद्दत गर्न सक्छु?",
+        "Authentication complete!": "प्रमाणीकरण पूरा भयो!",
+        "Your clearance level is": "तपाईंको सुरक्षा निकासी स्तर हो",
+        "Hello! Language switched to English.": "नमस्ते! भाषा नेपालीमा परिवर्तन गरिएको छ।"
+    },
+    bn: {
+        "Welcome back": "আবার স্বাগতম",
+        "clearance.": "ক্লিয়ারেন্স লেভেল।",
+        "What can I help you with today?": "আজ আমি আপনাকে কীভাবে সাহায্য করতে পারি?",
+        "Authentication complete!": "প্রমাণীকরণ সম্পন্ন হয়েছে!",
+        "Your clearance level is": "আপনার নিরাপত্তা ক্লিয়ারেন্স লেভেল হল",
+        "Hello! Language switched to English.": "নমস্কার! ভাষা বাংলায় পরিবর্তন করা হয়েছে।"
+    },
+    ar: {
+        "Welcome back": "مرحباً بعودتك",
+        "clearance.": "مستوى التصريح.",
+        "What can I help you with today?": "كيف يمكنني مساعدتك اليوم؟",
+        "Authentication complete!": "اكتملت عملية التحقق من الهوية!",
+        "Your clearance level is": "مستوى التصريح الخاص بك هو",
+        "Hello! Language switched to English.": "مرحباً! تم تغيير اللغة إلى العربية."
+    }
+};
+
+window.translateChatMessage = function(text, lang) {
+    if (!lang || lang === 'en') return text;
+    const dict = CHAT_TRANSLATIONS[lang];
+    if (!dict) return text;
+    
+    let translated = text;
+    const keys = Object.keys(dict).sort((a, b) => b.length - a.length);
+    keys.forEach(key => {
+        const val = dict[key];
+        const escapedKey = key.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        const regex = new RegExp(escapedKey, 'gi');
+        translated = translated.replace(regex, val);
+    });
+    return translated;
+};
+
+let browserVoices = [];
+function loadSystemVoices() {
+    if ('speechSynthesis' in window) {
+        browserVoices = window.speechSynthesis.getVoices() || [];
+    }
+}
+if ('speechSynthesis' in window) {
+    window.speechSynthesis.onvoiceschanged = loadSystemVoices;
+    loadSystemVoices();
+}
+
+window.handleChatLanguageChange = function() {
+    const select = document.getElementById("chatLanguageSelect");
+    if (!select) return;
+    state.chatLanguage = select.value;
+    
+    localStorage.setItem("medsphere_chat_lang", state.chatLanguage);
+    addSystemLog(`Chat language switched to ${select.options[select.selectedIndex].text}`, "Success");
+
+    let msg = "";
+    let engMsg = "Hello! Language switched to English. How can I assist you with your school operations today?";
+    if (state.chatLanguage === "hi") {
+        msg = "नमस्ते! भाषा हिन्दी में बदल दी गई है। मैं आज आपके चिकित्सा स्वास्थ्य में क्या सहायता कर सकता हूँ?";
+        engMsg = "Hello! Language switched to Hindi. How can I assist you with your health today?";
+    } else if (state.chatLanguage === "ne") {
+        msg = "नमस्ते! भाषा नेपालीमा परिवर्तन गरिएको छ। म आज तपाईंको स्वास्थ्यमा कसरी मद्दत गर्न सक्छु?";
+        engMsg = "Hello! Language switched to Nepali. How can I assist you with your health today?";
+    } else if (state.chatLanguage === "bn") {
+        msg = "নমস্কার! ভাষা বাংলায় পরিবর্তন করা হয়েছে। আজ আমি আপনার স্বাস্থ্যের যত্নে কীভাবে সাহায্য করতে পারি?";
+        engMsg = "Hello! Language switched to Bengali. How can I assist you with your health today?";
+    } else if (state.chatLanguage === "ar") {
+        msg = "مرحباً! تم تغيير اللغة إلى العربية. كيف يمكنني مساعدتك في شؤونك الصحية اليوم؟";
+        engMsg = "Hello! Language switched to Arabic. How can I assist you with your health today?";
+    } else {
+        msg = "Hello! Language switched to English. How can I assist you with your medical care today?";
+        engMsg = "Hello! Language switched to English. How can I assist you with your medical care today?";
+    }
+    
+    addChatMessage("incoming", msg, "MedSphere AI", engMsg);
+};
+
+window.speakAIText = function(text, englishText = null) {
+    if (!isTtsEnabled || !('speechSynthesis' in window)) return;
+    try {
+        window.speechSynthesis.cancel();
+        
+        const cleanText = text.replace(/<[^>]*>?/gm, '').replace(/[\*\_]/g, '');
+        
+        let langCode = "en-US";
+        if (state.chatLanguage === "hi") langCode = "hi-IN";
+        else if (state.chatLanguage === "ne") langCode = "ne-NP";
+        else if (state.chatLanguage === "bn") langCode = "bn-IN";
+        else if (state.chatLanguage === "ar") langCode = "ar-AE";
+        
+        let voices = browserVoices;
+        if (!voices || voices.length === 0) {
+            voices = window.speechSynthesis.getVoices() || [];
+        }
+        
+        const langPrefix = langCode.substring(0, 2).toLowerCase();
+        let matchedVoice = null;
+        
+        if (voices && voices.length > 0) {
+            const matchedVoices = voices.filter(v => v.lang.toLowerCase().startsWith(langPrefix));
+            if (matchedVoices.length > 0) {
+                matchedVoice = matchedVoices.find(v => 
+                    v.name.toLowerCase().includes("natural") || 
+                    v.name.toLowerCase().includes("online") || 
+                    v.name.toLowerCase().includes("google")
+                ) || matchedVoices[0];
+            }
+            
+            if (!matchedVoice && langPrefix === "ne") {
+                const hindiVoices = voices.filter(v => v.lang.toLowerCase().startsWith("hi"));
+                if (hindiVoices.length > 0) {
+                    matchedVoice = hindiVoices.find(v => 
+                        v.name.toLowerCase().includes("natural") || 
+                        v.name.toLowerCase().includes("online") || 
+                        v.name.toLowerCase().includes("google")
+                    ) || hindiVoices[0];
+                }
+            }
+        }
+        
+        const utterance = new SpeechSynthesisUtterance();
+        
+        if (matchedVoice) {
+            utterance.voice = matchedVoice;
+            utterance.lang = matchedVoice.lang;
+            utterance.text = cleanText;
+        } else {
+            console.log(`No native voice found for language '${langCode}'. Safely falling back to English TTS.`);
+            utterance.lang = "en-US";
+            let spokenEnglish = englishText ? englishText.replace(/<[^>]*>?/gm, '').replace(/[\*\_]/g, '') : cleanText;
+            utterance.text = spokenEnglish;
+        }
+        
+        utterance.rate = 1.02;
+        utterance.pitch = 1.0;
+        
+        setTimeout(() => {
+            window.speechSynthesis.speak(utterance);
+        }, 60);
+        
+    } catch (e) {
+        console.warn("TTS Error:", e);
+    }
+};
+
+window.toggleTtsSpeaker = function() {
+    isTtsEnabled = !isTtsEnabled;
+    const icon = document.getElementById("ttsIcon");
+    if (isTtsEnabled) {
+        icon.setAttribute("data-lucide", "volume-2");
+        addNotification("TTS Enabled", "Text-to-speech audio will now play for chatbot messages.", "info");
+    } else {
+        window.speechSynthesis.cancel();
+        icon.setAttribute("data-lucide", "volume-x");
+        addNotification("TTS Muted", "Text-to-speech has been turned off.", "info");
+    }
+    if (window.lucide) window.lucide.createIcons();
+};
+
+// Speech-to-Text mic trigger
+window.triggerSpeechToText = function() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        alert("Speech recognition is not supported in this browser. Please use Google Chrome or Microsoft Edge.");
+        return;
+    }
+    
+    const recognition = new SpeechRecognition();
+    recognition.lang = state.chatLanguage === "hi" ? "hi-IN" : (state.chatLanguage === "ar" ? "ar-AE" : "en-US");
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    const micIcon = document.getElementById("micIcon");
+    micIcon.setAttribute("data-lucide", "loader");
+    if (window.lucide) window.lucide.createIcons();
+
+    recognition.start();
+
+    recognition.onresult = (event) => {
+        const text = event.results[0][0].transcript;
+        document.getElementById("chatInput").value = text;
+    };
+
+    recognition.onend = () => {
+        micIcon.setAttribute("data-lucide", "mic");
+        if (window.lucide) window.lucide.createIcons();
+    };
+
+    recognition.onerror = (e) => {
+        console.error("Speech Recognition Error:", e);
+        micIcon.setAttribute("data-lucide", "mic");
+        if (window.lucide) window.lucide.createIcons();
+    };
+};
+
+window.handleSendChatMessage = function(e) {
+    e.preventDefault();
+    const input = document.getElementById("chatInput");
+    const val = input.value.trim();
+    if (!val) return;
+    
+    addChatMessage("outgoing", val, state.userName);
+    input.value = "";
+    
+    // Simple Medical NLP Symptoms check response
+    setTimeout(() => {
+        let answer = "I have analyzed your description. If you are experiencing persistent discomfort, I highly advise scheduling a clinical consultation with one of our specialized doctors.";
+        let engAnswer = answer;
+        
+        const q = val.toLowerCase();
+        if (q.includes("chest") || q.includes("heart") || q.includes("pain in chest")) {
+            answer = "⚠️ **Warning:** Symptoms of chest discomfort require urgent clinical check. Please visit the cardiology ward immediately or book an OPD consultation.";
+            engAnswer = answer;
+        } else if (q.includes("cough") || q.includes("bronchitis") || q.includes("fever")) {
+            answer = "You describe general cold or respiratory symptoms. I recommend resting, keeping hydrated, and consulting Dr. Lakshmi Prasad in Pediatrics/GP.";
+            engAnswer = answer;
+        }
+        
+        // Translate answer to selected chat language
+        let localizedAnswer = answer;
+        if (state.chatLanguage && state.chatLanguage !== "en") {
+            localizedAnswer = translateChatMessage(answer, state.chatLanguage);
+        }
+        
+        addChatMessage("incoming", localizedAnswer, "MedSphere AI", engAnswer);
+    }, 800);
+};
+
+// 15. Helper Utilities
+function formatCurrency(amount) {
+    return `${state.localization.currencySymbol}${amount.toLocaleString()}`;
+}
+
+function escapeHtml(text) {
+    if (!text) return "";
+    return text.toString()
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+window.addSystemLog = function(message, type = "Info") {
+    const logsContainer = document.getElementById("systemAuditLogsContainer");
+    if (!logsContainer) return;
+    
+    const div = document.createElement("div");
+    div.className = "flex justify-between items-start gap-2 border-b border-white/5 pb-1.5";
+    
+    let typeColor = "text-teal-400";
+    if (type === "Success") typeColor = "text-emerald-400";
+    else if (type === "Warning") typeColor = "text-amber-400";
+    else if (type === "Error") typeColor = "text-rose-400";
+    
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    div.innerHTML = `
+        <span class="text-white/60 font-mono text-[10px]">${time}</span>
+        <span class="flex-1">${message}</span>
+        <span class="font-bold ${typeColor} text-[10px] uppercase">${type}</span>
+    `;
+    
+    logsContainer.insertBefore(div, logsContainer.firstChild);
+};
+
+window.clearSystemLogs = function() {
+    const logsContainer = document.getElementById("systemAuditLogsContainer");
+    if (logsContainer) logsContainer.innerHTML = "";
+};
+
+// Notification popups
+window.addNotification = function(title, text, type = "success") {
+    // Generate toast popup
+    const toast = document.createElement("div");
+    toast.className = `fixed bottom-4 right-4 z-50 p-4 rounded-xl border backdrop-blur-md shadow-lg flex items-center gap-3 transition animate-scale max-w-sm`;
+    
+    let iconName = "check-circle";
+    let themeClasses = "bg-emerald-500/10 border-emerald-500/20 text-emerald-400";
+    
+    if (type === "warning") {
+        iconName = "alert-triangle";
+        themeClasses = "bg-amber-500/10 border-amber-500/20 text-amber-400";
+    } else if (type === "danger") {
+        iconName = "shield-alert";
+        themeClasses = "bg-rose-500/10 border-rose-500/20 text-rose-400";
+    } else if (type === "info") {
+        iconName = "info";
+        themeClasses = "bg-blue-500/10 border-blue-500/20 text-blue-400";
+    }
+    
+    toast.className += ` ${themeClasses}`;
+    toast.innerHTML = `
+        <i data-lucide="${iconName}" class="w-5 h-5 flex-shrink-0"></i>
+        <div>
+            <h4 class="font-bold text-sm text-white">${title}</h4>
+            <p class="text-xs opacity-80 text-[#9ca3af]">${text}</p>
+        </div>
+    `;
+    
+    document.body.appendChild(toast);
+    if (window.lucide) window.lucide.createIcons();
+    
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+};
+
+// Localization handlers
+window.handleCountryChange = function() {
+    const country = document.getElementById("localCountry").value;
+    const selectCur = document.getElementById("localCurrency");
+    const selectT = document.getElementById("localTimezone");
+    const inputTaxN = document.getElementById("localTaxName");
+    const inputTaxR = document.getElementById("localTaxRate");
+
+    if (!selectCur || !selectT || !inputTaxN || !inputTaxR) return;
+
+    if (country === "India") {
+        selectCur.value = "INR";
+        selectT.value = "Asia/Kolkata";
+        inputTaxN.value = "GST";
+        inputTaxR.value = "18";
+    } else if (country === "Nepal") {
+        selectCur.value = "NPR";
+        selectT.value = "Asia/Kathmandu";
+        inputTaxN.value = "VAT";
+        inputTaxR.value = "13";
+    } else if (country === "Bangladesh") {
+        selectCur.value = "BDT";
+        selectT.value = "Asia/Dhaka";
+        inputTaxN.value = "VAT";
+        inputTaxR.value = "15";
+    } else if (country === "United Arab Emirates") {
+        selectCur.value = "AED";
+        selectT.value = "Asia/Dubai";
+        inputTaxN.value = "VAT";
+        inputTaxR.value = "5";
+    } else if (country === "United States") {
+        selectCur.value = "USD";
+        selectT.value = "America/New_York";
+        inputTaxN.value = "Sales Tax";
+        inputTaxR.value = "8.5";
+    } else if (country === "United Kingdom") {
+        selectCur.value = "GBP";
+        selectT.value = "Europe/London";
+        inputTaxN.value = "VAT";
+        inputTaxR.value = "20";
+    } else if (country === "Singapore") {
+        selectCur.value = "SGD";
+        selectT.value = "Asia/Singapore";
+        inputTaxN.value = "GST";
+        inputTaxR.value = "9";
+    } else {
+        selectCur.value = "USD";
+        selectT.value = "America/New_York";
+        inputTaxN.value = "Sales Tax";
+        inputTaxR.value = "8.5";
+    }
+    
+    // Automatically switch chat language based on selected country
+    const langSelect = document.getElementById("chatLanguageSelect");
+    if (langSelect) {
+        if (country === "India") langSelect.value = "hi";
+        else if (country === "Nepal") langSelect.value = "ne";
+        else if (country === "Bangladesh") langSelect.value = "bn";
+        else if (country === "United Arab Emirates") langSelect.value = "ar";
+        else langSelect.value = "en";
+        state.chatLanguage = langSelect.value;
+        localStorage.setItem("medsphere_chat_lang", state.chatLanguage);
+        addNotification("Language Sync", `AI Chatbot localized.`, "info");
+    }
+
+    saveRegionalSettings();
+};
+
+window.handleOnboardCountryChange = function() {
+    const country = document.getElementById("onboardCountry").value;
+    
+    // Sync to trial form elements
+    const localC = document.getElementById("localCountry");
+    if (localC) {
+        localC.value = country;
+    }
+    
+    // Trigger standard country change
+    window.handleCountryChange();
+    
+    // Apply state changes back to onboarding UI
+    window.applyRegionalUI();
+};
+
+window.applyRegionalUI = function() {
+    const onboardC = document.getElementById("onboardCountry");
+    const onboardCur = document.getElementById("onboardCurrency");
+    const onboardT = document.getElementById("onboardTimezone");
+    const onboardTaxN = document.getElementById("onboardTaxName");
+
+    if (onboardC) onboardC.value = state.localization.country;
+    if (onboardCur) onboardCur.value = state.localization.currency;
+    if (onboardT) onboardT.value = state.localization.timezone;
+    if (onboardTaxN) onboardTaxN.value = state.localization.taxName;
+
+    // Also sync the modal form elements
+    const localC = document.getElementById("localCountry");
+    const localCur = document.getElementById("localCurrency");
+    const localT = document.getElementById("localTimezone");
+    const localTaxN = document.getElementById("localTaxName");
+    const localTaxR = document.getElementById("localTaxRate");
+
+    if (localC) localC.value = state.localization.country;
+    if (localCur) localCur.value = state.localization.currency;
+    if (localT) localT.value = state.localization.timezone;
+    if (localTaxN) localTaxN.value = state.localization.taxName;
+    if (localTaxR) localTaxR.value = state.localization.taxRate;
+
+    // Update dynamic currency symbols
+    document.querySelectorAll(".currency-symbol").forEach(el => el.innerText = state.localization.currencySymbol);
+    document.querySelectorAll(".tax-name-label").forEach(el => el.innerText = state.localization.taxName);
+};
+
+window.saveRegionalSettings = function() {
+    const country = document.getElementById("localCountry").value;
+    const currency = document.getElementById("localCurrency").value;
+    const timezone = document.getElementById("localTimezone").value;
+    const taxName = document.getElementById("localTaxName").value;
+    const taxRate = parseFloat(document.getElementById("localTaxRate").value) || 0;
+
+    let symbol = "₹";
+    if (currency === "USD") symbol = "$";
+    else if (currency === "AED") symbol = "AED ";
+    else if (currency === "GBP") symbol = "£";
+    else if (currency === "EUR") symbol = "€";
+    else if (currency === "SGD") symbol = "S$";
+    else if (currency === "NPR") symbol = "रू ";
+    else if (currency === "BDT") symbol = "৳";
+
+    state.localization = {
+        country,
+        currency,
+        currencySymbol: symbol,
+        timezone,
+        taxName,
+        taxRate
+    };
+
+    document.querySelectorAll(".currency-symbol").forEach(el => el.innerText = symbol);
+    document.querySelectorAll(".tax-name-label").forEach(el => el.innerText = taxName);
+
+    addSystemLog(`Admin updated regional settings: Country=${country}, Currency=${currency}`, "Success");
+    saveLocalState();
+    saveDatabaseState();
+};
+
+// Free trial hooks
+window.openFreeTrialModal = function() {
+    const modal = document.getElementById("freeTrialModal");
+    if (modal) modal.classList.remove("hidden");
+};
+
+window.closeFreeTrialModal = function() {
+    const modal = document.getElementById("freeTrialModal");
+    if (modal) modal.classList.add("hidden");
+};
+
+window.handleFreeTrialSubmit = function(e) {
+    e.preventDefault();
+    const schoolName = document.getElementById("trialSchoolName").value.trim();
+    const adminName = document.getElementById("trialAdminName").value.trim();
+    const email = document.getElementById("trialEmail").value.trim();
+    const mobile = document.getElementById("trialMobile").value.trim();
+    const plan = document.getElementById("trialPlanType") ? document.getElementById("trialPlanType").value : "Standard Free Trial";
+
+    const randNum = Math.floor(1000 + Math.random() * 9000);
+    const licenseKey = `MED-TRIAL-${randNum}-${schoolName.substring(0, 4).toUpperCase().replace(/\s/g, '')}`;
+
+    closeFreeTrialModal();
+
+    document.getElementById("successSchoolName").innerText = schoolName;
+    document.getElementById("successAdminName").innerText = adminName;
+    document.getElementById("successLicenseKey").innerText = licenseKey;
+
+    document.getElementById("trialSuccessModal").classList.remove("hidden");
+
+    // Push notification to Twilio Sandbox
+    sendAdminWhatsAppNotification(`🚀 *New Hospital Trial Activated!*\n🏫 *Hospital:* ${schoolName}\n👤 *Admin:* ${adminName}\n📧 *Email:* ${email}\n📞 *Phone:* ${mobile}\n🔑 *License:* ${licenseKey}`);
+    
+    MOCK_DB.admissions.push({
+        schoolName,
+        adminName,
+        email,
+        mobile,
+        plan,
+        licenseKey,
+        createdAt: new Date().toISOString()
+    });
+
+    saveDatabaseState();
+};
+
+window.launchTrialPrincipalWorkspace = function() {
+    document.getElementById("trialSuccessModal").classList.add("hidden");
+    const name = document.getElementById("trialAdminName").value.trim();
+    const key = document.getElementById("successLicenseKey").innerText;
+    switchRole(14, name, key);
+};
+
+window.sendAdminWhatsAppNotification = function(message) {
+    fetch(API_BASE_URL + '/api/notify-whatsapp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+    })
+    .then(r => r.json())
+    .then(data => console.log("WhatsApp alert response:", data))
+    .catch(err => console.error("WhatsApp alert error:", err));
+};
+
+function addChatMessage(type, content, senderName = "MedSphere AI", originalContent = null) {
+    const rawEnglish = originalContent || content;
+    const container = window.AppElements.chatMessages;
+    if (!container) return;
+    
+    const bubble = document.createElement("div");
+    bubble.className = `message-bubble ${type}`;
+    
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    let headerHtml = "";
+    if (type !== "system") {
+        headerHtml = `<span class="chat-role-header">${escapeHtml(senderName)}</span>`;
+    }
+
+    bubble.innerHTML = `
+        ${headerHtml}
+        <div>${content}</div>
+        <span class="chat-time">${timeStr}</span>
+    `;
+
+    container.appendChild(bubble);
+    container.scrollTop = container.scrollHeight;
+
+    if (type === "incoming" || type === "system") {
+        speakAIText(content, rawEnglish);
+    }
+}
