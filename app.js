@@ -122,23 +122,19 @@ window.resetToOnboarding = function() {
 window.selectRoleOnboarding = function(clearance, roleLabel) {
     state.roleClearance = clearance;
     state.userRole = roleLabel;
-    state.onboardingStep = 1;
-    saveLocalState();
     
-    document.getElementById("selected-role-label").innerText = roleLabel;
-    document.getElementById("onboarding-role-select").classList.add("hidden");
-    document.getElementById("onboarding-credentials").classList.remove("hidden");
+    let name = "Guest User";
+    let id = "DEMO-01";
     
-    // Prefill demo credentials for testing ease
-    const nameInput = document.getElementById("user-input-name");
-    const idInput = document.getElementById("user-input-id");
+    if (clearance === 15) { name = "Global Admin"; id = "SUPERADMIN"; }
+    else if (clearance === 14) { name = "IT Director"; id = "IT-ADMIN-01"; }
+    else if (clearance === 1) { name = "Dr. Surendra Rajhans"; id = "DOC-001"; }
+    else if (clearance === 2) { name = "Sister Anjali"; id = "NURSE-01"; }
+    else if (clearance === 3) { name = "Pharmacy Desk"; id = "PHARM-01"; }
+    else if (clearance === 4) { name = "Ramesh Kumar"; id = "PAT-001"; }
     
-    if (clearance === 15) { nameInput.value = "Global Admin"; idInput.value = "SUPERADMIN"; }
-    else if (clearance === 14) { nameInput.value = "IT Director"; idInput.value = "IT-ADMIN-01"; }
-    else if (clearance === 1) { nameInput.value = "Dr. Surendra Rajhans"; idInput.value = "DOC-001"; }
-    else if (clearance === 2) { nameInput.value = "Sister Anjali"; idInput.value = "NURSE-01"; }
-    else if (clearance === 3) { nameInput.value = "Pharmacy Desk"; idInput.value = "PHARM-01"; }
-    else if (clearance === 4) { nameInput.value = "Ramesh Kumar"; idInput.value = "PAT-001"; }
+    // Directly log into the workspace
+    switchRole(clearance, name, id);
 };
 
 window.onboardingBackToRoles = function() {
