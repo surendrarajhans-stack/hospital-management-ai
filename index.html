@@ -640,7 +640,7 @@
                         <!-- Vital Logger Form -->
                         <div class="glass-card p-6 space-y-4 flex flex-col">
                             <div class="card-header border-b border-white/5 pb-3">
-                                <h3 class="text-base font-bold text-white">Record Patient Vitals</h3>
+                                <h3 class="text-base font-bold text-white" id="nurseCardTitleLabel">Record Patient Vitals</h3>
                                 <span class="text-xs text-teal-400 font-semibold" id="vitalsBedNumberLabel">Select a Bed to log vitals</span>
                             </div>
                             <div class="flex-1 space-y-4" id="vitalsFormFields">
@@ -667,6 +667,35 @@
                                 <button class="w-full btn btn-primary py-2.5 flex items-center justify-center gap-2 mt-4" onclick="saveVitalsLog()">
                                     <i data-lucide="check" class="w-4 h-4"></i>
                                     <span>Log & Update Vitals</span>
+                                </button>
+                            </div>
+                            
+                            <div class="flex-1 space-y-4 hidden" id="admissionFormFields">
+                                <div>
+                                    <label class="block text-xs font-semibold text-[#9ca3af] mb-1">Patient Full Name</label>
+                                    <input type="text" id="admitName" placeholder="e.g. Ramesh Kumar" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-[#9ca3af] mb-1">Age (Years)</label>
+                                        <input type="number" id="admitAge" placeholder="e.g. 45" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-[#9ca3af] mb-1">Triage Priority</label>
+                                        <select id="admitTriage" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none">
+                                            <option value="Stable">Stable</option>
+                                            <option value="Under Observation">Under Observation</option>
+                                            <option value="Critical">Critical</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-[#9ca3af] mb-1">Chief Complaint / Symptoms</label>
+                                    <input type="text" id="admitComplaint" placeholder="e.g. Chronic hypertension, dry cough" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white">
+                                </div>
+                                <button class="w-full btn bg-emerald-500 text-slate-900 font-bold py-2.5 rounded-xl hover:opacity-90 transition mt-4" onclick="admitPatientToBed()">
+                                    <i data-lucide="user-plus" class="w-4 h-4 inline-block mr-1"></i>
+                                    <span>Admit Patient & Occupy Bed</span>
                                 </button>
                             </div>
                         </div>

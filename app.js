@@ -592,8 +592,84 @@ function populateNurseDashboard() {
         grid.appendChild(btn);
     });
     
+    // Toggle Form visibility based on bed occupancy status
+    if (selectedBedId) {
+        const activeBed = MOCK_DB.wards.find(b => b.id === selectedBedId);
+        if (activeBed && activeBed.occupied) {
+            document.getElementById("nurseCardTitleLabel").innerText = "Record Patient Vitals";
+            document.getElementById("vitalsFormFields").classList.remove("hidden");
+            document.getElementById("admissionFormFields").classList.add("hidden");
+        } else {
+            document.getElementById("nurseCardTitleLabel").innerText = "Admit & Register Patient";
+            document.getElementById("vitalsFormFields").classList.add("hidden");
+            document.getElementById("admissionFormFields").classList.remove("hidden");
+        }
+    } else {
+        document.getElementById("nurseCardTitleLabel").innerText = "Record Patient Vitals";
+        document.getElementById("vitalsFormFields").classList.remove("hidden");
+        document.getElementById("admissionFormFields").classList.add("hidden");
+    }
+    
     if (window.lucide) window.lucide.createIcons();
 }
+
+window.admitPatientToBed = function() {
+    if (!selectedBedId) {
+        alert("Please select an empty bed first.");
+        return;
+    }
+    
+    const bed = MOCK_DB.wards.find(b => b.id === selectedBedId);
+    if (!bed || bed.occupied) {
+        alert("Selected bed is already occupied.");
+        return;
+    }
+
+    const name = document.getElementById("admitName").value.trim();
+    const age = parseInt(document.getElementById("admitAge").value);
+    const triage = document.getElementById("admitTriage").value;
+    const complaint = document.getElementById("admitComplaint").value.trim();
+
+    if (!name || isNaN(age) || !complaint) {
+        alert("Please fill in all patient admission fields.");
+        return;
+    }
+
+    // Generate new patient ID
+    const patientId = `PAT-${Math.floor(100 + Math.random() * 900)}`;
+
+    // Create new patient record
+    const newPatient = {
+        id: patientId,
+        name: name,
+        age: age,
+        triage: triage,
+        bed: selectedBedId,
+        bill: 2500, // Admission registration fee
+        paid: false,
+        complaint: complaint
+    };
+
+    // Update DB
+    MOCK_DB.patients.push(newPatient);
+    bed.occupied = true;
+    bed.patientId = patientId;
+
+    // Reset Form inputs
+    document.getElementById("admitName").value = "";
+    document.getElementById("admitAge").value = "";
+    document.getElementById("admitComplaint").value = "";
+
+    // Sync state
+    addSystemLog(`Patient ${name} (${patientId}) admitted successfully to Bed ${selectedBedId}`, "Success");
+    addNotification("Patient Admitted", `${name} has been admitted and assigned to Bed ${selectedBedId}.`, "success");
+    
+    saveDatabaseState();
+    
+    // Refresh label & dashboards
+    document.getElementById("vitalsBedNumberLabel").innerText = `Bed: ${selectedBedId} (Occupied)`;
+    populateNurseDashboard();
+};
 
 window.saveVitalsLog = function() {
     if (!selectedBedId) {
