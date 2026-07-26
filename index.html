@@ -554,15 +554,64 @@
 
                     <!-- Consultation Row -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <!-- Patient Queue -->
-                        <div class="glass-card p-6 flex flex-col col-span-1">
-                            <div class="card-header border-b border-white/5 pb-3 mb-3">
-                                <h3 class="text-base font-bold text-white">Today's Check-ins Queue</h3>
+                        <!-- Patient Queue & Walk-in OPD Register Column -->
+                        <div class="col-span-1 space-y-6">
+                            <!-- Today's Queue -->
+                            <div class="glass-card p-6 flex flex-col">
+                                <div class="card-header border-b border-white/5 pb-3 mb-3">
+                                    <h3 class="text-base font-bold text-white">Today's Check-ins Queue</h3>
+                                </div>
+                                <div class="overflow-y-auto max-h-[250px] space-y-2" id="doctorPatientQueue">
+                                    <!-- Dynamic checkin queue -->
+                                </div>
                             </div>
-                            <div class="flex-1 overflow-y-auto max-h-[350px] space-y-2" id="doctorPatientQueue">
-                                <!-- Dynamic checkin queue -->
+                            
+                            <!-- OPD Walk-in Registration -->
+                            <div class="glass-card p-6 space-y-4">
+                                <div class="card-header border-b border-white/5 pb-2">
+                                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                        <i data-lucide="user-plus" class="text-amber-400"></i>
+                                        <span>Manual OPD Register</span>
+                                    </h3>
+                                    <p class="text-xs text-[#9ca3af] mt-0.5">Register walk-in outpatients for consultation.</p>
+                                </div>
+                                <div class="space-y-3 text-xs">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-[#9ca3af] mb-1">Patient Full Name</label>
+                                        <input type="text" id="opdName" placeholder="e.g. Ramesh Kumar" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white">
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block text-xs font-semibold text-[#9ca3af] mb-1">Age (Years)</label>
+                                            <input type="number" id="opdAge" placeholder="45" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-[#9ca3af] mb-1">Triage</label>
+                                            <select id="opdTriage" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none">
+                                                <option value="Stable">Stable</option>
+                                                <option value="Under Observation">Under Observation</option>
+                                                <option value="Critical">Critical</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-[#9ca3af] mb-1">Select Consulting Doctor</label>
+                                        <select id="opdDoctor" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none">
+                                            <!-- Dynamic doctor options -->
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-[#9ca3af] mb-1">Chief Complaint / Symptoms</label>
+                                        <input type="text" id="opdComplaint" placeholder="e.g. Mild headache, cold" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white">
+                                    </div>
+                                    <button class="w-full btn bg-amber-500 text-slate-900 font-bold py-2 flex items-center justify-center gap-1.5 hover:opacity-90 transition mt-2" onclick="registerOPDPatient()">
+                                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                                        <span>Check-in OPD Patient</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
+
 
                         <!-- Active Diagnosis File -->
                         <div class="glass-card p-6 col-span-1 lg:col-span-2 space-y-4">

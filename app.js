@@ -444,35 +444,104 @@ function populateDoctorDashboard() {
     const queue = document.getElementById("doctorPatientQueue");
     queue.innerHTML = "";
     
-    MOCK_DB.patients.forEach(pat => {
-        const div = document.createElement("div");
-        div.className = `p-3 rounded-xl border cursor-pointer transition text-xs flex justify-between items-center ${activePatientId === pat.id ? 'bg-teal-500/10 border-teal-500/30' : 'bg-white/5 border-white/5 hover:bg-white/10'}`;
-        
-        let triageColor = "bg-emerald-500/20 text-emerald-400";
-        if (pat.triage === "Critical") triageColor = "bg-red-500/20 text-red-400";
-        else if (pat.triage === "Under Observation") triageColor = "bg-amber-500/20 text-amber-400";
-        
-        div.innerHTML = `
-            <div>
-                <h4 class="font-bold text-white">${pat.name}</h4>
-                <span class="text-[#9ca3af] block mt-0.5">ID: ${pat.id} | Bed: ${pat.bed}</span>
-            </div>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${triageColor}">${pat.triage}</span>
-        `;
-        
-        div.onclick = () => {
-            activePatientId = pat.id;
-            currentPrescriptionMeds = [];
-            document.getElementById("addedMedsContainer").innerHTML = `<span class="text-xs text-[#6b7280]">No medication added yet.</span>`;
-            document.getElementById("compSymptoms").value = pat.complaint || "";
-            document.getElementById("compTriage").value = pat.triage;
-            document.getElementById("activePatientBadge").innerText = pat.name;
-            populateDoctorDashboard();
-        };
-        
-        queue.appendChild(div);
+    // Filter queue: show all if Super Admin, otherwise show if admitted (IPD) OR assigned to this doctor (OPD)
+    const myPatients = MOCK_DB.patients.filter(pat => {
+        if (state.roleClearance === 15) return true;
+        return pat.bed || pat.doctorId === state.userId;
     });
+
+    if (myPatients.length === 0) {
+        queue.innerHTML = `<span class="text-xs text-[#6b7280]">No active patients in queue.</span>`;
+    } else {
+        myPatients.forEach(pat => {
+            const div = document.createElement("div");
+            div.className = `p-3 rounded-xl border cursor-pointer transition text-xs flex justify-between items-center ${activePatientId === pat.id ? 'bg-teal-500/10 border-teal-500/30' : 'bg-white/5 border-white/5 hover:bg-white/10'}`;
+            
+            let triageColor = "bg-emerald-500/20 text-emerald-400";
+            if (pat.triage === "Critical") triageColor = "bg-red-500/20 text-red-400";
+            else if (pat.triage === "Under Observation") triageColor = "bg-amber-500/20 text-amber-400";
+            
+            const locationStr = pat.bed ? `Bed: ${pat.bed}` : 'OPD Walk-in';
+            
+            div.innerHTML = `
+                <div>
+                    <h4 class="font-bold text-white">${pat.name}</h4>
+                    <span class="text-[#9ca3af] block mt-0.5">ID: ${pat.id} | ${locationStr}</span>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${triageColor}">${pat.triage}</span>
+            `;
+            
+            div.onclick = () => {
+                activePatientId = pat.id;
+                currentPrescriptionMeds = [];
+                document.getElementById("addedMedsContainer").innerHTML = `<span class="text-xs text-[#6b7280]">No medication added yet.</span>`;
+                document.getElementById("compSymptoms").value = pat.complaint || "";
+                document.getElementById("compTriage").value = pat.triage;
+                document.getElementById("activePatientBadge").innerText = pat.name;
+                populateDoctorDashboard();
+            };
+            
+            queue.appendChild(div);
+        });
+    }
+
+    // Populate Doctor Selection dropdown inside OPD registration form
+    const opdDocSelect = document.getElementById("opdDoctor");
+    if (opdDocSelect) {
+        opdDocSelect.innerHTML = "";
+        MOCK_DB.doctors.forEach(d => {
+            const opt = document.createElement("option");
+            opt.value = d.id;
+            opt.innerText = `${d.name} (${d.specialty})`;
+            opdDocSelect.appendChild(opt);
+        });
+        
+        // Match currently logged-in doctor
+        if (state.userId && MOCK_DB.doctors.some(d => d.id === state.userId)) {
+            opdDocSelect.value = state.userId;
+        }
+    }
 }
+
+window.registerOPDPatient = function() {
+    const name = document.getElementById("opdName").value.trim();
+    const age = parseInt(document.getElementById("opdAge").value);
+    const triage = document.getElementById("opdTriage").value;
+    const docId = document.getElementById("opdDoctor").value;
+    const complaint = document.getElementById("opdComplaint").value.trim();
+
+    if (!name || isNaN(age) || !complaint) {
+        alert("Please fill in all OPD patient registration fields.");
+        return;
+    }
+
+    const patientId = `PAT-${Math.floor(100 + Math.random() * 900)}`;
+
+    const newPatient = {
+        id: patientId,
+        name: name,
+        age: age,
+        triage: triage,
+        bed: null, // null denotes OPD consultation
+        doctorId: docId,
+        bill: 500, // Standard OPD consultation fee
+        paid: false,
+        complaint: complaint
+    };
+
+    MOCK_DB.patients.push(newPatient);
+    
+    // Reset inputs
+    document.getElementById("opdName").value = "";
+    document.getElementById("opdAge").value = "";
+    document.getElementById("opdComplaint").value = "";
+
+    addSystemLog(`OPD Patient ${name} (${patientId}) registered for Doctor ${docId}`, "Success");
+    addNotification("OPD Patient Registered", `${name} checked in successfully for doctor consultation.`, "success");
+
+    saveDatabaseState();
+    populateDoctorDashboard();
+};
 
 window.addMedicationToPrescription = function() {
     const medName = document.getElementById("prescMedName").value.trim();
