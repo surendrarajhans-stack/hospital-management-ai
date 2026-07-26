@@ -170,6 +170,15 @@ window.switchRole = function(clearance, name, id) {
     state.userName = name;
     state.userId = id;
     state.roleClearance = clearance;
+    
+    // Map clearance level to role title
+    if (clearance === 15) state.userRole = "Super Admin";
+    else if (clearance === 14) state.userRole = "IT Administrator";
+    else if (clearance === 1) state.userRole = "Doctor";
+    else if (clearance === 2) state.userRole = "Nurse";
+    else if (clearance === 3) state.userRole = "Pharmacist";
+    else if (clearance === 4) state.userRole = "Patient";
+    
     state.onboardingStep = 2;
     saveLocalState();
     
