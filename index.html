@@ -146,7 +146,7 @@
                     </div>
 
                     <!-- Trial & Localization Setup Card -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left max-w-4xl mx-auto">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left max-w-6xl mx-auto">
                         <!-- Left: Trial -->
                         <div class="glass-card p-6 flex flex-col justify-between space-y-4 cursor-pointer hover:border-teal-500/20 transition" onclick="openFreeTrialModal()">
                             <div>
@@ -162,6 +162,23 @@
                                 <i data-lucide="rocket" class="w-4 h-4"></i>
                                 <span>Register 14-Day Free Trial</span>
                             </button>
+                        </div>
+
+                        <!-- Middle: Purchase -->
+                        <div class="glass-card p-6 flex flex-col justify-between space-y-4 cursor-pointer hover:border-amber-500/20 transition" onclick="openOnlineCheckoutModal()">
+                            <div>
+                                <h3 class="text-lg font-bold text-white flex items-center gap-2 hover:text-amber-400 transition">
+                                    <i data-lucide="credit-card" class="text-amber-400"></i>
+                                    <span>Upgrade & Buy License</span>
+                                </h3>
+                                <p class="text-xs text-[#9ca3af] mt-1.5 leading-relaxed">
+                                    Acquire a permanent SaaS license with active database sync, automated tax invoicing (GST/VAT), and multi-department billing controls.
+                                </p>
+                            </div>
+                            <button class="w-full py-2.5 flex items-center justify-center gap-2 font-semibold bg-gradient-to-r from-amber-500 to-orange-500 text-slate-900 rounded-xl hover:opacity-90 transition" onclick="event.stopPropagation(); openOnlineCheckoutModal()">
+                                <i data-lucide="shield-check" class="w-4 h-4"></i>
+                                <span>Buy Premium License</span>
+                              </button>
                         </div>
 
                         <!-- Right: Regional Settings -->
@@ -793,6 +810,116 @@
 
             </div>
         </main>
+    </div>
+
+    <!-- MODAL: ONLINE SUBSCRIPTION & LICENSE UPGRADE -->
+    <div id="onlineCheckoutModal" class="modal-overlay hidden">
+        <div class="glass-card max-w-2xl w-full p-8 space-y-6 animate-scale">
+            <div class="flex items-center justify-between border-b border-white/5 pb-3">
+                <div>
+                    <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i data-lucide="credit-card" class="text-amber-400 animate-pulse"></i>
+                        <span>Online Subscription & License Upgrade</span>
+                    </h3>
+                    <p class="text-xs text-[#9ca3af] mt-0.5">Instant Activation | Tax Invoice Included</p>
+                </div>
+                <button class="text-[#6b7280] hover:text-white" onclick="closeOnlineCheckoutModal()">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <!-- Plan Selection Cards Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                    <div class="checkout-plan-card p-3 rounded-2xl border border-white/10 cursor-pointer bg-white/5 hover:border-amber-500/30 transition" id="planStarter" onclick="selectCheckoutPlan('starter')">
+                        <div class="text-xs font-semibold text-[#9ca3af]">Clinic Starter</div>
+                        <div class="text-lg font-bold text-white my-1"><span class="currency-symbol">₹</span><span class="plan-price-val" data-plan="starter">29,999</span></div>
+                        <div class="text-[10px] text-[#6b7280]">Up to 15 Beds</div>
+                    </div>
+                    <div class="checkout-plan-card active p-3 rounded-2xl border-2 border-amber-500 cursor-pointer bg-amber-500/10 transition" id="planPro" onclick="selectCheckoutPlan('pro')">
+                        <span class="inline-block text-[8px] bg-amber-500 text-slate-900 font-bold px-1.5 py-0.5 rounded-full mb-1">POPULAR</span>
+                        <div class="text-xs font-semibold text-amber-400">Pro Hospital</div>
+                        <div class="text-lg font-bold text-white my-1"><span class="currency-symbol">₹</span><span class="plan-price-val" data-plan="pro">69,999</span></div>
+                        <div class="text-[10px] text-[#6b7280]">Up to 50 Beds</div>
+                    </div>
+                    <div class="checkout-plan-card p-3 rounded-2xl border border-white/10 cursor-pointer bg-white/5 hover:border-amber-500/30 transition" id="planProplus" onclick="selectCheckoutPlan('proplus')">
+                        <div class="text-xs font-semibold text-[#38bdf8]">Pro Plus Med</div>
+                        <div class="text-lg font-bold text-white my-1"><span class="currency-symbol">₹</span><span class="plan-price-val" data-plan="proplus">99,999</span></div>
+                        <div class="text-[10px] text-[#6b7280]">Up to 150 Beds</div>
+                    </div>
+                    <div class="checkout-plan-card p-3 rounded-2xl border border-white/10 cursor-pointer bg-white/5 hover:border-amber-500/30 transition" id="planEnterprise" onclick="selectCheckoutPlan('enterprise')">
+                        <div class="text-xs font-semibold text-[#fbbf24]">Enterprise Network</div>
+                        <div class="text-lg font-bold text-white my-1"><span class="currency-symbol">₹</span><span class="plan-price-val" data-plan="enterprise">1,49,999</span></div>
+                        <div class="text-[10px] text-[#6b7280]">Unlimited Beds</div>
+                    </div>
+                </div>
+
+                <form id="onlineCheckoutForm" onsubmit="handleOnlineCheckoutSubmit(event)">
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-[#9ca3af] mb-1">Hospital / Institution Name *</label>
+                                <input type="text" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white" id="checkoutSchoolName" required placeholder="e.g. LifeCare Clinic">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-[#9ca3af] mb-1">GSTIN / PAN (Optional)</label>
+                                <input type="text" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white" id="checkoutGstin" placeholder="e.g. 27AAAAA0000A1Z5">
+                            </div>
+                        </div>
+
+                        <!-- Payment Method Tabs -->
+                        <div>
+                            <label class="block text-xs font-semibold text-[#9ca3af] mb-1.5">Payment Method</label>
+                            <div class="grid grid-cols-2 gap-4">
+                                <label class="border border-white/10 p-3 rounded-xl text-xs cursor-pointer flex items-center gap-2 bg-white/5 hover:border-amber-500/20 transition">
+                                    <input type="radio" name="payMethod" value="upi" checked> 📱 UPI / QR Code (Instant)
+                                </label>
+                                <label class="border border-white/10 p-3 rounded-xl text-xs cursor-pointer flex items-center gap-2 bg-white/5 hover:border-amber-500/20 transition">
+                                    <input type="radio" name="payMethod" value="card"> 💳 Card / NetBanking / NEFT
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Business & Service Description Box -->
+                        <div class="bg-blue-500/5 border border-blue-500/10 rounded-xl p-3 text-xs leading-relaxed text-[#9ca3af]">
+                            <div class="font-bold text-blue-400 mb-1 flex items-center gap-1">
+                                <i data-lucide="shield-check" class="w-4 h-4"></i> About MedSphere AI (TechnoCons):
+                            </div>
+                            MedSphere AI (TechnoCons) is an enterprise AI-powered Hospital Management SaaS Operating System for clinics and hospitals. It provides multi-role governance consoles for Doctors, Nurses, Pharmacists, and Admins with cloud synchronization, Voice AI, and billing systems. We sell software subscription licenses for healthcare providers.
+                        </div>
+
+                        <!-- Order Summary Box -->
+                        <div class="bg-black/30 border border-white/5 p-4 rounded-xl text-xs space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-[#9ca3af]">Base Plan Price:</span>
+                                <span id="summaryBasePrice" class="text-white font-semibold">₹69,999.00</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-[#9ca3af]" id="summaryTaxLabel">18% GST (Tax Invoice):</span>
+                                <span id="summaryGstPrice" class="text-white font-semibold">₹12,599.82</span>
+                            </div>
+                            <div class="flex justify-between font-bold text-sm text-emerald-400 border-t border-dashed border-white/10 pt-2 mt-2">
+                                <span>Total Payable:</span>
+                                <span id="summaryTotalPrice">₹82,598.82</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between border-t border-white/5 pt-4">
+                            <div class="text-[10px] text-[#6b7280] flex items-center gap-1.5">
+                                <span class="bg-blue-500/10 border border-blue-500/20 text-blue-400 px-2 py-0.5 rounded font-bold">Razorpay</span>
+                                Secured 256-Bit SSL Payment
+                            </div>
+                            <div class="flex gap-2">
+                                <button type="button" class="btn btn-secondary px-4 py-2 text-xs" onclick="closeOnlineCheckoutModal()">Cancel</button>
+                                <button type="submit" class="btn bg-gradient-to-r from-amber-500 to-orange-500 text-slate-900 px-4 py-2 text-xs font-bold hover:opacity-90 transition flex items-center gap-1.5 shadow-lg shadow-amber-500/10">
+                                    <i data-lucide="shield-check" class="w-4 h-4"></i> Pay via Razorpay & Activate
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <!-- MODAL: FREE 14-DAY TRIAL ACTIVATION -->

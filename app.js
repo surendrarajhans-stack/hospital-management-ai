@@ -1387,3 +1387,132 @@ function addChatMessage(type, content, senderName = "MedSphere AI", originalCont
         speakAIText(content, rawEnglish);
     }
 }
+
+// 15. Online Checkout & Subscriptions Logic
+let selectedPlan = "pro";
+
+function getLocalPlanPrices(currency) {
+    const prices = {
+        INR: { starter: 29999, pro: 69999, proplus: 99999, enterprise: 149999 },
+        USD: { starter: 399, pro: 899, proplus: 1299, enterprise: 1899 },
+        AED: { starter: 1499, pro: 3299, proplus: 4799, enterprise: 6999 },
+        GBP: { starter: 299, pro: 699, proplus: 999, enterprise: 1499 },
+        EUR: { starter: 349, pro: 799, proplus: 1149, enterprise: 1699 },
+        SGD: { starter: 549, pro: 1199, proplus: 1749, enterprise: 2599 },
+        NPR: { starter: 47999, pro: 111999, proplus: 159999, enterprise: 239999 },
+        BDT: { starter: 38999, pro: 89999, proplus: 129999, enterprise: 194999 }
+    };
+    return prices[currency] || prices.INR;
+}
+
+window.openOnlineCheckoutModal = function() {
+    const modal = document.getElementById("onlineCheckoutModal");
+    if (modal) {
+        modal.classList.remove("hidden");
+        const loc = state.localization || { currency: "INR", currencySymbol: "₹" };
+        const symbol = loc.currencySymbol || "₹";
+        
+        modal.querySelectorAll(".currency-symbol").forEach(el => {
+            el.innerText = symbol;
+        });
+
+        const localPrices = getLocalPlanPrices(loc.currency || "INR");
+        modal.querySelectorAll(".plan-price-val").forEach(el => {
+            const planKey = el.getAttribute("data-plan");
+            if (planKey && localPrices[planKey] !== undefined) {
+                el.innerText = localPrices[planKey].toLocaleString();
+            }
+        });
+
+        window.selectCheckoutPlan("pro");
+    }
+};
+
+window.closeOnlineCheckoutModal = function() {
+    const modal = document.getElementById("onlineCheckoutModal");
+    if (modal) modal.classList.add("hidden");
+};
+
+window.selectCheckoutPlan = function(planKey) {
+    selectedPlan = planKey;
+    const cards = document.querySelectorAll(".checkout-plan-card");
+    cards.forEach(card => {
+        card.className = "checkout-plan-card p-3 rounded-2xl border border-white/10 cursor-pointer bg-white/5 hover:border-amber-500/30 transition";
+        
+        // Remove popular label if any
+        const popularBadge = card.querySelector(".badge");
+        if (popularBadge) popularBadge.remove();
+    });
+
+    const selectedCard = document.getElementById("plan" + planKey.charAt(0).toUpperCase() + planKey.slice(1));
+    if (selectedCard) {
+        selectedCard.className = "checkout-plan-card active p-3 rounded-2xl border-2 border-amber-500 cursor-pointer bg-amber-500/10 transition";
+        
+        if (planKey === "pro") {
+            const badge = document.createElement("span");
+            badge.className = "inline-block text-[8px] bg-amber-500 text-slate-900 font-bold px-1.5 py-0.5 rounded-full mb-1";
+            badge.innerText = "POPULAR";
+            selectedCard.insertBefore(badge, selectedCard.firstChild);
+        }
+    }
+
+    const loc = state.localization || { currency: "INR", currencySymbol: "₹", taxRate: 18, taxName: "GST" };
+    const basePrices = getLocalPlanPrices(loc.currency || "INR");
+    const base = basePrices[planKey] || basePrices.pro || 69999;
+    const taxRatePercent = loc.taxRate !== undefined ? loc.taxRate : 18;
+    const tax = base * (taxRatePercent / 100);
+    const total = base + tax;
+
+    const baseElem = document.getElementById("summaryBasePrice");
+    const gstElem = document.getElementById("summaryGstPrice");
+    const totalElem = document.getElementById("summaryTotalPrice");
+    const taxLabelElem = document.getElementById("summaryTaxLabel");
+
+    if (taxLabelElem) {
+        taxLabelElem.innerHTML = `${taxRatePercent}% ${loc.taxName || 'GST'} (Tax Invoice):`;
+    }
+
+    if (baseElem) baseElem.innerText = formatCurrency(base);
+    if (gstElem) gstElem.innerText = formatCurrency(tax);
+    if (totalElem) totalElem.innerText = formatCurrency(total);
+};
+
+window.handleOnlineCheckoutSubmit = function(e) {
+    e.preventDefault();
+    const schoolName = document.getElementById("checkoutSchoolName").value.trim();
+    const gstin = document.getElementById("checkoutGstin").value.trim();
+    if (!schoolName) return;
+
+    const loc = state.localization || { currency: "INR", currencySymbol: "₹", taxRate: 18, taxName: "GST" };
+    const basePrices = getLocalPlanPrices(loc.currency || "INR");
+    const base = basePrices[selectedPlan] || basePrices.pro || 69999;
+    const taxRatePercent = loc.taxRate !== undefined ? loc.taxRate : 18;
+    const tax = base * (taxRatePercent / 100);
+    const total = base + tax;
+
+    // Trigger simulated/real payment logic
+    const payId = "pay_Rzp" + Math.random().toString(36).substring(2, 10).toUpperCase();
+    window.completeRazorpayOrder(payId, schoolName, total, gstin);
+};
+
+window.completeRazorpayOrder = function(payId, schoolName, total, gstin) {
+    const loc = state.localization || { currencySymbol: "₹", taxRate: 18, taxName: "GST" };
+    const invoiceNo = "INV-2026-" + Math.floor(10000 + Math.random() * 90000);
+    const permLicenseKey = "MED-PERM-2026-" + schoolName.substring(0, 4).toUpperCase().replace(/\s/g, '');
+
+    // Close checkout modal
+    closeOnlineCheckoutModal();
+
+    // Log the user directly into IT admin workspace with the new license key!
+    switchRole(14, "IT Director", permLicenseKey);
+
+    // Welcome message in Chat AI
+    addChatMessage("incoming", `🎉 <strong>Subscription Payment Successful!</strong><br><br><strong>Transaction ID:</strong> <code>${payId}</code><br><strong>Official ${loc.taxName} Tax Invoice:</strong> <code>${invoiceNo}</code><br><strong>Permanent MedSphere License Key:</strong> <code style="color: #fbbf24; font-weight: bold;">${permLicenseKey}</code><br><strong>Total Paid:</strong> ${formatCurrency(total)} (Includes ${loc.taxRate}% ${loc.taxName})<br><br><span class="text-xs text-[#9ca3af]">A permanent clinical database node has been provisioned.</span>`);
+
+    // Trigger WhatsApp notification to Admin
+    sendAdminWhatsAppNotification(`💳 *New MedSphere License Purchase!*\n🏥 *Hospital:* ${schoolName}\n💸 *Plan:* ${selectedPlan.toUpperCase()}\n💰 *Total Paid:* ${formatCurrency(total)}\n🧾 *Invoice:* ${invoiceNo}\n🔑 *License Key:* ${permLicenseKey}`);
+
+    addSystemLog(`Razorpay Payment Complete (${payId}): ${schoolName} purchased ${selectedPlan.toUpperCase()} Plan (${invoiceNo})`, "Success");
+    addNotification("Payment Successful!", `Permanent license ${permLicenseKey} activated for ${schoolName}.`, "success");
+    saveDatabaseState();
+};
