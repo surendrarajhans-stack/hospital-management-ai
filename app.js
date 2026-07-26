@@ -777,6 +777,21 @@ function populatePatientPortal() {
         opt.innerText = `${d.name} (${d.specialty})`;
         dSelect.appendChild(opt);
     });
+
+    // Initialize appointment date input default & min values to today
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+    
+    const dateInput = document.getElementById("patientChooseDate");
+    if (dateInput) {
+        dateInput.min = todayStr;
+        if (!dateInput.value) {
+            dateInput.value = todayStr;
+        }
+    }
 }
 
 window.bookPatientAppointment = function() {
@@ -793,8 +808,12 @@ window.bookPatientAppointment = function() {
     addSystemLog(`Appointment requested with ${doc ? doc.name : 'Doctor'} on ${date} at ${time}`, "Success");
     addNotification("Appointment Requested", `Your visit on ${date} at ${time} has been registered.`, "success");
     
-    // Reset date input
-    document.getElementById("patientChooseDate").value = "";
+    // Reset date input back to today's date
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    document.getElementById("patientChooseDate").value = `${yyyy}-${mm}-${dd}`;
 };
 
 window.triggerPatientBillCheckout = function() {
