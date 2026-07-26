@@ -233,6 +233,7 @@ window.switchDashboardView = function(viewId, elementLink = null) {
     else if (viewId === "view-nurse") label = "Ward Monitoring & Vitals";
     else if (viewId === "view-pharmacist") label = "Pharmacy Dispensing & Invoices";
     else if (viewId === "view-patient") label = "Your Care & AI Assistant";
+    else if (viewId === "view-manual-patient-entry") label = "Manual Patient Entry Desk";
     
     document.getElementById("current-view-title").innerText = label;
     
@@ -258,6 +259,7 @@ window.switchDashboardView = function(viewId, elementLink = null) {
     else if (viewId === "view-nurse") populateNurseDashboard();
     else if (viewId === "view-pharmacist") populatePharmacistDashboard();
     else if (viewId === "view-patient") populatePatientPortal();
+    else if (viewId === "view-manual-patient-entry") populateDedicatedPatientEntryDashboard();
 };
 
 function saveLocalState() {
@@ -1789,4 +1791,158 @@ window.completeRazorpayOrder = function(payId, schoolName, total, gstin) {
     addSystemLog(`Razorpay Payment Complete (${payId}): ${schoolName} purchased ${selectedPlan.toUpperCase()} Plan (${invoiceNo})`, "Success");
     addNotification("Payment Successful!", `Permanent license ${permLicenseKey} activated for ${schoolName}.`, "success");
     saveDatabaseState();
+};
+
+// 16. Dedicated Manual Patient Entry Dashboard Logic
+window.populateDedicatedPatientEntryDashboard = function() {
+    // 1. Populate Consultant Doctor Dropdown
+    const docSelect = document.getElementById("dedicatedPatDoctor");
+    if (docSelect) {
+        docSelect.innerHTML = "";
+        MOCK_DB.doctors.forEach(d => {
+            const opt = document.createElement("option");
+            opt.value = d.id;
+            opt.innerText = `${d.name} (${d.specialty})`;
+            docSelect.appendChild(opt);
+        });
+    }
+
+    // 2. Populate Empty Beds Dropdown
+    const bedSelect = document.getElementById("dedicatedPatBed");
+    if (bedSelect) {
+        bedSelect.innerHTML = "";
+        const emptyBeds = MOCK_DB.wards.filter(b => !b.occupied);
+        if (emptyBeds.length === 0) {
+            const opt = document.createElement("option");
+            opt.value = "";
+            opt.innerText = "No empty beds available";
+            bedSelect.appendChild(opt);
+        } else {
+            emptyBeds.forEach(b => {
+                const opt = document.createElement("option");
+                opt.value = b.id;
+                opt.innerText = `${b.id} (${b.type})`;
+                bedSelect.appendChild(opt);
+            });
+        }
+    }
+
+    // 3. Compute Stats
+    const totalBeds = MOCK_DB.wards.length;
+    const occupiedBeds = MOCK_DB.wards.filter(b => b.occupied).length;
+    const ipdCount = MOCK_DB.patients.filter(p => p.bed !== null).length;
+    const opdCount = MOCK_DB.patients.filter(p => p.bed === null).length;
+    const occupancyRate = totalBeds > 0 ? Math.round((occupiedBeds / totalBeds) * 100) : 0;
+
+    document.getElementById("statDedicatedIpdCount").innerText = ipdCount;
+    document.getElementById("statDedicatedOpdCount").innerText = opdCount;
+    document.getElementById("statDedicatedOccupancyRate").innerText = `${occupancyRate}%`;
+
+    // 4. Render Recently Registered Patient list (last 3 items)
+    const recentList = document.getElementById("dedicatedRecentPatientsList");
+    if (recentList) {
+        recentList.innerHTML = "";
+        const recentPatients = [...MOCK_DB.patients].reverse().slice(0, 3);
+        if (recentPatients.length === 0) {
+            recentList.innerHTML = `<span class="text-xs text-[#6b7280]">No patients registered yet.</span>`;
+        } else {
+            recentPatients.forEach(p => {
+                const div = document.createElement("div");
+                div.className = "p-3 bg-white/5 rounded-xl border border-white/5 text-xs flex justify-between items-center";
+                
+                let triageColor = "bg-emerald-500/20 text-emerald-400";
+                if (p.triage === "Critical") triageColor = "bg-red-500/20 text-red-400";
+                else if (p.triage === "Under Observation") triageColor = "bg-amber-500/20 text-amber-400";
+
+                const typeStr = p.bed ? `IPD (${p.bed})` : "OPD Walk-in";
+
+                div.innerHTML = `
+                    <div>
+                        <h4 class="font-bold text-white">${p.name} (Age: ${p.age})</h4>
+                        <span class="text-[#9ca3af] block mt-0.5">${p.id} | ${typeStr}</span>
+                    </div>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${triageColor}">${p.triage}</span>
+                `;
+                recentList.appendChild(div);
+            });
+        }
+    }
+};
+
+window.toggleDedicatedAdmissionFields = function() {
+    const type = document.getElementById("dedicatedPatType").value;
+    const docField = document.getElementById("dedicatedPatDocField");
+    const bedField = document.getElementById("dedicatedPatBedField");
+    
+    if (type === "OPD") {
+        docField.classList.remove("hidden");
+        bedField.classList.add("hidden");
+    } else {
+        docField.classList.add("hidden");
+        bedField.classList.remove("hidden");
+    }
+};
+
+window.executeDedicatedPatientAdmit = function() {
+    const name = document.getElementById("dedicatedPatName").value.trim();
+    const age = parseInt(document.getElementById("dedicatedPatAge").value);
+    const triage = document.getElementById("dedicatedPatTriage").value;
+    const type = document.getElementById("dedicatedPatType").value;
+    const complaint = document.getElementById("dedicatedPatComplaint").value.trim();
+
+    if (!name || isNaN(age) || !complaint) {
+        alert("Please fill in all manual patient registration fields.");
+        return;
+    }
+
+    const patientId = `PAT-${Math.floor(100 + Math.random() * 900)}`;
+    let newPatient = {
+        id: patientId,
+        name: name,
+        age: age,
+        triage: triage,
+        paid: false,
+        complaint: complaint
+    };
+
+    if (type === "OPD") {
+        const docId = document.getElementById("dedicatedPatDoctor").value;
+        newPatient.bed = null;
+        newPatient.doctorId = docId;
+        newPatient.bill = 500; // Standard OPD consultation fee
+        
+        addSystemLog("OPD Walk-in", `Registered OPD Patient ${name} (${patientId}) under Doctor ${docId}`);
+        addNotification("OPD Patient Registered", `${name} checked in successfully for doctor consultation.`, "success");
+    } else {
+        const bedId = document.getElementById("dedicatedPatBed").value;
+        if (!bedId) {
+            alert("No empty beds available to admit patient!");
+            return;
+        }
+        
+        const bed = MOCK_DB.wards.find(b => b.id === bedId);
+        if (!bed || bed.occupied) {
+            alert("Selected bed is already occupied.");
+            return;
+        }
+        
+        newPatient.bed = bedId;
+        newPatient.bill = 2500; // IPD registration fee
+        
+        bed.occupied = true;
+        bed.patientId = patientId;
+        
+        addSystemLog("IPD Admission", `Patient ${name} (${patientId}) admitted successfully to Bed ${bedId}`);
+        addNotification("Patient Admitted", `${name} has been admitted and assigned to Bed ${bedId}.`, "success");
+    }
+
+    MOCK_DB.patients.push(newPatient);
+
+    // Reset Form inputs
+    document.getElementById("dedicatedPatName").value = "";
+    document.getElementById("dedicatedPatAge").value = "";
+    document.getElementById("dedicatedPatComplaint").value = "";
+
+    saveDatabaseState();
+    populateDedicatedPatientEntryDashboard();
 };
