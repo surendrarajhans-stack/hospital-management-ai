@@ -412,7 +412,117 @@ function populateITDashboard() {
     const occupied = MOCK_DB.wards.filter(b => b.occupied).length;
     document.getElementById("statOccupiedBeds").innerText = `${occupied} / ${totalBeds}`;
     document.getElementById("statIcuRate").innerText = `${Math.round((occupied / totalBeds) * 100)}%`;
+
+    // Populate Doctor Selection dropdown inside Admin Manual Registration
+    const adminPatDoctor = document.getElementById("adminPatDoctor");
+    if (adminPatDoctor) {
+        adminPatDoctor.innerHTML = "";
+        MOCK_DB.doctors.forEach(d => {
+            const opt = document.createElement("option");
+            opt.value = d.id;
+            opt.innerText = `${d.name} (${d.specialty})`;
+            adminPatDoctor.appendChild(opt);
+        });
+    }
+
+    // Populate Bed Selection dropdown (only empty beds) inside Admin Manual Registration
+    const adminPatBed = document.getElementById("adminPatBed");
+    if (adminPatBed) {
+        adminPatBed.innerHTML = "";
+        const emptyBeds = MOCK_DB.wards.filter(b => !b.occupied);
+        if (emptyBeds.length === 0) {
+            const opt = document.createElement("option");
+            opt.value = "";
+            opt.innerText = "No empty beds";
+            adminPatBed.appendChild(opt);
+        } else {
+            emptyBeds.forEach(b => {
+                const opt = document.createElement("option");
+                opt.value = b.id;
+                opt.innerText = `${b.id} (${b.type})`;
+                adminPatBed.appendChild(opt);
+            });
+        }
+    }
 }
+
+window.toggleAdminAdmissionTypeFields = function() {
+    const type = document.getElementById("adminPatType").value;
+    const docField = document.getElementById("adminPatDocField");
+    const bedField = document.getElementById("adminPatBedField");
+    
+    if (type === "OPD") {
+        docField.classList.remove("hidden");
+        bedField.classList.add("hidden");
+    } else {
+        docField.classList.add("hidden");
+        bedField.classList.remove("hidden");
+    }
+};
+
+window.executeAdminPatientAdmit = function() {
+    const name = document.getElementById("adminPatName").value.trim();
+    const age = parseInt(document.getElementById("adminPatAge").value);
+    const triage = document.getElementById("adminPatTriage").value;
+    const type = document.getElementById("adminPatType").value;
+    const complaint = document.getElementById("adminPatComplaint").value.trim();
+
+    if (!name || isNaN(age) || !complaint) {
+        alert("Please fill in all manual patient registration fields.");
+        return;
+    }
+
+    const patientId = `PAT-${Math.floor(100 + Math.random() * 900)}`;
+    let newPatient = {
+        id: patientId,
+        name: name,
+        age: age,
+        triage: triage,
+        paid: false,
+        complaint: complaint
+    };
+
+    if (type === "OPD") {
+        const docId = document.getElementById("adminPatDoctor").value;
+        newPatient.bed = null;
+        newPatient.doctorId = docId;
+        newPatient.bill = 500; // OPD fee
+        
+        addSystemLog(`OPD Patient ${name} (${patientId}) registered under Doctor ${docId}`, "Success");
+        addNotification("OPD Patient Registered", `${name} checked in successfully for doctor consultation.`, "success");
+    } else {
+        const bedId = document.getElementById("adminPatBed").value;
+        if (!bedId) {
+            alert("No empty beds available to admit patient!");
+            return;
+        }
+        
+        const bed = MOCK_DB.wards.find(b => b.id === bedId);
+        if (!bed || bed.occupied) {
+            alert("Selected bed is already occupied.");
+            return;
+        }
+        
+        newPatient.bed = bedId;
+        newPatient.bill = 2500; // IPD fee
+        
+        bed.occupied = true;
+        bed.patientId = patientId;
+        
+        addSystemLog(`Patient ${name} (${patientId}) admitted successfully to Bed ${bedId}`, "Success");
+        addNotification("Patient Admitted", `${name} has been admitted and assigned to Bed ${bedId}.`, "success");
+    }
+
+    MOCK_DB.patients.push(newPatient);
+
+    // Reset Form inputs
+    document.getElementById("adminPatName").value = "";
+    document.getElementById("adminPatAge").value = "";
+    document.getElementById("adminPatComplaint").value = "";
+
+    saveDatabaseState();
+    populateITDashboard();
+};
 
 // IT Cloud Import handler
 window.processLocalFileImport = function() {
