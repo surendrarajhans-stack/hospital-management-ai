@@ -2273,7 +2273,12 @@ window.autoPopulateLabFields = function() {
         document.getElementById("labWbc").value = (p.id === "PAT-001") ? 18400 : 8200;
         document.getElementById("labPlt").value = (p.id === "PAT-001") ? 42000 : 240000;
         document.getElementById("labPotassium").value = (p.id === "PAT-001") ? 6.3 : 4.1;
+        document.getElementById("labSodium").value = (p.id === "PAT-001") ? 118 : 138;
         document.getElementById("labTroponin").value = (p.id === "PAT-001") ? 0.85 : 0.01;
+        document.getElementById("labCreatinine").value = (p.id === "PAT-001") ? 3.8 : 0.9;
+        document.getElementById("labGlucose").value = (p.id === "PAT-001") ? 385 : 110;
+        document.getElementById("labSgpt").value = (p.id === "PAT-001") ? 540 : 35;
+        document.getElementById("labLactate").value = (p.id === "PAT-001") ? 4.5 : 1.2;
     }
 };
 
@@ -2283,7 +2288,12 @@ window.runAiLabAnomalyScan = function() {
     const wbc = parseFloat(document.getElementById("labWbc").value) || 0;
     const plt = parseFloat(document.getElementById("labPlt").value) || 0;
     const k = parseFloat(document.getElementById("labPotassium").value) || 0;
+    const na = parseFloat(document.getElementById("labSodium").value) || 0;
     const trop = parseFloat(document.getElementById("labTroponin").value) || 0;
+    const creat = parseFloat(document.getElementById("labCreatinine").value) || 0;
+    const rbs = parseFloat(document.getElementById("labGlucose").value) || 0;
+    const sgpt = parseFloat(document.getElementById("labSgpt").value) || 0;
+    const lac = parseFloat(document.getElementById("labLactate").value) || 0;
     
     const findings = [];
     let riskLevel = "GREEN"; // GREEN, YELLOW, RED
@@ -2292,13 +2302,33 @@ window.runAiLabAnomalyScan = function() {
         riskLevel = "RED";
         findings.push(`🚨 <strong>Troponin-I Elevation (${trop} ng/mL):</strong> Critical cardiac muscle injury. Silent Myocardial Infarction (MI) risk.`);
     }
-    if (k > 6.0) {
+    if (k > 6.0 || (k > 0 && k < 2.8)) {
         riskLevel = "RED";
-        findings.push(`🚨 <strong>Severe Hyperkalemia (${k} mEq/L):</strong> High risk of cardiac arrhythmia & ventricular arrest. Immediate ECG required.`);
+        findings.push(`🚨 <strong>Severe Electrolyte Anomaly (K+: ${k} mEq/L):</strong> High risk of cardiac arrhythmia & cardiac arrest. Immediate ECG required.`);
+    }
+    if (na > 0 && na < 120) {
+        riskLevel = "RED";
+        findings.push(`🚨 <strong>Severe Hyponatremia (Na+: ${na} mEq/L):</strong> Cerebral edema & acute seizure risk. Hypertonic saline protocol.`);
+    }
+    if (creat > 3.5) {
+        riskLevel = "RED";
+        findings.push(`🚨 <strong>Acute Kidney Injury / Renal Failure (Serum Creatinine: ${creat} mg/dL):</strong> Critical renal function impairment.`);
+    }
+    if (lac > 4.0) {
+        riskLevel = "RED";
+        findings.push(`🚨 <strong>Hyperlactatemia / Tissue Hypoxia (Lactate: ${lac} mmol/L):</strong> High indicator of Septic Shock.`);
     }
     if (hb > 0 && hb < 7.0) {
         riskLevel = "RED";
         findings.push(`⚠️ <strong>Severe Anemia / Hemoglobin Drop (${hb} g/dL):</strong> Critical oxygen capacity loss. Blood transfusion indicator.`);
+    }
+    if (rbs > 350 || (rbs > 0 && rbs < 50)) {
+        if (riskLevel !== "RED") riskLevel = "YELLOW";
+        findings.push(`⚠️ <strong>Glucose Panic Threshold (RBS: ${rbs} mg/dL):</strong> Risk of Diabetic Ketoacidosis (DKA) or Hypoglycemic Coma.`);
+    }
+    if (sgpt > 500) {
+        if (riskLevel !== "RED") riskLevel = "YELLOW";
+        findings.push(`⚠️ <strong>Acute Hepatic Injury (SGPT/ALT: ${sgpt} U/L):</strong> Severe hepatocellular damage.`);
     }
     if (wbc > 15000 && plt < 50000) {
         riskLevel = "RED";
@@ -2309,7 +2339,7 @@ window.runAiLabAnomalyScan = function() {
     }
     
     if (findings.length === 0) {
-        findings.push(`✅ All lab values (Hb, WBC, Platelets, K+, Troponin-I) fall within normal biological reference ranges.`);
+        findings.push(`✅ All 10 lab parameters (Hb, WBC, Plt, K+, Na+, Troponin-I, Creatinine, RBS, SGPT, Lactate) fall within normal biological reference ranges.`);
     }
     
     const card = document.getElementById("labScanResultCard");
