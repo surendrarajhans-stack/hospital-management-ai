@@ -1674,28 +1674,36 @@ select option {
 }
 
 @media (max-width: 768px) {
-    html, body {
+    html {
+        overflow-y: scroll !important;
+        overflow-x: hidden !important;
+        height: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    body {
         position: relative !important;
         height: auto !important;
         min-height: 100% !important;
         overflow-x: hidden !important;
-        overflow-y: auto !important;
+        overflow-y: visible !important;
         -webkit-overflow-scrolling: touch !important;
-        touch-action: pan-y !important;
+        touch-action: auto !important;
     }
     
     .app-container, main, #view-container, .dashboard-pane, section[id^='view-'], #onboarding-role-select {
+        display: block !important;
         height: auto !important;
         max-height: none !important;
         min-height: 0 !important;
         overflow: visible !important;
         overflow-y: visible !important;
+        position: static !important;
         -webkit-overflow-scrolling: touch !important;
-        touch-action: pan-y !important;
     }
 
     #view-container {
-        padding: 8px 12px 120px 12px !important; /* Space for mobile navigation & browser address bar */
+        padding: 8px 12px 120px 12px !important;
     }
 
     .dashboard-pane {
@@ -1703,27 +1711,17 @@ select option {
         padding: 12px !important;
     }
 
-    /* Disable transform stacking contexts and add explicit pan-y touch action for effortless touch scrolling */
-    .glass-card, .role-card, button, select, input {
+    .glass-card, .role-card {
         transform: none !important;
         will-change: auto !important;
         backface-visibility: visible !important;
-        touch-action: pan-y !important;
-    }
-
-    /* Prevent inner text, headings, icons, and descriptions inside mobile cards from trapping touch drag gestures */
-    .glass-card *:not(button):not(select):not(input):not(a):not(option),
-    .role-card *:not(button):not(select):not(input):not(a):not(option) {
-        pointer-events: none !important;
-        -webkit-user-select: none !important;
-        user-select: none !important;
-        touch-action: pan-y !important;
+        pointer-events: auto !important;
+        user-select: auto !important;
+        -webkit-user-select: auto !important;
     }
     
     .overflow-y-auto {
         -webkit-overflow-scrolling: touch !important;
-        overscroll-behavior-y: contain !important;
-        touch-action: pan-y !important;
     }
 
     .modal-overlay {
@@ -1731,6 +1729,5 @@ select option {
         padding: 16px 10px 80px 10px !important;
         overflow-y: auto !important;
         -webkit-overflow-scrolling: touch !important;
-        touch-action: pan-y !important;
     }
 }
