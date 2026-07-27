@@ -2665,3 +2665,150 @@ window.printComplianceCertificate = function() {
     `);
     certWin.document.close();
 };
+
+// 20. AI Oncology & Precision Cancer Agent Handlers
+window.openOncologyAgentModal = function() {
+    const modal = document.getElementById("oncologyAgentModal");
+    if (!modal) return;
+    
+    // Populate patient select dropdown
+    const select = document.getElementById("oncoPatSelect");
+    if (select) {
+        select.innerHTML = `<option value="">-- Select Oncology Patient --</option>`;
+        MOCK_DB.patients.forEach(p => {
+            select.innerHTML += `<option value="${p.id}">${p.name} (ID: ${p.id} - ${p.age}y)</option>`;
+        });
+    }
+    
+    modal.classList.remove("hidden");
+    if (window.lucide) lucide.createIcons();
+};
+
+window.closeOncologyAgentModal = function() {
+    const modal = document.getElementById("oncologyAgentModal");
+    if (modal) modal.classList.add("hidden");
+};
+
+window.autoPopulateOncologyFields = function() {
+    const patId = document.getElementById("oncoPatSelect").value;
+    if (!patId) return;
+    
+    const p = MOCK_DB.patients.find(x => x.id === patId);
+    if (p) {
+        if (p.id === "PAT-001") {
+            document.getElementById("oncoPrimarySite").value = "Lung";
+            document.getElementById("oncoTnmStage").value = "Stage III";
+            document.getElementById("oncoCea").value = 18.4;
+            document.getElementById("oncoGeneMutation").value = "EGFR exon 19 del / L858R";
+        } else {
+            document.getElementById("oncoPrimarySite").value = "Breast";
+            document.getElementById("oncoTnmStage").value = "Stage II";
+            document.getElementById("oncoCa125").value = 12.0;
+            document.getElementById("oncoReceptorStatus").value = "ER+ / PR+ / HER2-";
+        }
+    }
+};
+
+window.runAiOncologyScan = function() {
+    const patId = document.getElementById("oncoPatSelect").value;
+    const p = MOCK_DB.patients.find(x => x.id === patId) || { name: "Patient Assessment" };
+    const site = document.getElementById("oncoPrimarySite").value;
+    const stage = document.getElementById("oncoTnmStage").value;
+    
+    const psa = parseFloat(document.getElementById("oncoPsa").value) || 0;
+    const cea = parseFloat(document.getElementById("oncoCea").value) || 0;
+    const ca125 = parseFloat(document.getElementById("oncoCa125").value) || 0;
+    const ca199 = parseFloat(document.getElementById("oncoCa199").value) || 0;
+    
+    const mutation = document.getElementById("oncoGeneMutation").value;
+    const receptor = document.getElementById("oncoReceptorStatus").value;
+    
+    const findings = [];
+    let targetedTherapy = "Standard Platinum-based Doublet Chemotherapy";
+    
+    // Biomarker Analysis
+    if (site === "Prostate" && psa > 4.0) {
+        findings.push(`🧬 <strong>PSA Elevation (${psa} ng/mL):</strong> Indicates active prostate tissue turnover / prostatic malignancy activity.`);
+    }
+    if ((site === "Colorectal" || site === "Lung") && cea > 5.0) {
+        findings.push(`🧬 <strong>Serum CEA Elevation (${cea} ng/mL):</strong> Carcinoembryonic antigen marker elevated; indicates disease monitoring / response indicator.`);
+    }
+    if (site === "Ovarian" && ca125 > 35.0) {
+        findings.push(`🧬 <strong>CA-125 Elevation (${ca125} U/mL):</strong> Epithelial ovarian cancer progression marker elevated.`);
+    }
+    if (site === "Pancreatic" && ca199 > 37.0) {
+        findings.push(`🧬 <strong>CA 19-9 Elevation (${ca199} U/mL):</strong> Gastrointestinal / pancreaticobiliary malignancy marker flagged.`);
+    }
+    
+    // Genomic Mutation & Targeted Chemotherapy Router
+    if (mutation.includes("EGFR")) {
+        targetedTherapy = "💊 <strong>1st Line Targeted TKI:</strong> Osimertinib 80mg daily (EGFR-TKI 3rd Generation). Superior Progression-Free Survival (PFS).";
+        findings.push(`🎯 <strong>EGFR Sensitizing Mutation Detected:</strong> High sensitivity to EGFR Tyrosine Kinase Inhibitors (TKIs).`);
+    } else if (mutation.includes("ALK")) {
+        targetedTherapy = "💊 <strong>Targeted ALK Inhibitor:</strong> Alectinib 600mg BID. High CNS penetration.";
+        findings.push(`🎯 <strong>ALK Gene Fusion Rearrangement:</strong> Responsive to 2nd-gen ALK inhibitors.`);
+    } else if (mutation.includes("BRCA")) {
+        targetedTherapy = "💊 <strong>PARP Inhibitor Therapy:</strong> Olaparib 300mg BID. Synthetic lethality in Homologous Recombination Deficiency (HRD).";
+        findings.push(`🎯 <strong>Pathogenic BRCA1/2 Mutation:</strong> High response rate to PARP inhibition.`);
+    } else if (mutation.includes("BRAF")) {
+        targetedTherapy = "💊 <strong>Dual BRAF/MEK Inhibition:</strong> Dabrafenib + Trametinib combination regimen.";
+        findings.push(`🎯 <strong>BRAF V600E Mutation:</strong> Targeted BRAF/MEK blockade recommended.`);
+    } else if (receptor.includes("HER2 Positive")) {
+        targetedTherapy = "💊 <strong>HER2-Targeted Monoclonal Antibody:</strong> Trastuzumab (Herceptin) + Pertuzumab + Docetaxel.";
+        findings.push(`🎯 <strong>HER2 Overexpression (3+):</strong> Anti-HER2 targeted monoclonal antibody regimen indicated.`);
+    } else if (receptor.includes("ER+ / PR+")) {
+        targetedTherapy = "💊 <strong>Endocrine Therapy + CDK4/6 Inhibitor:</strong> Letrozole / Anastrozole + Palbociclib / Ribociclib.";
+        findings.push(`🎯 <strong>Hormone Receptor Positive:</strong> High sensitivity to CDK4/6 inhibitor plus aromatase inhibitor.`);
+    }
+    
+    findings.push(`📋 <strong>TNM Staging Assessment:</strong> Classified as <strong>${stage}</strong> (${site} Primary Site).`);
+    findings.push(`💡 <strong>AI Targeted Chemotherapy Protocol:</strong> ${targetedTherapy}`);
+    
+    const card = document.getElementById("oncoScanResultCard");
+    const badge = document.getElementById("oncoResultRiskBadge");
+    const list = document.getElementById("oncoResultFindingsList");
+    
+    card.classList.remove("hidden");
+    badge.innerHTML = `🧬 PRECISION ONCOLOGY PROFILE: ${site.toUpperCase()} (${stage})`;
+    list.innerHTML = findings.map(f => `<div class="p-2 bg-[#0b0f19] rounded-xl border border-white/5">${f}</div>`).join("");
+    
+    if (window.lucide) lucide.createIcons();
+};
+
+window.printOncologyReport = function() {
+    const patId = document.getElementById("oncoPatSelect").value;
+    const p = MOCK_DB.patients.find(x => x.id === patId) || { name: "Patient Assessment", age: 52 };
+    const findings = document.getElementById("oncoResultFindingsList").innerText;
+    
+    const printWin = window.open("", "_blank", "width=850,height=950");
+    printWin.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>MedSphere AI - Precision Oncology & Cancer Genomics Consultation Report</title>
+            <style>
+                body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; color: #1e293b; background: #fff; line-height: 1.5; }
+                .header { text-align: center; border-bottom: 2px solid #7e22ce; padding-bottom: 20px; margin-bottom: 20px; }
+                .title { font-size: 22px; font-weight: bold; color: #581c87; }
+                .sub { font-size: 13px; color: #7e22ce; font-weight: bold; }
+                .card { background: #faf5ff; border: 1px solid #e9d5ff; padding: 20px; border-radius: 10px; margin-top: 20px; font-size: 13px; }
+                .footer { margin-top: 40px; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 15px; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div class="title">AI PRECISION ONCOLOGY & GENOMICS CONSULTATION REPORT</div>
+                <div class="sub">MedSphere NCCN-Aligned Cancer Intelligence Agent</div>
+            </div>
+            <div><strong>Patient Name:</strong> ${p.name} | <strong>Patient ID:</strong> ${p.id || 'ONCO-892'} | <strong>Age:</strong> ${p.age} Years</div>
+            <div class="card">
+                <strong>GENOMIC & TARGETED THERAPY ANALYSIS:</strong><br><br>
+                ${findings.replace(/\n/g, '<br>')}
+            </div>
+            <div class="footer">Digitally issued by MedSphere AI Precision Oncology & Genomics Agent • Medical Oncologist Sign-off Required</div>
+            <script>window.onload = function() { window.print(); }</script>
+        </body>
+        </html>
+    `);
+    printWin.document.close();
+};

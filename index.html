@@ -101,6 +101,10 @@
                     <i data-lucide="shield-check" class="w-5 h-5 text-amber-400"></i>
                     <span>Insurance Verifier</span>
                 </a>
+                <a href="javascript:void(0)" class="sidebar-link" onclick="openOncologyAgentModal()">
+                    <i data-lucide="dna" class="w-5 h-5 text-purple-400"></i>
+                    <span>AI Oncology & Cancer Agent</span>
+                </a>
             </nav>
 
             <!-- Footer / Version & Logout -->
@@ -1777,6 +1781,128 @@
                     <div class="text-xs text-[#9ca3af] space-y-1" id="triageRationaleText">
                         <!-- Dynamic triage rationale -->
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: AI ONCOLOGY & PRECISION CANCER AGENT -->
+    <div id="oncologyAgentModal" class="modal-overlay hidden">
+        <div class="glass-card max-w-3xl w-full p-6 space-y-5 animate-scale">
+            <div class="flex items-center justify-between border-b border-white/5 pb-3">
+                <div>
+                    <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i data-lucide="dna" class="text-purple-400"></i>
+                        <span>AI Oncology & Precision Cancer Agent</span>
+                    </h3>
+                    <p class="text-xs text-[#9ca3af] mt-0.5">Serum Biomarker Analyzer, Somatic Genomic Mutation Router & Targeted Therapy Assistant</p>
+                </div>
+                <button class="text-[#6b7280] hover:text-white" onclick="closeOncologyAgentModal()">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4 text-xs">
+                <!-- Patient Selection & Primary Organ Site -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-[#9ca3af] font-semibold mb-1">Select Patient *</label>
+                        <select id="oncoPatSelect" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500" onchange="autoPopulateOncologyFields()">
+                            <!-- Dynamic patients -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[#9ca3af] font-semibold mb-1">Primary Cancer Site / Organ</label>
+                        <select id="oncoPrimarySite" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
+                            <option value="Breast">Breast Malignancy</option>
+                            <option value="Lung">Non-Small Cell Lung Cancer (NSCLC)</option>
+                            <option value="Colorectal">Colorectal Carcinoma</option>
+                            <option value="Prostate">Prostate Adenocarcinoma</option>
+                            <option value="Ovarian">Ovarian Epithelial Carcinoma</option>
+                            <option value="Pancreatic">Pancreatic / GI Malignancy</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[#9ca3af] font-semibold mb-1">TNM Staging Stage</label>
+                        <select id="oncoTnmStage" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
+                            <option value="Stage I">Stage I (Localized, T1 N0 M0)</option>
+                            <option value="Stage II">Stage II (Locally Advanced, T2 N0 M0)</option>
+                            <option value="Stage III">Stage III (Regional Nodal, T3 N1-2 M0)</option>
+                            <option value="Stage IV">Stage IV (Distant Metastasis, T4 N3 M1)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Tumor Biomarkers Grid -->
+                <div class="space-y-1 pt-1">
+                    <h4 class="text-xs font-bold text-purple-400 uppercase tracking-wider">Serum Tumor Biomarkers Panel</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div>
+                            <label class="block text-[#9ca3af] font-semibold mb-1">PSA (Prostate ng/mL)</label>
+                            <input type="number" step="0.1" id="oncoPsa" placeholder="e.g. 2.5 (High: >4.0)" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-[#9ca3af] font-semibold mb-1">CEA (Colorectal ng/mL)</label>
+                            <input type="number" step="0.1" id="oncoCea" placeholder="e.g. 1.8 (High: >5.0)" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-[#9ca3af] font-semibold mb-1">CA-125 (Ovarian U/mL)</label>
+                            <input type="number" step="0.1" id="oncoCa125" placeholder="e.g. 15.0 (High: >35)" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-[#9ca3af] font-semibold mb-1">CA 19-9 (GI/Pancreas U/mL)</label>
+                            <input type="number" step="0.1" id="oncoCa199" placeholder="e.g. 12.0 (High: >37)" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white font-mono">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Genomic Mutations & Receptor Panel -->
+                <div class="space-y-1 pt-1">
+                    <h4 class="text-xs font-bold text-purple-400 uppercase tracking-wider">Oncogene Somatic Mutations & Receptor Profiling</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[#9ca3af] font-semibold mb-1">Oncogene Somatic Mutation</label>
+                            <select id="oncoGeneMutation" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
+                                <option value="None">Wild Type / No Somatic Mutation</option>
+                                <option value="EGFR exon 19 del / L858R">EGFR Mutation (exon 19 del / L858R)</option>
+                                <option value="KRAS G12C">KRAS G12C Mutation</option>
+                                <option value="BRAF V600E">BRAF V600E Mutation</option>
+                                <option value="BRCA1 / BRCA2 pathogenic">BRCA1 / BRCA2 Germline/Somatic Mutation</option>
+                                <option value="ALK Fusion Positive">ALK Gene Rearrangement / Fusion Positive</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[#9ca3af] font-semibold mb-1">Receptor Status (ER / PR / HER2)</label>
+                            <select id="oncoReceptorStatus" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
+                                <option value="Unspecified">Not Tested / Unspecified</option>
+                                <option value="ER+ / PR+ / HER2-">ER+ / PR+ Hormone Positive (HER2 Negative)</option>
+                                <option value="HER2 Positive (3+)">HER2 Overexpressed (HER2 Positive 3+)</option>
+                                <option value="Triple Negative (TNBC)">Triple Negative (ER- / PR- / HER2-)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="w-full btn bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-2.5 rounded-xl transition flex items-center justify-center gap-2" onclick="runAiOncologyScan()">
+                    <i data-lucide="dna" class="w-4 h-4"></i>
+                    <span>Run AI Oncology Genomic & Therapy Analysis</span>
+                </button>
+
+                <!-- Oncology Analysis Results Card -->
+                <div id="oncoScanResultCard" class="hidden p-4 bg-white/5 rounded-2xl border border-purple-500/30 space-y-3">
+                    <div class="flex items-center justify-between border-b border-white/5 pb-2">
+                        <span class="text-xs font-bold text-purple-300" id="oncoResultRiskBadge">
+                            🧬 ONCOLOGY GENOMIC PROFILE ANALYZED
+                        </span>
+                        <span class="text-[10px] text-purple-400 font-mono" id="oncoResultTimestamp">NCCN Guideline V2026</span>
+                    </div>
+                    <div class="text-xs text-[#9ca3af] space-y-1.5" id="oncoResultFindingsList">
+                        <!-- Dynamic oncology findings -->
+                    </div>
+                    <button class="w-full btn bg-white/10 hover:bg-white/20 text-white text-xs py-2 flex items-center justify-center gap-1.5 mt-2" onclick="printOncologyReport()">
+                        <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                        <span>Print AI Precision Oncology Consultation Report</span>
+                    </button>
                 </div>
             </div>
         </div>
