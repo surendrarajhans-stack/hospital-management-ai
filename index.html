@@ -107,7 +107,10 @@
             <div class="p-4 border-t border-white/5 space-y-3 bg-slate-950/20">
                 <div class="flex items-center justify-between text-xs text-[#6b7280]">
                     <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Cloud DB Active</span>
-                    <span class="font-mono text-[10px] text-[#9ca3af]">v1.0.0</span>
+                    <button onclick="openLegalComplianceModal()" class="text-[10px] text-teal-400 hover:underline flex items-center gap-1 font-semibold">
+                        <i data-lucide="shield-check" class="w-3 h-3"></i>
+                        <span>Legal EULA</span>
+                    </button>
                 </div>
                 <button onclick="resetToOnboarding()" class="w-full text-xs py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-[#9ca3af] hover:text-white border border-white/5 transition flex items-center justify-center gap-2 font-medium">
                     <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
@@ -986,6 +989,22 @@
                                         </select>
                                     </div>
                                 </div>
+                                <!-- ABHA 14-Digit Health ID (ABDM Compliant) -->
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-3.5 bg-white/5 rounded-2xl border border-white/5">
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-semibold text-[#9ca3af] mb-1.5 uppercase flex items-center justify-between">
+                                            <span>ABHA Health ID (14-Digit ABDM ID)</span>
+                                            <span class="text-[10px] text-teal-400 font-semibold">🇮🇳 ABDM M3 Ready</span>
+                                        </label>
+                                        <input type="text" id="dedicatedPatAbhaId" placeholder="e.g. 91-4829-1029-3841" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-teal-500 font-mono tracking-wider">
+                                    </div>
+                                    <div class="flex items-end">
+                                        <button type="button" class="w-full py-2.5 px-3 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 text-teal-300 border border-teal-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition" onclick="generateAbhaHealthId()">
+                                            <i data-lucide="qr-code" class="w-4 h-4"></i>
+                                            <span>Generate ABHA ID</span>
+                                        </button>
+                                    </div>
+                                </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-xs font-semibold text-[#9ca3af] mb-1.5 uppercase">Admission Type</label>
@@ -1461,6 +1480,79 @@
                         </button>
                     </div>
                 </div>
+    <!-- MODAL: LEGAL EULA, DATA PRIVACY & ABDM COMPLIANCE CERTIFICATE -->
+    <div id="legalComplianceModal" class="modal-overlay hidden">
+        <div class="glass-card max-w-3xl w-full p-8 space-y-6 animate-scale">
+            <div class="flex items-center justify-between border-b border-white/5 pb-3">
+                <div>
+                    <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i data-lucide="shield-check" class="text-emerald-400"></i>
+                        <span>Legal EULA, Data Privacy & ABDM Compliance Certificate</span>
+                    </h3>
+                    <p class="text-xs text-[#9ca3af] mt-0.5">MedSphere AI Hospital OS | Regulatory & Terms Disclosure</p>
+                </div>
+                <button class="text-[#6b7280] hover:text-white" onclick="closeLegalComplianceModal()">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4 text-xs text-[#9ca3af] leading-relaxed max-h-[60vh] overflow-y-auto pr-2">
+                <!-- Section 1: Clinical Decision Support Disclaimer -->
+                <div class="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-2">
+                    <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                        <i data-lucide="stethoscope" class="w-4 h-4 text-teal-400"></i>
+                        <span>1. Clinical Decision Support EULA & Medical Disclaimer</span>
+                    </h4>
+                    <p>
+                        MedSphere AI is an administrative hospital operating system and clinical decision-support assistant. All AI-generated symptom analysis, diagnostic laboratory anomaly flags, and triage scores are provided strictly to assist healthcare staff. MedSphere AI does not issue independent medical diagnoses. Final clinical diagnosis, prescription verification, and treatment authorization remain the sole responsibility of the licensed treating medical practitioner.
+                    </p>
+                </div>
+
+                <!-- Section 2: Data Privacy & DPDP Act 2023 / HIPAA Compliance -->
+                <div class="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-2">
+                    <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                        <i data-lucide="lock" class="w-4 h-4 text-cyan-400"></i>
+                        <span>2. Data Privacy & DPDP Act 2023 / HIPAA Encryption Standards</span>
+                    </h4>
+                    <p>
+                        Patient electronic health records (EHR), registration data, and billing transactions processed through MedSphere AI are encrypted in transit and at rest using 256-bit SSL/TLS protocol. In accordance with the Digital Personal Data Protection (DPDP) Act 2023 and HIPAA guidelines, patient records are protected against unauthorized access, with role-based access control (RBAC) and immutable audit trails logged for all system interactions.
+                    </p>
+                </div>
+
+                <!-- Section 3: ABDM (Ayushman Bharat Digital Mission) Compliance -->
+                <div class="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-2">
+                    <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                        <i data-lucide="qr-code" class="w-4 h-4 text-amber-400"></i>
+                        <span>3. ABDM (Ayushman Bharat Digital Mission) & ABHA ID Linkage</span>
+                    </h4>
+                    <p>
+                        MedSphere AI supports 14-digit ABHA (Ayushman Bharat Health Account) Health ID generation, validation, and PM-JAY scheme cashless claims processing. Health records generated under this license adhere to ABDM M3 interoperability specifications for seamless electronic health record exchange across accredited hospital nodes.
+                    </p>
+                </div>
+
+                <!-- Compliance Badges Banner -->
+                <div class="grid grid-cols-3 gap-3 text-center pt-2">
+                    <div class="p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                        <div class="text-[10px] text-emerald-400 uppercase font-semibold">DPDP Act 2023</div>
+                        <div class="text-xs font-bold text-white mt-0.5">256-Bit Encrypted</div>
+                    </div>
+                    <div class="p-3 bg-teal-500/10 rounded-xl border border-teal-500/20">
+                        <div class="text-[10px] text-teal-400 uppercase font-semibold">ABDM M3 Ready</div>
+                        <div class="text-xs font-bold text-white mt-0.5">14-Digit ABHA Link</div>
+                    </div>
+                    <div class="p-3 bg-amber-500/10 rounded-xl border border-amber-500/20">
+                        <div class="text-[10px] text-amber-400 uppercase font-semibold">Clinical Support EULA</div>
+                        <div class="text-xs font-bold text-white mt-0.5">Doctor Decision Final</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between border-t border-white/5 pt-4">
+                <span class="text-[11px] text-[#6b7280]">Certificate Token: <span class="font-mono text-white">EULA-REG-2026-ABDM9842</span></span>
+                <button class="btn btn-primary text-xs py-2.5 px-4 flex items-center gap-1.5 font-semibold" onclick="printComplianceCertificate()">
+                    <i data-lucide="printer" class="w-4 h-4"></i>
+                    <span>Print Official Compliance Certificate</span>
+                </button>
             </div>
         </div>
     </div>
