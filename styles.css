@@ -1681,20 +1681,21 @@ select option {
         overflow-x: hidden !important;
         overflow-y: auto !important;
         -webkit-overflow-scrolling: touch !important;
-        touch-action: auto !important;
+        touch-action: pan-y !important;
     }
     
-    .app-container, main, #view-container, .dashboard-pane, section[id^='view-'] {
+    .app-container, main, #view-container, .dashboard-pane, section[id^='view-'], #onboarding-role-select {
         height: auto !important;
         max-height: none !important;
         min-height: 0 !important;
         overflow: visible !important;
         overflow-y: visible !important;
         -webkit-overflow-scrolling: touch !important;
+        touch-action: pan-y !important;
     }
 
     #view-container {
-        padding: 12px 12px 120px 12px !important; /* Space for mobile navigation & browser address bar */
+        padding: 8px 12px 120px 12px !important; /* Space for mobile navigation & browser address bar */
     }
 
     .dashboard-pane {
@@ -1702,17 +1703,19 @@ select option {
         padding: 12px !important;
     }
 
-    /* Disable transform stacking contexts on mobile to allow 100% fluid touch drag bubbling */
-    .glass-card {
+    /* Disable transform stacking contexts and add explicit pan-y touch action for effortless touch scrolling */
+    .glass-card, .role-card, button, select, input {
         padding: 16px !important;
         transform: none !important;
         will-change: auto !important;
         backface-visibility: visible !important;
+        touch-action: pan-y !important;
     }
     
     .overflow-y-auto {
         -webkit-overflow-scrolling: touch !important;
         overscroll-behavior-y: contain !important;
+        touch-action: pan-y !important;
     }
 
     .modal-overlay {
@@ -1720,5 +1723,6 @@ select option {
         padding: 16px 10px 80px 10px !important;
         overflow-y: auto !important;
         -webkit-overflow-scrolling: touch !important;
+        touch-action: pan-y !important;
     }
 }
