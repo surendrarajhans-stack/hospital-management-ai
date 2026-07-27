@@ -68,7 +68,7 @@
             </div>
 
             <!-- Nav Links -->
-            <nav class="flex-1 px-4 space-y-1 overflow-y-auto">
+            <nav class="flex-1 px-4 space-y-1 overflow-y-auto pb-6">
                 <a href="javascript:void(0)" class="sidebar-link active" onclick="switchDashboardView('view-super-admin', this)">
                     <i data-lucide="shield-check" class="w-5 h-5"></i>
                     <span>Super Admin</span>
@@ -99,10 +99,16 @@
                 </a>
             </nav>
 
-            <!-- Footer / Version -->
-            <div class="p-4 border-t border-white/5 flex items-center justify-between text-xs text-[#6b7280]">
-                <span>Status: <span class="text-emerald-500 font-semibold">Active</span></span>
-                <span>v1.0.0</span>
+            <!-- Footer / Version & Logout -->
+            <div class="p-4 border-t border-white/5 space-y-3 bg-slate-950/20">
+                <div class="flex items-center justify-between text-xs text-[#6b7280]">
+                    <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Cloud DB Active</span>
+                    <span class="font-mono text-[10px] text-[#9ca3af]">v1.0.0</span>
+                </div>
+                <button onclick="resetToOnboarding()" class="w-full text-xs py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-[#9ca3af] hover:text-white border border-white/5 transition flex items-center justify-center gap-2 font-medium">
+                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                    <span>Switch Role / Logout</span>
+                </button>
             </div>
         </aside>
 

@@ -92,12 +92,37 @@ body {
     transition: background var(--transition-normal);
 }
 
-/* Layout Framework */
-.app-container {
+/* Sidebar Navigation Links */
+.sidebar-link {
     display: flex;
-    flex-direction: column;
-    height: 100vh;
-    width: 100vw;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #9ca3af;
+    text-decoration: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 2px;
+}
+
+.sidebar-link:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateX(3px);
+}
+
+.sidebar-link.active {
+    color: #ffffff;
+    background: rgba(13, 148, 136, 0.15);
+    border: 1px solid rgba(13, 148, 136, 0.3);
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.1);
+}
+
+.sidebar-link.active i {
+    color: #2dd4bf;
 }
 
 /* App Header styling */
