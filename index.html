@@ -689,6 +689,53 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- AI Diagnostic & Triage Intelligence Row -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                        <!-- AI Diagnostic Lab Anomaly Detector Card -->
+                        <div class="glass-card p-6 space-y-4 border border-teal-500/20">
+                            <div class="card-header border-b border-white/5 pb-3">
+                                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                    <i data-lucide="flask-conical" class="text-teal-400 animate-pulse"></i>
+                                    <span>AI Diagnostic Lab Anomaly Detector</span>
+                                </h3>
+                                <p class="text-xs text-[#9ca3af] mt-1">Automated pathology scanner flagging panic lab values, electrolyte imbalances & cardiac troponin spikes.</p>
+                            </div>
+                            <div class="p-3.5 bg-teal-500/5 rounded-2xl border border-teal-500/10 space-y-2">
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="text-teal-300 font-semibold">Active Pathology Monitor:</span>
+                                    <span class="text-emerald-400 font-bold">● Live Scanner Active</span>
+                                </div>
+                                <p class="text-[11px] text-[#9ca3af]">Scans CBC, KFT, LFT, Electrolytes, Troponin-I & Arterial Blood Gas values to trigger automated doctor notifications.</p>
+                            </div>
+                            <button class="w-full btn btn-primary py-2.5 flex items-center justify-center gap-2 font-semibold text-xs" onclick="openLabAnomalyModal()">
+                                <i data-lucide="activity" class="w-4 h-4"></i>
+                                <span>Run AI Pathology Anomaly Scan</span>
+                            </button>
+                        </div>
+
+                        <!-- AI Clinical Triage Analyzer Card -->
+                        <div class="glass-card p-6 space-y-4 border border-amber-500/20">
+                            <div class="card-header border-b border-white/5 pb-3">
+                                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                    <i data-lucide="heart-pulse" class="text-amber-400 animate-pulse"></i>
+                                    <span>AI Clinical Triage Analyzer</span>
+                                </h3>
+                                <p class="text-xs text-[#9ca3af] mt-1">Emergency Severity Index (ESI 1-5) acuity analyzer & automated ICU/OPD bed router.</p>
+                            </div>
+                            <div class="p-3.5 bg-amber-500/5 rounded-2xl border border-amber-500/10 space-y-2">
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="text-amber-300 font-semibold">Triage Protocol:</span>
+                                    <span class="text-amber-400 font-bold">ESI Standard Level 1-5</span>
+                                </div>
+                                <p class="text-[11px] text-[#9ca3af]">Evaluates complaints & vitals (BP, Pulse, SpO2, Temp, RR) to classify acuity & escalate critical cases instantly.</p>
+                            </div>
+                            <button class="w-full btn bg-amber-500 text-slate-900 hover:bg-amber-400 py-2.5 flex items-center justify-center gap-2 font-bold text-xs transition" onclick="openTriageAnalyzerModal()">
+                                <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                                <span>Launch AI Triage Acuity Analyzer</span>
+                            </button>
+                        </div>
+                    </div>
                 </section>
 
                 <!-- 6. VIEW: NURSE / WARD PANEL -->
@@ -1557,6 +1604,148 @@
                     <i data-lucide="printer" class="w-4 h-4"></i>
                     <span>Print Official Compliance Certificate</span>
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: AI DIAGNOSTIC LAB ANOMALY DETECTOR -->
+    <div id="labAnomalyModal" class="modal-overlay hidden">
+        <div class="glass-card max-w-2xl w-full p-6 space-y-5 animate-scale">
+            <div class="flex items-center justify-between border-b border-white/5 pb-3">
+                <div>
+                    <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i data-lucide="flask-conical" class="text-teal-400"></i>
+                        <span>AI Diagnostic Lab Anomaly Detector</span>
+                    </h3>
+                    <p class="text-xs text-[#9ca3af] mt-0.5">Automated Pathology Panic-Value Scanner & Red-Flag Detector</p>
+                </div>
+                <button class="text-[#6b7280] hover:text-white" onclick="closeLabAnomalyModal()">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div>
+                        <label class="block text-[#9ca3af] font-semibold mb-1">Select Patient *</label>
+                        <select id="labPatSelect" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-teal-500" onchange="autoPopulateLabFields()">
+                            <!-- Dynamic patients -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[#9ca3af] font-semibold mb-1">Hemoglobin (g/dL)</label>
+                        <input type="number" step="0.1" id="labHb" placeholder="e.g. 13.5 (Panic: <7.0)" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white font-mono">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                    <div>
+                        <label class="block text-[#9ca3af] font-semibold mb-1">WBC (cells/µL)</label>
+                        <input type="number" id="labWbc" placeholder="e.g. 8500" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-[#9ca3af] font-semibold mb-1">Platelets (cells/µL)</label>
+                        <input type="number" id="labPlt" placeholder="e.g. 250000" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-[#9ca3af] font-semibold mb-1">Potassium K+ (mEq/L)</label>
+                        <input type="number" step="0.1" id="labPotassium" placeholder="e.g. 4.2 (Panic: >6.0)" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-[#9ca3af] font-semibold mb-1">Troponin-I (ng/mL)</label>
+                        <input type="number" step="0.01" id="labTroponin" placeholder="e.g. 0.01 (Panic: >0.4)" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white font-mono">
+                    </div>
+                </div>
+
+                <button class="w-full btn btn-primary py-2.5 flex items-center justify-center gap-2 font-semibold text-xs" onclick="runAiLabAnomalyScan()">
+                    <i data-lucide="zap" class="w-4 h-4"></i>
+                    <span>Execute AI Pathology Anomaly Scan</span>
+                </button>
+
+                <!-- Scan Results Card -->
+                <div id="labScanResultCard" class="hidden p-4 bg-white/5 rounded-2xl border border-teal-500/20 space-y-3">
+                    <div class="flex items-center justify-between border-b border-white/5 pb-2">
+                        <span class="text-xs font-bold text-white flex items-center gap-1.5" id="labResultRiskBadge">
+                            🟢 NORMAL PATHOLOGY PROFILE
+                        </span>
+                        <span class="text-[10px] text-teal-400 font-mono" id="labResultTimestamp">Just now</span>
+                    </div>
+                    <div class="text-xs text-[#9ca3af] space-y-1" id="labResultFindingsList">
+                        <!-- Dynamic findings -->
+                    </div>
+                    <button class="w-full btn bg-white/10 hover:bg-white/20 text-white text-xs py-2 flex items-center justify-center gap-1.5 mt-2" onclick="printLabAnomalyCertificate()">
+                        <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                        <span>Print Pathology Anomaly Report</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: AI CLINICAL TRIAGE ANALYZER -->
+    <div id="triageAnalyzerModal" class="modal-overlay hidden">
+        <div class="glass-card max-w-2xl w-full p-6 space-y-5 animate-scale">
+            <div class="flex items-center justify-between border-b border-white/5 pb-3">
+                <div>
+                    <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i data-lucide="heart-pulse" class="text-amber-400"></i>
+                        <span>AI Clinical Triage & Acuity Analyzer</span>
+                    </h3>
+                    <p class="text-xs text-[#9ca3af] mt-0.5">Emergency Severity Index (ESI 1-5) Acuity Router & Risk Stratifier</p>
+                </div>
+                <button class="text-[#6b7280] hover:text-white" onclick="closeTriageAnalyzerModal()">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4 text-xs">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[#9ca3af] font-semibold mb-1">Patient Name / Identifier *</label>
+                        <input type="text" id="triagePatName" placeholder="e.g. Ramesh Kumar" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white">
+                    </div>
+                    <div>
+                        <label class="block text-[#9ca3af] font-semibold mb-1">Chief Symptoms / Complaint *</label>
+                        <input type="text" id="triageComplaint" placeholder="e.g. Sudden chest tightness, diaphoresis, dyspnea" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div>
+                        <label class="block text-[#9ca3af] font-semibold mb-1">BP (mmHg)</label>
+                        <input type="text" id="triageBp" placeholder="120/80" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-[#9ca3af] font-semibold mb-1">Pulse (bpm)</label>
+                        <input type="number" id="triagePulse" placeholder="78" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-[#9ca3af] font-semibold mb-1">SpO2 (%)</label>
+                        <input type="number" id="triageSpo2" placeholder="98" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-[#9ca3af] font-semibold mb-1">Temp (°F)</label>
+                        <input type="number" step="0.1" id="triageTemp" placeholder="98.6" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white font-mono">
+                    </div>
+                </div>
+
+                <button class="w-full btn bg-amber-500 text-slate-900 hover:bg-amber-400 py-2.5 flex items-center justify-center gap-2 font-bold text-xs transition" onclick="runAiTriageScan()">
+                    <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                    <span>Analyze ESI Acuity & Assign Bed Priority</span>
+                </button>
+
+                <!-- Triage Results Card -->
+                <div id="triageResultCard" class="hidden p-4 bg-white/5 rounded-2xl border border-amber-500/20 space-y-3">
+                    <div class="flex items-center justify-between border-b border-white/5 pb-2">
+                        <span class="text-xs font-bold text-amber-400" id="triageLevelBadge">
+                            LEVEL 2 - EMERGENT ACUITY
+                        </span>
+                        <span class="text-[10px] text-teal-400 font-semibold" id="triageBedRecommendation">ICU / ER Bay Recommended</span>
+                    </div>
+                    <div class="text-xs text-[#9ca3af] space-y-1" id="triageRationaleText">
+                        <!-- Dynamic triage rationale -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>

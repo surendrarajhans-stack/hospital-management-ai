@@ -2239,6 +2239,197 @@ window.printPreAuthLetter = function() {
     printWin.document.close();
 };
 
+// 19. AI Diagnostic Lab Anomaly Detector & AI Clinical Triage Analyzer
+window.openLabAnomalyModal = function() {
+    const modal = document.getElementById("labAnomalyModal");
+    if (!modal) return;
+    
+    // Populate patient select
+    const select = document.getElementById("labPatSelect");
+    if (select) {
+        select.innerHTML = `<option value="">-- Select Admitted / OPD Patient --</option>`;
+        MOCK_DB.patients.forEach(p => {
+            select.innerHTML += `<option value="${p.id}">${p.name} (ID: ${p.id} - Bed: ${p.bed || 'OPD'})</option>`;
+        });
+    }
+    
+    modal.classList.remove("hidden");
+    if (window.lucide) lucide.createIcons();
+};
+
+window.closeLabAnomalyModal = function() {
+    const modal = document.getElementById("labAnomalyModal");
+    if (modal) modal.classList.add("hidden");
+};
+
+window.autoPopulateLabFields = function() {
+    const patId = document.getElementById("labPatSelect").value;
+    if (!patId) return;
+    
+    const p = MOCK_DB.patients.find(x => x.id === patId);
+    if (p) {
+        // Set realistic lab values based on patient
+        document.getElementById("labHb").value = (p.id === "PAT-001") ? 6.4 : 12.8;
+        document.getElementById("labWbc").value = (p.id === "PAT-001") ? 18400 : 8200;
+        document.getElementById("labPlt").value = (p.id === "PAT-001") ? 42000 : 240000;
+        document.getElementById("labPotassium").value = (p.id === "PAT-001") ? 6.3 : 4.1;
+        document.getElementById("labTroponin").value = (p.id === "PAT-001") ? 0.85 : 0.01;
+    }
+};
+
+window.runAiLabAnomalyScan = function() {
+    const patId = document.getElementById("labPatSelect").value;
+    const hb = parseFloat(document.getElementById("labHb").value) || 0;
+    const wbc = parseFloat(document.getElementById("labWbc").value) || 0;
+    const plt = parseFloat(document.getElementById("labPlt").value) || 0;
+    const k = parseFloat(document.getElementById("labPotassium").value) || 0;
+    const trop = parseFloat(document.getElementById("labTroponin").value) || 0;
+    
+    const findings = [];
+    let riskLevel = "GREEN"; // GREEN, YELLOW, RED
+    
+    if (trop > 0.4) {
+        riskLevel = "RED";
+        findings.push(`🚨 <strong>Troponin-I Elevation (${trop} ng/mL):</strong> Critical cardiac muscle injury. Silent Myocardial Infarction (MI) risk.`);
+    }
+    if (k > 6.0) {
+        riskLevel = "RED";
+        findings.push(`🚨 <strong>Severe Hyperkalemia (${k} mEq/L):</strong> High risk of cardiac arrhythmia & ventricular arrest. Immediate ECG required.`);
+    }
+    if (hb > 0 && hb < 7.0) {
+        riskLevel = "RED";
+        findings.push(`⚠️ <strong>Severe Anemia / Hemoglobin Drop (${hb} g/dL):</strong> Critical oxygen capacity loss. Blood transfusion indicator.`);
+    }
+    if (wbc > 15000 && plt < 50000) {
+        riskLevel = "RED";
+        findings.push(`⚠️ <strong>Sepsis / Severe Infection Triad (WBC: ${wbc}, Plt: ${plt}):</strong> Septic shock or Dengue hemorrhagic risk.`);
+    } else if (wbc > 11000) {
+        if (riskLevel !== "RED") riskLevel = "YELLOW";
+        findings.push(`⚠️ <strong>Leukocytosis (WBC: ${wbc}):</strong> Elevated inflammatory marker indicating systemic infection.`);
+    }
+    
+    if (findings.length === 0) {
+        findings.push(`✅ All lab values (Hb, WBC, Platelets, K+, Troponin-I) fall within normal biological reference ranges.`);
+    }
+    
+    const card = document.getElementById("labScanResultCard");
+    const badge = document.getElementById("labResultRiskBadge");
+    const list = document.getElementById("labResultFindingsList");
+    
+    card.classList.remove("hidden");
+    list.innerHTML = findings.map(f => `<div>${f}</div>`).join("");
+    
+    if (riskLevel === "RED") {
+        badge.className = "text-xs font-bold text-red-400 flex items-center gap-1.5 animate-pulse";
+        badge.innerHTML = "🚨 PANIC RED-FLAG LAB ANOMALY DETECTED";
+    } else if (riskLevel === "YELLOW") {
+        badge.className = "text-xs font-bold text-amber-400 flex items-center gap-1.5";
+        badge.innerHTML = "⚠️ MODERATE PATHOLOGY RISK DETECTED";
+    } else {
+        badge.className = "text-xs font-bold text-emerald-400 flex items-center gap-1.5";
+        badge.innerHTML = "🟢 NORMAL PATHOLOGY PROFILE";
+    }
+    
+    if (window.lucide) lucide.createIcons();
+};
+
+window.printLabAnomalyCertificate = function() {
+    const patId = document.getElementById("labPatSelect").value;
+    const p = MOCK_DB.patients.find(x => x.id === patId) || { name: "Patient Check", age: 45 };
+    const findings = document.getElementById("labResultFindingsList").innerText;
+    
+    const printWin = window.open("", "_blank", "width=800,height=900");
+    printWin.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>MedSphere AI - Pathology Anomaly Warning Report</title>
+            <style>
+                body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; color: #1e293b; background: #fff; }
+                .header { text-align: center; border-bottom: 2px solid #0d9488; padding-bottom: 20px; margin-bottom: 20px; }
+                .title { font-size: 20px; font-weight: bold; color: #0f172a; }
+                .findings { background: #fff1f2; border: 1px solid #fecdd3; padding: 15px; border-radius: 8px; font-size: 13px; color: #9f1239; margin-top: 20px; }
+                .footer { margin-top: 40px; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 15px; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div class="title">AI PATHOLOGY DIAGNOSTIC ANOMALY REPORT</div>
+                <div style="color: #0d9488; font-size: 13px; font-weight: bold;">MedSphere AI Pathology Scanner</div>
+            </div>
+            <div><strong>Patient Name:</strong> ${p.name} | <strong>Age:</strong> ${p.age} | <strong>Bed:</strong> ${p.bed || 'OPD'}</div>
+            <div class="findings">
+                <strong>AI ANOMALY SCAN FINDINGS:</strong><br><br>
+                ${findings.replace(/\n/g, '<br>')}
+            </div>
+            <div class="footer">Digitally issued by MedSphere AI Lab Anomaly Detector • Doctor Verification Required</div>
+            <script>window.onload = function() { window.print(); }</script>
+        </body>
+        </html>
+    `);
+    printWin.document.close();
+};
+
+// AI Clinical Triage Analyzer
+window.openTriageAnalyzerModal = function() {
+    const modal = document.getElementById("triageAnalyzerModal");
+    if (modal) {
+        modal.classList.remove("hidden");
+        if (window.lucide) lucide.createIcons();
+    }
+};
+
+window.closeTriageAnalyzerModal = function() {
+    const modal = document.getElementById("triageAnalyzerModal");
+    if (modal) modal.classList.add("hidden");
+};
+
+window.runAiTriageScan = function() {
+    const name = document.getElementById("triagePatName").value || "Walk-in Patient";
+    const complaint = document.getElementById("triageComplaint").value.toLowerCase();
+    const bp = document.getElementById("triageBp").value;
+    const pulse = parseInt(document.getElementById("triagePulse").value) || 80;
+    const spo2 = parseInt(document.getElementById("triageSpo2").value) || 98;
+    const temp = parseFloat(document.getElementById("triageTemp").value) || 98.6;
+    
+    let level = "LEVEL 4 - LESS URGENT";
+    let bedRec = "General OPD Consultation";
+    let color = "text-emerald-400";
+    const rationale = [];
+    
+    if (complaint.includes("chest pain") || complaint.includes("unconscious") || spo2 < 90 || pulse > 140) {
+        level = "LEVEL 1 - RESUSCITATION CRITICAL";
+        bedRec = "🚨 Immediate ICU / ER Trauma Bay";
+        color = "text-red-500 animate-pulse";
+        rationale.push("• Severe hemodynamic instability or respiratory failure risk.");
+        rationale.push(`• Low SpO2 (${spo2}%) or critical complaint ("${complaint}").`);
+    } else if (complaint.includes("tightness") || complaint.includes("breath") || complaint.includes("high fever") || temp > 103 || spo2 < 94) {
+        level = "LEVEL 2 - EMERGENT ACUITY";
+        bedRec = "⚠️ Emergency High-Care Ward Bay";
+        color = "text-amber-400";
+        rationale.push("• High-risk complaint requiring rapid physician intervention within 10 minutes.");
+        rationale.push(`• Vitals: Pulse ${pulse} bpm, SpO2 ${spo2}%, Temp ${temp}°F.`);
+    } else if (complaint.includes("fever") || complaint.includes("pain") || temp > 101) {
+        level = "LEVEL 3 - URGENT CARE";
+        bedRec = "General Ward Bed / Priority OPD";
+        color = "text-yellow-400";
+        rationale.push("• Stable vitals requiring diagnostic testing or fluid therapy.");
+    } else {
+        rationale.push("• Hemodynamically stable. Routine OPD consultation queue.");
+    }
+    
+    const card = document.getElementById("triageResultCard");
+    const badge = document.getElementById("triageLevelBadge");
+    const rec = document.getElementById("triageBedRecommendation");
+    const text = document.getElementById("triageRationaleText");
+    
+    card.classList.remove("hidden");
+    badge.className = `text-xs font-bold ${color}`;
+    badge.innerText = level;
+    rec.innerText = bedRec;
+    text.innerHTML = rationale.map(r => `<div>${r}</div>`).join("");
+};
+
 // 18. ABHA Health ID Generator & Legal Compliance EULA Handlers
 window.generateAbhaHealthId = function() {
     const p1 = "91";
