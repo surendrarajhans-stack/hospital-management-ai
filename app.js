@@ -960,12 +960,14 @@ window.loadPatientBillingInvoice = function() {
     
     const p = MOCK_DB.patients.find(x => x.id === billingSelectedPatientId);
     const badge = document.getElementById("billingPaymentStatusBadge");
+    const insRow = document.getElementById("invoiceInsuranceRow");
     
     if (!p) {
         document.getElementById("invoiceConsultFees").innerText = `${state.localization.currencySymbol}0`;
         document.getElementById("invoiceRoomCharges").innerText = `${state.localization.currencySymbol}0`;
         document.getElementById("invoicePharmacyCharges").innerText = `${state.localization.currencySymbol}0`;
         document.getElementById("invoiceTotalAmount").innerText = `${state.localization.currencySymbol}0`;
+        if (insRow) insRow.classList.add("hidden");
         badge.className = "inline-block text-xs font-bold bg-[#ef4444]/20 text-[#ef4444] px-3 py-1.5 rounded-full mt-1";
         badge.innerText = "Select Patient";
         return;
@@ -982,13 +984,24 @@ window.loadPatientBillingInvoice = function() {
     
     const baseAmount = p.bill;
     const taxValue = Math.round(baseAmount * (state.localization.taxRate / 100));
-    const totalAmount = baseAmount + taxValue;
+    let totalAmount = baseAmount + taxValue;
+    
+    // Deduct Cashless TPA Insurance Cover if applicable
+    if (p.insurance && p.insurance.approvedAmount) {
+        if (insRow) {
+            insRow.classList.remove("hidden");
+            document.getElementById("invoiceInsuranceAmount").innerText = `-${formatCurrency(p.insurance.approvedAmount)}`;
+        }
+        totalAmount = Math.max(0, totalAmount - p.insurance.approvedAmount);
+    } else {
+        if (insRow) insRow.classList.add("hidden");
+    }
     
     document.getElementById("invoiceTotalAmount").innerText = formatCurrency(totalAmount);
     
-    if (p.paid) {
+    if (p.paid || totalAmount === 0) {
         badge.className = "inline-block text-xs font-bold bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-full mt-1";
-        badge.innerText = "Settled / Paid";
+        badge.innerText = "Settled / Covered";
     } else {
         badge.className = "inline-block text-xs font-bold bg-rose-500/20 text-rose-400 px-3 py-1.5 rounded-full mt-1";
         badge.innerText = "Payment Outstanding";
@@ -1889,6 +1902,8 @@ window.executeDedicatedPatientAdmit = function() {
     const triage = document.getElementById("dedicatedPatTriage").value;
     const type = document.getElementById("dedicatedPatType").value;
     const complaint = document.getElementById("dedicatedPatComplaint").value.trim();
+    const insProvider = document.getElementById("dedicatedPatInsuranceProvider") ? document.getElementById("dedicatedPatInsuranceProvider").value : "None";
+    const policyNo = document.getElementById("dedicatedPatPolicyNo") ? document.getElementById("dedicatedPatPolicyNo").value.trim() : "";
 
     if (!name || isNaN(age) || !complaint) {
         alert("Please fill in all manual patient registration fields.");
@@ -1904,6 +1919,14 @@ window.executeDedicatedPatientAdmit = function() {
         paid: false,
         complaint: complaint
     };
+
+    if (insProvider !== "None" && policyNo) {
+        newPatient.insurance = {
+            provider: insProvider,
+            policyNumber: policyNo,
+            status: "Pending Pre-Auth"
+        };
+    }
 
     if (type === "OPD") {
         const docId = document.getElementById("dedicatedPatDoctor").value;
@@ -1942,7 +1965,250 @@ window.executeDedicatedPatientAdmit = function() {
     document.getElementById("dedicatedPatName").value = "";
     document.getElementById("dedicatedPatAge").value = "";
     document.getElementById("dedicatedPatComplaint").value = "";
+    if (document.getElementById("dedicatedPatPolicyNo")) document.getElementById("dedicatedPatPolicyNo").value = "";
 
     saveDatabaseState();
     populateDedicatedPatientEntryDashboard();
+};
+
+// 17. AI Health Insurance & Cashless TPA Verifier Modal Logic
+let activeInsVerificationResult = null;
+
+window.openInsuranceVerifierModal = function(targetPatientId) {
+    const modal = document.getElementById("insuranceVerifierModal");
+    const patSelect = document.getElementById("insVerifPatientSelect");
+    
+    if (patSelect) {
+        patSelect.innerHTML = `<option value="">Select registered patient...</option>`;
+        MOCK_DB.patients.forEach(p => {
+            const opt = document.createElement("option");
+            opt.value = p.id;
+            opt.innerText = `${p.name} (${p.id}) ${p.insurance ? '- ' + p.insurance.provider : ''}`;
+            patSelect.appendChild(opt);
+        });
+        
+        if (targetPatientId) {
+            patSelect.value = targetPatientId;
+            autoPopulateInsuranceForm();
+        }
+    }
+    
+    document.getElementById("insVerifResultCard").classList.add("hidden");
+    document.getElementById("insVerifLoading").classList.add("hidden");
+    modal.classList.remove("hidden");
+};
+
+window.closeInsuranceVerifierModal = function() {
+    document.getElementById("insuranceVerifierModal").classList.add("hidden");
+};
+
+window.autoPopulateInsuranceForm = function() {
+    const patId = document.getElementById("insVerifPatientSelect").value;
+    const p = MOCK_DB.patients.find(x => x.id === patId);
+    
+    if (p) {
+        if (p.insurance && p.insurance.provider) {
+            document.getElementById("insVerifProvider").value = p.insurance.provider;
+        }
+        if (p.insurance && p.insurance.policyNumber) {
+            document.getElementById("insVerifPolicyNo").value = p.insurance.policyNumber;
+        } else if (!document.getElementById("insVerifPolicyNo").value) {
+            document.getElementById("insVerifPolicyNo").value = "POL-" + Math.floor(10000000 + Math.random() * 90000000);
+        }
+        
+        const estBill = p.bill ? p.bill : 25000;
+        document.getElementById("insVerifClaimAmount").value = estBill;
+    }
+};
+
+window.runAiInsuranceVerification = function() {
+    const patId = document.getElementById("insVerifPatientSelect").value;
+    const provider = document.getElementById("insVerifProvider").value;
+    const policyNo = document.getElementById("insVerifPolicyNo").value.trim();
+    const claimAmt = parseFloat(document.getElementById("insVerifClaimAmount").value) || 50000;
+    
+    if (!patId) {
+        alert("Please select a patient first.");
+        return;
+    }
+    if (!policyNo) {
+        alert("Please enter a valid Policy or Health Card Number.");
+        return;
+    }
+
+    const patient = MOCK_DB.patients.find(p => p.id === patId);
+
+    // Hide result & show loading
+    document.getElementById("insVerifResultCard").classList.add("hidden");
+    document.getElementById("insVerifLoading").classList.remove("hidden");
+
+    addSystemLog("AI TPA Verifier", `Connecting to TPA gateway for ${provider} (Policy: ${policyNo})...`);
+
+    setTimeout(() => {
+        document.getElementById("insVerifLoading").classList.add("hidden");
+        
+        // Compute Cashless Coverage Rules (80% approved, 20% co-pay)
+        const approvedAmt = Math.round(claimAmt * 0.8);
+        const copayAmt = claimAmt - approvedAmt;
+        const refCode = "TPA-AUTH-2026-" + Math.floor(10000 + Math.random() * 90000);
+        const maxLimit = 500000;
+
+        activeInsVerificationResult = {
+            patientId: patId,
+            patientName: patient ? patient.name : "Patient",
+            provider: provider,
+            policyNumber: policyNo,
+            totalClaim: claimAmt,
+            approvedAmount: approvedAmt,
+            copayAmount: copayAmt,
+            refCode: refCode,
+            maxLimit: maxLimit
+        };
+
+        // Populate DOM elements
+        document.getElementById("insResultProviderName").innerText = provider;
+        document.getElementById("insResultRefCode").innerText = `Ref: ${refCode}`;
+        document.getElementById("insResultTotalClaim").innerText = formatCurrency(claimAmt);
+        document.getElementById("insResultApprovedAmount").innerText = formatCurrency(approvedAmt);
+        document.getElementById("insResultCopayAmount").innerText = formatCurrency(copayAmt);
+        document.getElementById("insResultCopayNote").innerText = formatCurrency(copayAmt);
+        document.getElementById("insResultMaxLimit").innerText = formatCurrency(maxLimit);
+
+        document.getElementById("insVerifResultCard").classList.remove("hidden");
+
+        addSystemLog("AI TPA Verifier", `Cashless Pre-Auth Granted: ${formatCurrency(approvedAmt)} approved by ${provider} for ${patient ? patient.name : patId}`);
+        addNotification("Cashless Pre-Auth Approved!", `${provider} pre-approved ${formatCurrency(approvedAmt)} (Ref: ${refCode}).`, "success");
+    }, 1200);
+};
+
+window.applyInsuranceCoverageToPatient = function() {
+    if (!activeInsVerificationResult) return;
+    
+    const p = MOCK_DB.patients.find(x => x.id === activeInsVerificationResult.patientId);
+    if (p) {
+        p.insurance = {
+            provider: activeInsVerificationResult.provider,
+            policyNumber: activeInsVerificationResult.policyNumber,
+            approvedAmount: activeInsVerificationResult.approvedAmount,
+            copayAmount: activeInsVerificationResult.copayAmount,
+            refCode: activeInsVerificationResult.refCode,
+            status: "Approved"
+        };
+
+        addSystemLog("Insurance Applied", `Cashless discount of ${formatCurrency(activeInsVerificationResult.approvedAmount)} applied to ${p.name}`);
+        addNotification("Insurance Benefit Applied", `Applied ${formatCurrency(activeInsVerificationResult.approvedAmount)} cashless cover to ${p.name}'s account.`, "success");
+
+        saveDatabaseState();
+        closeInsuranceVerifierModal();
+        
+        // Refresh active views
+        if (typeof populatePharmacistDashboard === "function") populatePharmacistDashboard();
+        if (typeof populatePatientPortal === "function") populatePatientPortal();
+        if (typeof populateDedicatedPatientEntryDashboard === "function") populateDedicatedPatientEntryDashboard();
+    }
+};
+
+window.printPreAuthLetter = function() {
+    if (!activeInsVerificationResult) return;
+
+    const res = activeInsVerificationResult;
+    const loc = state.localization || { currencySymbol: "₹" };
+
+    const printWin = window.open("", "_blank", "width=800,height=900");
+    printWin.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Cashless TPA Pre-Authorization Certificate - MedSphere AI</title>
+            <style>
+                body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; color: #1e293b; line-height: 1.6; }
+                .header { border-b: 3px solid #0d9488; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+                .logo { font-size: 24px; font-weight: bold; color: #0d9488; }
+                .title { font-size: 20px; font-weight: bold; text-align: center; text-transform: uppercase; margin: 20px 0; color: #0f172a; }
+                .badge { background: #dcfce7; color: #15803d; font-weight: bold; padding: 6px 12px; border-radius: 20px; font-size: 13px; text-align: center; display: inline-block; }
+                .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 25px 0; font-size: 14px; }
+                .card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 12px; }
+                .table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+                .table th, .table td { border: 1px solid #cbd5e1; padding: 10px 14px; text-align: left; }
+                .table th { background: #f1f5f9; }
+                .footer { margin-top: 50px; border-top: 1px solid #e2e8f0; pt: 20px; font-size: 12px; color: #64748b; text-align: center; }
+                .stamp { border: 2px dashed #0d9488; color: #0d9488; font-weight: bold; text-align: center; padding: 15px; border-radius: 10px; margin-top: 30px; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div>
+                    <div class="logo">🏥 MedSphere AI Health System</div>
+                    <div style="font-size: 12px; color: #64748b;">Hospital Subdomain: hospital.technocons.com</div>
+                </div>
+                <div style="text-align: right; font-size: 12px;">
+                    <div><strong>Date:</strong> ${new Date().toLocaleDateString()}</div>
+                    <div><strong>Ref No:</strong> ${res.refCode}</div>
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <div class="badge">✅ OFFICIAL CASHLESS PRE-AUTHORIZATION SANCTION</div>
+            </div>
+
+            <div class="title">TPA Cashless Eligibility Approval Certificate</div>
+
+            <div class="grid">
+                <div class="card">
+                    <strong style="color: #0f172a; display: block; margin-bottom: 8px;">PATIENT DETAILS</strong>
+                    <div><strong>Patient Name:</strong> ${res.patientName}</div>
+                    <div><strong>Patient ID:</strong> ${res.patientId}</div>
+                    <div><strong>Admission Type:</strong> Inpatient (IPD) Cashless</div>
+                </div>
+                <div class="card">
+                    <strong style="color: #0f172a; display: block; margin-bottom: 8px;">TPA INSURANCE DETAILS</strong>
+                    <div><strong>TPA Company:</strong> ${res.provider}</div>
+                    <div><strong>Policy Number:</strong> ${res.policyNumber}</div>
+                    <div><strong>Max Annual Limit:</strong> ${loc.currencySymbol}${res.maxLimit.toLocaleString()}</div>
+                </div>
+            </div>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Coverage Category</th>
+                        <th>Amount (${loc.currencySymbol})</th>
+                        <th>Approval Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Total Estimated Medical Claim</td>
+                        <td>${loc.currencySymbol}${res.totalClaim.toLocaleString()}</td>
+                        <td>Initial Pre-Auth Claim Submitted</td>
+                    </tr>
+                    <tr style="font-weight: bold; color: #059669;">
+                        <td>TPA Approved Cashless Coverage (80%)</td>
+                        <td>${loc.currencySymbol}${res.approvedAmount.toLocaleString()}</td>
+                        <td>Pre-Approved for Direct Settlement</td>
+                    </tr>
+                    <tr style="color: #d97706;">
+                        <td>Patient Co-Pay Obligation (20%)</td>
+                        <td>${loc.currencySymbol}${res.copayAmount.toLocaleString()}</td>
+                        <td>Payable by Patient at Hospital Desk</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="stamp">
+                DIRECT CASHLESS DISPATCH APPROVED BY ${res.provider.toUpperCase()}<br>
+                <span style="font-weight: normal; font-size: 11px;">Digitally signed & validated by MedSphere AI Health Gateway • Token ID: ${res.refCode}</span>
+            </div>
+
+            <div class="footer">
+                This is a computer-generated pre-authorization document issued by MedSphere AI Health Management.
+            </div>
+
+            <script>
+                window.onload = function() { window.print(); }
+            </script>
+        </body>
+        </html>
+    `);
+    printWin.document.close();
 };

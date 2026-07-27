@@ -123,7 +123,12 @@
                 </div>
 
                 <!-- Notifications & Actions -->
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <!-- Quick AI Insurance Verifier Link -->
+                    <button class="text-xs text-amber-400 border border-amber-500/20 px-3 py-1.5 rounded-xl bg-amber-500/5 hover:bg-amber-500/10 transition flex items-center gap-1.5 font-medium" onclick="openInsuranceVerifierModal()">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                        <span>AI TPA Insurance Verifier</span>
+                    </button>
                     <!-- Quick Switch Role Link -->
                     <button class="text-xs text-teal-400 border border-teal-500/20 px-3 py-1.5 rounded-xl bg-teal-500/5 hover:bg-teal-500/10 transition" onclick="resetToOnboarding()">
                         Switch Role
@@ -813,16 +818,26 @@
                                         <span>Pharmacy & Medication Charges:</span>
                                         <span class="text-white" id="invoicePharmacyCharges"><span class="currency-symbol">₹</span>0</span>
                                     </div>
+                                    <div class="flex justify-between text-sm text-emerald-400 font-semibold hidden" id="invoiceInsuranceRow">
+                                        <span class="flex items-center gap-1.5"><i data-lucide="shield-check" class="w-4 h-4"></i> TPA Insurance Cashless Cover:</span>
+                                        <span id="invoiceInsuranceAmount">-<span class="currency-symbol">₹</span>0</span>
+                                    </div>
                                     <div class="border-t border-white/5 pt-3 flex justify-between text-base font-bold">
                                         <span class="text-white">Total Amount (Inc. <span class="tax-name-label">GST</span>):</span>
                                         <span class="text-teal-400" id="invoiceTotalAmount"><span class="currency-symbol">₹</span>0</span>
                                     </div>
                                 </div>
 
-                                <button class="w-full btn btn-primary py-3 flex items-center justify-center gap-2" id="invoicePrintBtn" onclick="printPatientReceipt()">
-                                    <i data-lucide="printer" class="w-5 h-5"></i>
-                                    <span>Print Bill & Dispense Receipt</span>
-                                </button>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <button class="w-full btn bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 py-3 text-xs font-bold flex items-center justify-center gap-2 rounded-xl transition" onclick="openInsuranceVerifierModal(document.getElementById('billingPatientSelect').value)">
+                                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                                        <span>Verify TPA Insurance Cover</span>
+                                    </button>
+                                    <button class="w-full btn btn-primary py-3 flex items-center justify-center gap-2 text-xs font-bold" id="invoicePrintBtn" onclick="printPatientReceipt()">
+                                        <i data-lucide="printer" class="w-4 h-4"></i>
+                                        <span>Print Bill & Dispense Receipt</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -979,6 +994,25 @@
                                                 <!-- Dynamic empty beds selection -->
                                             </select>
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-[#9ca3af] mb-1.5 uppercase">Insurance Provider / TPA (Optional)</label>
+                                        <select id="dedicatedPatInsuranceProvider" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-teal-500">
+                                            <option value="None">Self-Pay / Cash Patient</option>
+                                            <option value="Star Health & Allied Insurance">Star Health & Allied Insurance</option>
+                                            <option value="HDFC ERGO Health">HDFC ERGO Cashless TPA</option>
+                                            <option value="Max Bupa (Niva Bupa)">Max Bupa (Niva Bupa Health)</option>
+                                            <option value="ICICI Lombard General">ICICI Lombard Health</option>
+                                            <option value="Ayushman Bharat (PM-JAY)">Ayushman Bharat (PM-JAY Scheme)</option>
+                                            <option value="Care Health Insurance">Care Health Insurance (Religare)</option>
+                                            <option value="CGHS / ECHS Govt Scheme">CGHS / ECHS Govt Scheme</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-[#9ca3af] mb-1.5 uppercase">Policy / Health Card No. (Optional)</label>
+                                        <input type="text" id="dedicatedPatPolicyNo" placeholder="e.g. POL-98421045" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-teal-500">
                                     </div>
                                 </div>
                                 <div>
@@ -1297,5 +1331,125 @@
 
     <!-- Main Client Engine Script -->
     <script src="app.js"></script>
+    <!-- MODAL: AI HEALTH INSURANCE & CASHLESS TPA VERIFIER -->
+    <div id="insuranceVerifierModal" class="modal-overlay hidden">
+        <div class="glass-card max-w-2xl w-full p-8 space-y-6 animate-scale max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-white/5 pb-3">
+                <div>
+                    <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i data-lucide="shield-check" class="text-amber-400"></i>
+                        <span>AI Cashless TPA & Insurance Verifier</span>
+                    </h3>
+                    <p class="text-xs text-[#9ca3af] mt-0.5">Real-time Policy Eligibility Check, Pre-Auth & Co-Pay Calculator</p>
+                </div>
+                <button class="text-[#6b7280] hover:text-white" onclick="closeInsuranceVerifierModal()">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4 text-sm">
+                <!-- Select Patient -->
+                <div>
+                    <label class="block text-xs font-semibold text-[#9ca3af] mb-1 uppercase">Select Patient *</label>
+                    <select id="insVerifPatientSelect" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400" onchange="autoPopulateInsuranceForm()">
+                        <option value="">Select registered patient...</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-[#9ca3af] mb-1 uppercase">TPA / Insurance Company *</label>
+                        <select id="insVerifProvider" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
+                            <option value="Star Health & Allied Insurance">Star Health & Allied Insurance</option>
+                            <option value="HDFC ERGO Health">HDFC ERGO Cashless TPA</option>
+                            <option value="Max Bupa (Niva Bupa)">Max Bupa (Niva Bupa Health)</option>
+                            <option value="ICICI Lombard General">ICICI Lombard Health</option>
+                            <option value="Ayushman Bharat (PM-JAY)">Ayushman Bharat (PM-JAY Scheme)</option>
+                            <option value="Care Health Insurance">Care Health Insurance (Religare)</option>
+                            <option value="Tata AIG Health">Tata AIG General Insurance</option>
+                            <option value="CGHS / ECHS Govt Scheme">CGHS / ECHS Govt Scheme</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-[#9ca3af] mb-1 uppercase">Policy / Health Card Number *</label>
+                        <input type="text" id="insVerifPolicyNo" placeholder="e.g. POL-98421045" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-[#9ca3af] mb-1 uppercase">Member / ABHA ID (Optional)</label>
+                        <input type="text" id="insVerifMemberId" placeholder="e.g. MEM-44912 / ABHA-0192" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-[#9ca3af] mb-1 uppercase">Claim / Estimated Bill (₹) *</label>
+                        <input type="number" id="insVerifClaimAmount" placeholder="e.g. 50000" value="50000" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
+                    </div>
+                </div>
+
+                <button class="w-full btn bg-amber-500 text-slate-900 font-bold py-3 rounded-xl hover:opacity-90 transition flex items-center justify-center gap-2 text-sm" onclick="runAiInsuranceVerification()">
+                    <i data-lucide="cpu" class="w-5 h-5"></i>
+                    <span>Run AI TPA Eligibility Verification</span>
+                </button>
+
+                <!-- Verification Progress Loading Indicator -->
+                <div id="insVerifLoading" class="hidden space-y-2 p-4 bg-white/5 rounded-2xl border border-white/10 text-center animate-pulse">
+                    <div class="text-amber-400 font-semibold text-xs flex items-center justify-center gap-2">
+                        <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
+                        <span>Connecting to Cashless TPA Gateway & Validating Policy...</span>
+                    </div>
+                    <div class="text-[10px] text-[#9ca3af]" id="insVerifLoadingSub">Verifying policy status, annual limits, sub-limits, and co-payment rules...</div>
+                </div>
+
+                <!-- Verification Result Card -->
+                <div id="insVerifResultCard" class="hidden space-y-4 p-5 bg-white/5 rounded-2xl border border-amber-500/20">
+                    <div class="flex items-center justify-between border-b border-white/5 pb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 font-bold text-xs" id="insResultStatusBadge">
+                                ✅ CASHLESS PRE-APPROVED
+                            </span>
+                            <span class="text-xs text-[#9ca3af]" id="insResultRefCode">Ref: TPA-AUTH-2026-98421</span>
+                        </div>
+                        <span class="text-xs font-mono text-amber-400 font-bold" id="insResultProviderName">Star Health</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                        <div class="p-2.5 bg-black/20 rounded-xl border border-white/5">
+                            <span class="text-[10px] text-[#9ca3af] block uppercase">Total Claim</span>
+                            <span class="text-sm font-bold text-white" id="insResultTotalClaim"><span class="currency-symbol">₹</span>50,000</span>
+                        </div>
+                        <div class="p-2.5 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                            <span class="text-[10px] text-emerald-400 block uppercase font-semibold">TPA Cover (80%)</span>
+                            <span class="text-sm font-bold text-emerald-400" id="insResultApprovedAmount"><span class="currency-symbol">₹</span>40,000</span>
+                        </div>
+                        <div class="p-2.5 bg-amber-500/10 rounded-xl border border-amber-500/20">
+                            <span class="text-[10px] text-amber-400 block uppercase font-semibold">Patient Co-Pay (20%)</span>
+                            <span class="text-sm font-bold text-amber-400" id="insResultCopayAmount"><span class="currency-symbol">₹</span>10,000</span>
+                        </div>
+                        <div class="p-2.5 bg-black/20 rounded-xl border border-white/5">
+                            <span class="text-[10px] text-[#9ca3af] block uppercase">Max Policy Limit</span>
+                            <span class="text-sm font-bold text-teal-400" id="insResultMaxLimit"><span class="currency-symbol">₹</span>5,00,000</span>
+                        </div>
+                    </div>
+
+                    <div class="text-xs text-[#9ca3af] bg-black/20 p-3 rounded-xl border border-white/5 space-y-1">
+                        <div>• <strong>Cashless Coverage:</strong> Room Rent Covered, ICU Cap Exempted, Pharmacy Covered.</div>
+                        <div>• <strong>Patient Liability:</strong> Co-pay amount of <span id="insResultCopayNote" class="text-amber-400 font-bold"><span class="currency-symbol">₹</span>10,000</span> to be collected at checkout.</div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                        <button class="w-full btn btn-primary text-xs py-2.5 flex items-center justify-center gap-1.5" onclick="applyInsuranceCoverageToPatient()">
+                            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                            <span>Apply Cashless Discount to Patient</span>
+                        </button>
+                        <button class="w-full btn bg-white/10 hover:bg-white/20 text-white text-xs py-2.5 flex items-center justify-center gap-1.5" onclick="printPreAuthLetter()">
+                            <i data-lucide="file-text" class="w-4 h-4"></i>
+                            <span>Print Digital Pre-Auth Letter</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
