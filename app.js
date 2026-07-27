@@ -215,6 +215,11 @@ window.switchRole = function(clearance, name, id) {
 
 // 6. Navigation View Switching
 window.switchDashboardView = function(viewId, elementLink = null) {
+    // Strip trailing # from address bar if present
+    if (window.location.hash) {
+        history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+
     // Hide all dashboards
     document.querySelectorAll("section[id^='view-']").forEach(sec => sec.classList.add("hidden"));
     
