@@ -1835,8 +1835,11 @@
 
                 <!-- Tumor Biomarkers Grid -->
                 <div class="space-y-1 pt-1">
-                    <h4 class="text-xs font-bold text-purple-400 uppercase tracking-wider">Serum Tumor Biomarkers Panel</h4>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-bold text-purple-400 uppercase tracking-wider">1. Serum Tumor Biomarkers Panel</h4>
+                        <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30 font-semibold">🟢 Standard Nursing Home & Local Lab Ready</span>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-1">
                         <div>
                             <label class="block text-[#9ca3af] font-semibold mb-1">PSA (Prostate ng/mL)</label>
                             <input type="number" step="0.1" id="oncoPsa" placeholder="e.g. 2.5 (High: >4.0)" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white font-mono">
@@ -1858,8 +1861,11 @@
 
                 <!-- Genomic Mutations & Receptor Panel -->
                 <div class="space-y-1 pt-1">
-                    <h4 class="text-xs font-bold text-purple-400 uppercase tracking-wider">Oncogene Somatic Mutations & Receptor Profiling</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-bold text-purple-400 uppercase tracking-wider">2. Somatic Mutations & Receptors</h4>
+                        <span class="text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30 font-semibold">🧬 Specialized NGS & Tissue Biopsy Outsource Lab</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
                         <div>
                             <label class="block text-[#9ca3af] font-semibold mb-1">Oncogene Somatic Mutation</label>
                             <select id="oncoGeneMutation" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500">
