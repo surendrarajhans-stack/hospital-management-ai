@@ -5,14 +5,17 @@
 const API_BASE_URL = window.location.origin;
 
 // Global URL Hash Cleaner (Strips trailing /# from browser address bar automatically)
-function cleanUrlHash() {
-    if (window.location.hash) {
-        history.replaceState(null, "", window.location.pathname + window.location.search);
+window.cleanUrlHash = function() {
+    if (window.location.href.includes("#")) {
+        const cleanUrl = window.location.href.split('#')[0];
+        history.replaceState(null, "", cleanUrl);
     }
-}
+};
+
 cleanUrlHash();
 window.addEventListener("DOMContentLoaded", cleanUrlHash);
 window.addEventListener("hashchange", cleanUrlHash);
+
 document.addEventListener("click", (e) => {
     const anchor = e.target.closest("a");
     if (anchor) {
@@ -236,9 +239,7 @@ window.switchRole = function(clearance, name, id) {
 // 6. Navigation View Switching
 window.switchDashboardView = function(viewId, elementLink = null) {
     // Strip trailing # from address bar if present
-    if (window.location.hash) {
-        history.replaceState(null, "", window.location.pathname + window.location.search);
-    }
+    cleanUrlHash();
 
     // Hide all dashboards
     document.querySelectorAll("section[id^='view-']").forEach(sec => sec.classList.add("hidden"));
