@@ -1043,7 +1043,116 @@ window.printPatientReceipt = function() {
     if (!p) return;
     
     addSystemLog(`Printed billing receipt for Patient ${p.name} (${billingSelectedPatientId})`, "Success");
-    alert(`PRINT SYSTEM INTERCEPT:\n========================\nMEDSPHERE CLINIC OUTPATIENT RECEIPT\n========================\nPatient: ${p.name}\nTotal Charge (Tax Inc.): ${document.getElementById("invoiceTotalAmount").innerText}\nStatus: ${p.paid ? 'Settled' : 'Unpaid'}\n========================`);
+    
+    const baseAmount = p.bill;
+    const taxRate = state.localization.taxRate;
+    const taxValue = Math.round(baseAmount * (taxRate / 100));
+    let grossTotal = baseAmount + taxValue;
+    let tpaDeduction = (p.insurance && p.insurance.approvedAmount) ? p.insurance.approvedAmount : 0;
+    let netPayable = Math.max(0, grossTotal - tpaDeduction);
+    
+    const invoiceWin = window.open("", "_blank", "width=850,height=950");
+    invoiceWin.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>MedSphere AI - Official Hospital Tax Invoice & Discharge Receipt</title>
+            <style>
+                body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; color: #1e293b; background: #fff; line-height: 1.5; }
+                .invoice-box { max-width: 800px; margin: auto; padding: 30px; border: 1px solid #eee; border-radius: 12px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); }
+                .header-table { width: 100%; border-bottom: 2px solid #0d9488; padding-bottom: 20px; margin-bottom: 20px; }
+                .hospital-name { font-size: 24px; font-weight: bold; color: #0f172a; }
+                .hospital-sub { font-size: 12px; color: #0d9488; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+                .inv-title { text-align: right; font-size: 20px; font-weight: bold; color: #334155; }
+                .inv-details { font-size: 12px; color: #64748b; text-align: right; margin-top: 4px; }
+                .patient-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; font-size: 13px; }
+                .bill-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; font-size: 13px; }
+                .bill-table th { background: #f1f5f9; padding: 10px; text-align: left; font-weight: bold; color: #334155; border-bottom: 1px solid #cbd5e1; }
+                .bill-table td { padding: 12px 10px; border-bottom: 1px solid #e2e8f0; }
+                .total-row { font-weight: bold; }
+                .badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; display: inline-block; }
+                .badge-settled { background: #dcfce7; color: #166534; }
+                .badge-unpaid { background: #ffe4e6; color: #9f1239; }
+                .footer-stamp { margin-top: 40px; border-top: 1px dashed #cbd5e1; padding-top: 20px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #64748b; }
+            </style>
+        </head>
+        <body>
+            <div class="invoice-box">
+                <table class="header-table">
+                    <tr>
+                        <td>
+                            <div class="hospital-name">MedSphere Healthcare OS</div>
+                            <div class="hospital-sub">NABH Accredited Tertiary Care Center</div>
+                            <div style="font-size: 11px; color: #64748b; margin-top: 4px;">Node: ${state.localization.country} • Currency: ${state.localization.currency} (${state.localization.currencySymbol})</div>
+                        </td>
+                        <td>
+                            <div class="inv-title">TAX INVOICE & RECEIPT</div>
+                            <div class="inv-details">Receipt No: INV-2026-${Math.floor(10000 + Math.random() * 90000)}</div>
+                            <div class="inv-details">Date: ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</div>
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="patient-card">
+                    <div>
+                        <strong>Patient Name:</strong> ${p.name}<br>
+                        <strong>Patient ID:</strong> ${p.id}<br>
+                        <strong>Age:</strong> ${p.age} Years | <strong>Triage:</strong> ${p.triage || 'Stable'}
+                    </div>
+                    <div style="text-align: right;">
+                        <strong>Admission / Ward Bed:</strong> ${p.bed || 'Outpatient (OPD)'}<br>
+                        <strong>Complaint:</strong> ${p.complaint || 'General Clinical Consultation'}<br>
+                        <strong>Billing Status:</strong> <span class="badge ${p.paid || netPayable === 0 ? 'badge-settled' : 'badge-unpaid'}">${p.paid || netPayable === 0 ? 'PAID / SETTLED' : 'PAYMENT OUTSTANDING'}</span>
+                    </div>
+                </div>
+
+                <table class="bill-table">
+                    <thead>
+                        <tr>
+                            <th>Item Description / Particulars</th>
+                            <th>Category</th>
+                            <th style="text-align: right;">Amount (${state.localization.currencySymbol})</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Clinical Consultation & Ward Admission Fee</td>
+                            <td>Hospital Services</td>
+                            <td style="text-align: right;">${formatCurrency(baseAmount)}</td>
+                        </tr>
+                        <tr>
+                            <td>Statutory Tax (${state.localization.taxName} @ ${taxRate}%)</td>
+                            <td>Government Levy</td>
+                            <td style="text-align: right;">${formatCurrency(taxValue)}</td>
+                        </tr>
+                        ${tpaDeduction > 0 ? `
+                        <tr style="color: #0d9488; font-weight: bold;">
+                            <td>Cashless TPA Cover (${p.insurance ? p.insurance.provider : 'TPA Insurance'})</td>
+                            <td>Insurance Pre-Auth Cover</td>
+                            <td style="text-align: right;">-${formatCurrency(tpaDeduction)}</td>
+                        </tr>` : ''}
+                        <tr class="total-row" style="font-size: 15px;">
+                            <td colspan="2" style="text-align: right; padding-top: 15px;">Net Outstanding Payable:</td>
+                            <td style="text-align: right; padding-top: 15px; color: #0f172a;">${formatCurrency(netPayable)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="footer-stamp">
+                    <div>
+                        <strong>Digitally Verified by MedSphere AI Billing Gateway</strong><br>
+                        GSTIN / Reg Token: GSTIN-2026-MED98421 • ABDM M3 Compliant
+                    </div>
+                    <div style="text-align: right; border-top: 1px solid #334155; padding-top: 4px; width: 180px;">
+                        Authorized Cashier Signature
+                    </div>
+                </div>
+            </div>
+            <script>window.onload = function() { window.print(); }</script>
+        </body>
+        </html>
+    `);
+    invoiceWin.document.close();
 };
 
 // 13. Patient Portal Controllers
