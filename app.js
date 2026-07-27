@@ -4,6 +4,26 @@
 
 const API_BASE_URL = window.location.origin;
 
+// Global URL Hash Cleaner (Strips trailing /# from browser address bar automatically)
+function cleanUrlHash() {
+    if (window.location.hash) {
+        history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+}
+cleanUrlHash();
+window.addEventListener("DOMContentLoaded", cleanUrlHash);
+window.addEventListener("hashchange", cleanUrlHash);
+document.addEventListener("click", (e) => {
+    const anchor = e.target.closest("a");
+    if (anchor) {
+        const href = anchor.getAttribute("href");
+        if (href === "#" || href === "") {
+            e.preventDefault();
+            cleanUrlHash();
+        }
+    }
+});
+
 // 1. Unified Application State
 const state = {
     userName: "",
