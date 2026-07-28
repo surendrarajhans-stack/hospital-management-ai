@@ -209,9 +209,15 @@ window.switchRole = function(clearance, name, id) {
     state.onboardingStep = 2;
     saveLocalState();
     
-    // Show navigation layouts
-    if (window.AppElements.sidebar) window.AppElements.sidebar.classList.remove("hidden");
+    // Show navigation layouts on desktop; hide mobile drawer overlay on mobile phones
     if (window.AppElements.header) window.AppElements.header.classList.remove("hidden");
+    if (window.AppElements.sidebar) {
+        if (window.innerWidth < 768) {
+            window.AppElements.sidebar.classList.add("hidden");
+        } else {
+            window.AppElements.sidebar.classList.remove("hidden");
+        }
+    }
     document.getElementById("onboarding-credentials").classList.add("hidden");
     
     // Update sidebar badges
@@ -257,8 +263,9 @@ window.switchDashboardView = function(viewId, elementLink = null) {
     cleanUrlHash();
 
     // Auto-close mobile navigation drawer when a department view link is clicked on phones
-    if (window.innerWidth < 768 && window.AppElements && window.AppElements.sidebar) {
-        window.AppElements.sidebar.classList.add("hidden");
+    const mobileSidebar = document.getElementById("main-sidebar");
+    if (window.innerWidth < 768 && mobileSidebar) {
+        mobileSidebar.classList.add("hidden");
     }
 
     // Hide onboarding SaaS marketing hero when navigating department views for instant top-viewport presentation
