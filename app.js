@@ -241,12 +241,21 @@ window.switchDashboardView = function(viewId, elementLink = null) {
     // Strip trailing # from address bar if present
     cleanUrlHash();
 
+    // Hide onboarding SaaS marketing hero when navigating department views for instant top-viewport presentation
+    const landingHero = document.getElementById("onboarding-role-select");
+    if (landingHero) landingHero.classList.add("hidden");
+
     // Hide all dashboards
     document.querySelectorAll("section[id^='view-']").forEach(sec => sec.classList.add("hidden"));
     
     // Show active dashboard
     const target = document.getElementById(viewId);
     if (target) target.classList.remove("hidden");
+
+    // Scroll view container and main viewport smoothly to top
+    const viewContainer = document.getElementById("view-container");
+    if (viewContainer) viewContainer.scrollTop = 0;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     
     state.activeDashboardView = viewId;
     saveLocalState();
