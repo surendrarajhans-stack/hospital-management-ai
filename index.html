@@ -164,18 +164,45 @@
             <!-- DASHBOARD CONTAINER -->
             <div id="view-container" class="flex-1 p-6 overflow-y-auto space-y-6">
 
-                <!-- 1. ONBOARDING ROLE SELECTION SCREEN -->
-                <section id="onboarding-role-select" class="max-w-4xl mx-auto py-4 md:py-12 text-center space-y-6 md:space-y-8">
+                <!-- 1. ONBOARDING ROLE SELECTION & B2B MARKETING LANDING PAGE -->
+                <section id="onboarding-role-select" class="max-w-6xl mx-auto py-4 md:py-8 text-center space-y-6 md:space-y-8">
+                    <!-- SaaS Hero Banner -->
                     <div class="space-y-4">
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-teal-500 to-cyan-400 flex items-center justify-center mx-auto shadow-xl shadow-teal-500/10 animate-bounce">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-teal-500 to-cyan-400 flex items-center justify-center mx-auto shadow-xl shadow-teal-500/20 animate-bounce">
                             <i data-lucide="activity" class="w-10 h-10 text-slate-900 stroke-[2.5]"></i>
                         </div>
-                        <h2 class="font-display font-bold text-3xl md:text-4xl text-white">Select Your Hospital Workspace</h2>
-                        <p class="text-lg text-slate-400 max-w-xl mx-auto">Access customized dashboards and AI-assisted workflows based on your clinical clearance.</p>
+                        <h1 class="font-display font-extrabold text-3xl md:text-5xl text-white tracking-tight">
+                            MedSphere AI Hospital OS
+                        </h1>
+                        <p class="text-base md:text-lg text-slate-300 max-w-3xl mx-auto leading-relaxed">
+                            The Next-Gen <span class="text-teal-400 font-bold">ABDM M3 & HIPAA Ready</span> Hospital Operating System for Nursing Homes, Polyclinics & Hospitals Worldwide.
+                        </p>
+
+                        <!-- Feature Badges Grid -->
+                        <div class="flex flex-wrap justify-center gap-2 max-w-4xl mx-auto pt-2 text-[11px] font-semibold">
+                            <span class="px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 flex items-center gap-1">
+                                <i data-lucide="flask-conical" class="w-3.5 h-3.5 text-teal-400"></i> 10-Param AI Lab Anomaly Detector
+                            </span>
+                            <span class="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 flex items-center gap-1">
+                                <i data-lucide="heart-pulse" class="w-3.5 h-3.5 text-amber-400"></i> AI Clinical Triage Acuity (ESI 1-5)
+                            </span>
+                            <span class="px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 flex items-center gap-1">
+                                <i data-lucide="dna" class="w-3.5 h-3.5 text-purple-400"></i> AI Precision Oncology Agent
+                            </span>
+                            <span class="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 flex items-center gap-1">
+                                <i data-lucide="qr-code" class="w-3.5 h-3.5 text-emerald-400"></i> ABDM 14-Digit ABHA ID Generator
+                            </span>
+                            <span class="px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 flex items-center gap-1">
+                                <i data-lucide="file-text" class="w-3.5 h-3.5 text-cyan-400"></i> Multi-Currency Tax Invoice & TPA Verifier
+                            </span>
+                            <span class="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300 flex items-center gap-1">
+                                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-blue-400"></i> DPDP Act 2023 & HIPAA Compliance Certificate
+                            </span>
+                        </div>
                     </div>
 
                     <!-- Trial & Localization Setup Card -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left max-w-6xl mx-auto">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left max-w-6xl mx-auto pt-4">
                         <!-- Left: Trial -->
                         <div class="glass-card p-6 flex flex-col justify-between space-y-4 cursor-pointer hover:border-teal-500/20 transition" onclick="openFreeTrialModal()">
                             <div>
