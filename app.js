@@ -1897,7 +1897,7 @@ window.togglePaymentGatewayUI = function(gateway) {
 // Stripe & PayPal Production API Key Configuration
 window.MEDSPHERE_PAYMENT_KEYS = {
     stripePublishableKey: window.STRIPE_LIVE_KEY || "pk_test_51M3DemoStripeKeyMedSphere2026",
-    paypalClientId: window.PAYPAL_LIVE_CLIENT_ID || "sb"
+    paypalClientId: window.PAYPAL_LIVE_CLIENT_ID || "BAA51Ma8nhPfPZqKaf-78qG-xLtENqFCE_7dAhX_Ml4R4mYmm4mFneEIwKZZ0J37mAamN1APYv_Cj4hyQw"
 };
 
 window.initStripeCardElement = function() {
