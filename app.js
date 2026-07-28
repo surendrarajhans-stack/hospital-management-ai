@@ -244,10 +244,22 @@ window.switchRole = function(clearance, name, id) {
     addSystemLog(`User ${name} authenticated successfully as ${state.userRole}.`, "Success");
 };
 
+window.toggleSidebar = function() {
+    const sidebar = document.getElementById("main-sidebar");
+    if (sidebar) {
+        sidebar.classList.toggle("hidden");
+    }
+};
+
 // 6. Navigation View Switching
 window.switchDashboardView = function(viewId, elementLink = null) {
     // Strip trailing # from address bar if present
     cleanUrlHash();
+
+    // Auto-close mobile navigation drawer when a department view link is clicked on phones
+    if (window.innerWidth < 768 && window.AppElements && window.AppElements.sidebar) {
+        window.AppElements.sidebar.classList.add("hidden");
+    }
 
     // Hide onboarding SaaS marketing hero when navigating department views for instant top-viewport presentation
     const landingHero = document.getElementById("onboarding-role-select");
