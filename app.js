@@ -341,9 +341,12 @@ function loadDatabaseState() {
             Object.assign(MOCK_DB, cloudDb);
             console.log("MedSphere state synced from cloud successfully.");
             
-            // Re-render active view
-            if (state.activeDashboardView) {
-                switchDashboardView(state.activeDashboardView);
+            // Re-render current dashboard if user is actively inside a department view
+            if (state.activeDashboardView && state.onboardingStep === 2) {
+                const activeSec = document.getElementById(state.activeDashboardView);
+                if (activeSec && !activeSec.classList.contains("hidden")) {
+                    switchDashboardView(state.activeDashboardView);
+                }
             }
             if (typeof window.applyRegionalUI === 'function') window.applyRegionalUI();
         }
