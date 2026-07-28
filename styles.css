@@ -1691,8 +1691,7 @@ select option {
         touch-action: auto !important;
     }
     
-    .app-container, main, #view-container, .dashboard-pane, section[id^='view-'], #onboarding-role-select {
-        display: block !important;
+    .app-container, main, #view-container, .dashboard-pane {
         height: auto !important;
         max-height: none !important;
         min-height: 0 !important;
@@ -1700,6 +1699,17 @@ select option {
         overflow-y: visible !important;
         position: static !important;
         -webkit-overflow-scrolling: touch !important;
+    }
+
+    /* Ensure hidden sections and hero remain strictly hidden on mobile when class hidden is applied */
+    section.hidden, #onboarding-role-select.hidden, .hidden {
+        display: none !important;
+    }
+
+    section[id^='view-']:not(.hidden), #onboarding-role-select:not(.hidden) {
+        display: block !important;
+        height: auto !important;
+        overflow: visible !important;
     }
 
     #view-container {
