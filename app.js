@@ -272,10 +272,15 @@ window.switchDashboardView = function(viewId, elementLink = null) {
     const target = document.getElementById(viewId);
     if (target) target.classList.remove("hidden");
 
-    // Scroll view container and main viewport smoothly to top
-    const viewContainer = document.getElementById("view-container");
-    if (viewContainer) viewContainer.scrollTop = 0;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Multi-browser mobile & desktop viewport scroll reset
+    setTimeout(() => {
+        window.scrollTo(0, 0);
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+        const viewContainer = document.getElementById("view-container");
+        if (viewContainer) viewContainer.scrollTop = 0;
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 30);
     
     state.activeDashboardView = viewId;
     saveLocalState();
