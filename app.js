@@ -1894,13 +1894,19 @@ window.togglePaymentGatewayUI = function(gateway) {
     if (window.lucide) lucide.createIcons();
 };
 
+// Stripe & PayPal Production API Key Configuration
+window.MEDSPHERE_PAYMENT_KEYS = {
+    stripePublishableKey: window.STRIPE_LIVE_KEY || "pk_test_51M3DemoStripeKeyMedSphere2026",
+    paypalClientId: window.PAYPAL_LIVE_CLIENT_ID || "sb"
+};
+
 window.initStripeCardElement = function() {
     const container = document.getElementById("stripeCardElement");
     if (!container || container.childElementCount > 0) return;
 
     try {
         if (window.Stripe) {
-            stripeInstance = window.Stripe("pk_test_51M3DemoStripeKeyMedSphere2026");
+            stripeInstance = window.Stripe(window.MEDSPHERE_PAYMENT_KEYS.stripePublishableKey);
             const elements = stripeInstance.elements();
             stripeCardElement = elements.create("card", {
                 style: {
