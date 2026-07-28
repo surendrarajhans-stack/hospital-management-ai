@@ -107,7 +107,7 @@ window.addEventListener("DOMContentLoaded", () => {
     cacheDOM();
     if (window.lucide) window.lucide.createIcons();
     
-    // Check if license is active
+    // Load local state
     const savedState = localStorage.getItem("medsphere_state");
     if (savedState) {
         try {
@@ -119,12 +119,8 @@ window.addEventListener("DOMContentLoaded", () => {
     loadDatabaseState();
     if (typeof window.applyRegionalUI === 'function') window.applyRegionalUI();
     
-    // Switch to initial state
-    if (state.onboardingStep === 2 && state.userId) {
-        switchRole(state.roleClearance, state.userName, state.userId);
-    } else {
-        resetToOnboarding();
-    }
+    // Always default to B2B SaaS Landing Page & Role Selector on initial website launch
+    resetToOnboarding();
 });
 
 // 5. Onboarding / Role switching flows
