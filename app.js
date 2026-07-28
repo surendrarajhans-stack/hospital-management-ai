@@ -128,14 +128,26 @@ window.resetToOnboarding = function() {
     state.onboardingStep = 0;
     saveLocalState();
     
-    if (window.AppElements.sidebar) window.AppElements.sidebar.classList.add("hidden");
-    if (window.AppElements.header) window.AppElements.header.classList.add("hidden");
+    // Make sure landing hero is visible
+    const landingHero = document.getElementById("onboarding-role-select");
+    if (landingHero) landingHero.classList.remove("hidden");
     
-    document.getElementById("onboarding-role-select").classList.remove("hidden");
     document.getElementById("onboarding-credentials").classList.add("hidden");
     
-    // Hide all dashboards
+    // Hide all department views
     document.querySelectorAll("section[id^='view-']").forEach(sec => sec.classList.add("hidden"));
+    
+    // Update active header label
+    const titleElem = document.getElementById("current-view-title");
+    if (titleElem) titleElem.innerText = "SaaS Platform Overview & Pricing";
+    
+    // Update active nav link
+    document.querySelectorAll(".sidebar-link").forEach(lnk => lnk.classList.remove("active"));
+
+    // Scroll viewport cleanly to top
+    const viewContainer = document.getElementById("view-container");
+    if (viewContainer) viewContainer.scrollTop = 0;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 window.selectRoleOnboarding = function(clearance, roleLabel) {
