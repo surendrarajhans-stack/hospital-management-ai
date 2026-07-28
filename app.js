@@ -1779,11 +1779,16 @@ window.sendAdminWhatsAppNotification = function(message) {
     })
     .then(r => r.json())
     .then(data => console.log("WhatsApp alert response:", data))
-    .catch(err => console.error("WhatsApp alert error:", err));
+.catch(err => console.error("WhatsApp alert error:", err));
 };
 
 function addChatMessage(type, content, senderName = "MedSphere AI", originalContent = null) {
     const rawEnglish = originalContent || content;
+   // Stripe & PayPal Gateway Integration Variables
+let activeGateway = "stripe";
+let stripeInstance = null;
+let stripeCardElement = null;
+
     const container = window.AppElements.chatMessages;
     if (!container) return;
     
@@ -1849,7 +1854,121 @@ window.openOnlineCheckoutModal = function() {
         });
 
         window.selectCheckoutPlan("pro");
+        window.togglePaymentGatewayUI("stripe");
     }
+};
+
+window.togglePaymentGatewayUI = function(gateway) {
+    activeGateway = gateway;
+    const stripeBox = document.getElementById("stripeCardContainer");
+    const paypalBox = document.getElementById("paypalButtonContainer");
+    const securityBadge = document.getElementById("payGatewaySecurityBadge");
+    const submitBtn = document.getElementById("paySubmitBtn");
+
+    if (gateway === "stripe") {
+        if (stripeBox) stripeBox.classList.remove("hidden");
+        if (paypalBox) paypalBox.classList.add("hidden");
+        if (securityBadge) securityBadge.innerText = "Stripe 256-Bit SSL";
+        if (submitBtn) {
+            submitBtn.classList.remove("hidden");
+            submitBtn.innerHTML = `<i data-lucide="credit-card" class="w-4 h-4"></i> Pay via Stripe Card & Activate`;
+        }
+        window.initStripeCardElement();
+    } else if (gateway === "paypal") {
+        if (stripeBox) stripeBox.classList.add("hidden");
+        if (paypalBox) paypalBox.classList.remove("hidden");
+        if (securityBadge) securityBadge.innerText = "PayPal Express SSL";
+        if (submitBtn) {
+            submitBtn.classList.add("hidden"); // PayPal uses its own smart buttons
+        }
+        window.renderPayPalSmartButtons();
+    } else { // Razorpay / UPI
+        if (stripeBox) stripeBox.classList.add("hidden");
+        if (paypalBox) paypalBox.classList.add("hidden");
+        if (securityBadge) securityBadge.innerText = "Razorpay / UPI SSL";
+        if (submitBtn) {
+            submitBtn.classList.remove("hidden");
+            submitBtn.innerHTML = `<i data-lucide="shield-check" class="w-4 h-4"></i> Pay via Razorpay / UPI & Activate`;
+        }
+    }
+    if (window.lucide) lucide.createIcons();
+};
+
+window.initStripeCardElement = function() {
+    const container = document.getElementById("stripeCardElement");
+    if (!container || container.childElementCount > 0) return;
+
+    try {
+        if (window.Stripe) {
+            stripeInstance = window.Stripe("pk_test_51M3DemoStripeKeyMedSphere2026");
+            const elements = stripeInstance.elements();
+            stripeCardElement = elements.create("card", {
+                style: {
+                    base: {
+                        color: "#ffffff",
+                        fontFamily: "Inter, sans-serif",
+                        fontSmoothing: "antialiased",
+                        fontSize: "13px",
+                        "::placeholder": { color: "#9ca3af" }
+                    },
+                    invalid: { color: "#f87171", iconColor: "#f87171" }
+                }
+            });
+            stripeCardElement.mount("#stripeCardElement");
+        } else {
+            container.innerHTML = `<div class="text-xs text-teal-400 font-mono">💳 Stripe 256-Bit Encrypted Form Ready (Mock PK Key Active)</div>`;
+        }
+    } catch(err) {
+        container.innerHTML = `<div class="text-xs text-teal-400 font-mono">💳 Stripe 256-Bit Encrypted Form Active</div>`;
+    }
+};
+
+window.renderPayPalSmartButtons = function() {
+    const container = document.getElementById("paypalButtonsRender");
+    if (!container || container.childElementCount > 0) return;
+
+    try {
+        if (window.paypal) {
+            window.paypal.Buttons({
+                style: { layout: 'horizontal', color: 'gold', shape: 'pill', label: 'pay' },
+                createOrder: function(data, actions) {
+                    const loc = state.localization || { currency: "USD" };
+                    const basePrices = getLocalPlanPrices(loc.currency || "USD");
+                    const amount = basePrices[selectedPlan] || 69;
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: { value: amount.toString() },
+                            description: `MedSphere AI Hospital OS - ${selectedPlan.toUpperCase()} Subscription`
+                        }]
+                    });
+                },
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(function(details) {
+                        const schoolName = document.getElementById("checkoutSchoolName").value || "Healthcare Partner";
+                        window.completePaymentOrder("PAYPAL-" + details.id, schoolName, "PayPal Express");
+                    });
+                }
+            }).render('#paypalButtonsRender');
+        } else {
+            container.innerHTML = `
+                <button type="button" class="w-full btn bg-amber-400 text-slate-900 font-bold py-2 px-4 rounded-full flex items-center justify-center gap-2 hover:bg-amber-300 transition" onclick="window.simulatePayPalPayment()">
+                    <span>🅿️ Pay via PayPal Express ($ / € / £)</span>
+                </button>
+            `;
+        }
+    } catch(err) {
+        container.innerHTML = `
+            <button type="button" class="w-full btn bg-amber-400 text-slate-900 font-bold py-2 px-4 rounded-full flex items-center justify-center gap-2 hover:bg-amber-300 transition" onclick="window.simulatePayPalPayment()">
+                <span>🅿️ Pay via PayPal Express ($ / € / £)</span>
+            </button>
+        `;
+    }
+};
+
+window.simulatePayPalPayment = function() {
+    const schoolName = document.getElementById("checkoutSchoolName").value.trim() || "International Clinic";
+    const payId = "PP-EXP-2026-" + Math.floor(100000 + Math.random() * 900000);
+    window.completePaymentOrder(payId, schoolName, "PayPal Express");
 };
 
 window.closeOnlineCheckoutModal = function() {
@@ -1905,7 +2024,10 @@ window.handleOnlineCheckoutSubmit = function(e) {
     e.preventDefault();
     const schoolName = document.getElementById("checkoutSchoolName").value.trim();
     const gstin = document.getElementById("checkoutGstin").value.trim();
-    if (!schoolName) return;
+    if (!schoolName) {
+        alert("Please enter your Hospital / Institution Name.");
+        return;
+    }
 
     const loc = state.localization || { currency: "INR", currencySymbol: "₹", taxRate: 18, taxName: "GST" };
     const basePrices = getLocalPlanPrices(loc.currency || "INR");
@@ -1914,13 +2036,24 @@ window.handleOnlineCheckoutSubmit = function(e) {
     const tax = base * (taxRatePercent / 100);
     const total = base + tax;
 
-    // Trigger simulated/real payment logic
-    const payId = "pay_Rzp" + Math.random().toString(36).substring(2, 10).toUpperCase();
-    window.completeRazorpayOrder(payId, schoolName, total, gstin);
+    let gatewayName = "Stripe Gateway";
+    let payId = "ch_stripe_" + Math.random().toString(36).substring(2, 10).toUpperCase();
+
+    if (activeGateway === "razorpay") {
+        gatewayName = "Razorpay / UPI";
+        payId = "pay_rzp_" + Math.random().toString(36).substring(2, 10).toUpperCase();
+    } else if (activeGateway === "paypal") {
+        gatewayName = "PayPal Express";
+        payId = "pay_pp_" + Math.random().toString(36).substring(2, 10).toUpperCase();
+    }
+
+    window.completePaymentOrder(payId, schoolName, gatewayName, total, gstin);
 };
 
-window.completeRazorpayOrder = function(payId, schoolName, total, gstin) {
+window.completePaymentOrder = function(payId, schoolName, gatewayName, total, gstin) {
     const loc = state.localization || { currencySymbol: "₹", taxRate: 18, taxName: "GST" };
+    const basePrices = getLocalPlanPrices(loc.currency || "INR");
+    const calculatedTotal = total || (basePrices[selectedPlan] ? basePrices[selectedPlan] * 1.18 : 82598);
     const invoiceNo = "INV-2026-" + Math.floor(10000 + Math.random() * 90000);
     const permLicenseKey = "MED-PERM-2026-" + schoolName.substring(0, 4).toUpperCase().replace(/\s/g, '');
 

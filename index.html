@@ -29,6 +29,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     
+    <!-- Stripe & PayPal SDKs -->
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD"></script>
+    
     <!-- Custom Modern Styling -->
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -1231,17 +1235,37 @@
                             </div>
                         </div>
 
-                        <!-- Payment Method Tabs -->
+                        <!-- Payment Method Selection Grid -->
                         <div>
-                            <label class="block text-xs font-semibold text-[#9ca3af] mb-1.5">Payment Method</label>
-                            <div class="grid grid-cols-2 gap-4">
-                                <label class="border border-white/10 p-3 rounded-xl text-xs cursor-pointer flex items-center gap-2 bg-white/5 hover:border-amber-500/20 transition">
-                                    <input type="radio" name="payMethod" value="upi" checked> 📱 UPI / QR Code (Instant)
+                            <label class="block text-xs font-semibold text-[#9ca3af] mb-1.5">Select Payment Gateway</label>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                                <label class="border border-white/10 p-3 rounded-xl cursor-pointer flex items-center gap-2 bg-white/5 hover:border-amber-500/30 transition">
+                                    <input type="radio" name="payMethod" value="stripe" checked onchange="togglePaymentGatewayUI('stripe')">
+                                    <span class="font-semibold text-white">💳 Stripe (Global Cards)</span>
                                 </label>
-                                <label class="border border-white/10 p-3 rounded-xl text-xs cursor-pointer flex items-center gap-2 bg-white/5 hover:border-amber-500/20 transition">
-                                    <input type="radio" name="payMethod" value="card"> 💳 Card / NetBanking / NEFT
+                                <label class="border border-white/10 p-3 rounded-xl cursor-pointer flex items-center gap-2 bg-white/5 hover:border-amber-500/30 transition">
+                                    <input type="radio" name="payMethod" value="paypal" onchange="togglePaymentGatewayUI('paypal')">
+                                    <span class="font-semibold text-white">🅿️ PayPal Express</span>
+                                </label>
+                                <label class="border border-white/10 p-3 rounded-xl cursor-pointer flex items-center gap-2 bg-white/5 hover:border-amber-500/30 transition">
+                                    <input type="radio" name="payMethod" value="razorpay" onchange="togglePaymentGatewayUI('razorpay')">
+                                    <span class="font-semibold text-white">📱 Razorpay / UPI</span>
                                 </label>
                             </div>
+                        </div>
+
+                        <!-- Dynamic Stripe Element Container -->
+                        <div id="stripeCardContainer" class="p-4 bg-white/5 rounded-xl border border-white/10 space-y-2">
+                            <label class="block text-xs font-semibold text-slate-300">Stripe 256-Bit SSL Encrypted Card Details</label>
+                            <div id="stripeCardElement" class="p-3 bg-[#0b0f19] rounded-lg border border-white/10 text-white min-h-[40px]">
+                                <!-- Stripe Card Element Mounted Here -->
+                            </div>
+                        </div>
+
+                        <!-- Dynamic PayPal Smart Button Container -->
+                        <div id="paypalButtonContainer" class="hidden p-4 bg-white/5 rounded-xl border border-white/10 text-center space-y-2">
+                            <div class="text-xs text-slate-300 mb-2 font-semibold">Pay via PayPal Balance or International Credit Card</div>
+                            <div id="paypalButtonsRender" class="min-h-[45px]"></div>
                         </div>
 
                         <!-- Business & Service Description Box -->
@@ -1270,13 +1294,13 @@
 
                         <div class="flex items-center justify-between border-t border-white/5 pt-4">
                             <div class="text-[10px] text-[#6b7280] flex items-center gap-1.5">
-                                <span class="bg-blue-500/10 border border-blue-500/20 text-blue-400 px-2 py-0.5 rounded font-bold">Razorpay</span>
-                                Secured 256-Bit SSL Payment
+                                <span class="bg-blue-500/10 border border-blue-500/20 text-blue-400 px-2 py-0.5 rounded font-bold" id="payGatewaySecurityBadge">Stripe SSL</span>
+                                Secured 256-Bit Payment Gateway
                             </div>
                             <div class="flex gap-2">
                                 <button type="button" class="btn btn-secondary px-4 py-2 text-xs" onclick="closeOnlineCheckoutModal()">Cancel</button>
-                                <button type="submit" class="btn bg-gradient-to-r from-amber-500 to-orange-500 text-slate-900 px-4 py-2 text-xs font-bold hover:opacity-90 transition flex items-center gap-1.5 shadow-lg shadow-amber-500/10">
-                                    <i data-lucide="shield-check" class="w-4 h-4"></i> Pay via Razorpay & Activate
+                                <button type="submit" id="paySubmitBtn" class="btn bg-gradient-to-r from-amber-500 to-orange-500 text-slate-900 px-4 py-2 text-xs font-bold hover:opacity-90 transition flex items-center gap-1.5 shadow-lg shadow-amber-500/10">
+                                    <i data-lucide="shield-check" class="w-4 h-4"></i> Complete Payment & Activate License
                                 </button>
                             </div>
                         </div>
