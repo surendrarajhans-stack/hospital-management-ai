@@ -1220,6 +1220,21 @@ window.printPatientReceipt = function() {
 function populatePatientPortal() {
     const patientProfile = MOCK_DB.patients.find(p => p.id === state.userId) || MOCK_DB.patients[0];
     
+    // Update Patient Profile Header Banner
+    const pName = patientProfile.name || state.userName || "Ramesh Kumar";
+    const pAbha = patientProfile.abhaId || "91-4820-5912-3049";
+    const pBed = patientProfile.bed ? `Bed: ${patientProfile.bed}` : "OPD Outpatient";
+    
+    const nameElem = document.getElementById("patientPortalName");
+    const avatarElem = document.getElementById("patientPortalAvatar");
+    const abhaElem = document.getElementById("patientPortalAbha");
+    const bedElem = document.getElementById("patientPortalBed");
+    
+    if (nameElem) nameElem.innerText = pName;
+    if (avatarElem) avatarElem.innerText = pName.charAt(0).toUpperCase();
+    if (abhaElem) abhaElem.innerText = pAbha;
+    if (bedElem) bedElem.innerText = pBed;
+
     // Update outstanding bill
     const baseAmount = patientProfile.bill;
     const taxValue = Math.round(baseAmount * (state.localization.taxRate / 100));
