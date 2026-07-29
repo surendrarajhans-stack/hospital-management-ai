@@ -620,9 +620,7 @@ window.processLocalFileImport = function() {
 
 // 10. Doctor Portal Controllers
 let activePatientId = "";
-let currentPrescriptionMeds = [];
-
-function populateDoctorDashboard() {
+let currentPrescriptionMeds = [];function populateDoctorDashboard() {
     const queue = document.getElementById("doctorPatientQueue");
     queue.innerHTML = "";
     
@@ -635,9 +633,18 @@ function populateDoctorDashboard() {
     if (myPatients.length === 0) {
         queue.innerHTML = `<span class="text-xs text-[#6b7280]">No active patients in queue.</span>`;
     } else {
+        // Auto-select first patient by default if none selected
+        if (!activePatientId && myPatients.length > 0) {
+            const first = myPatients[0];
+            activePatientId = first.id;
+            document.getElementById("compSymptoms").value = first.complaint || "";
+            document.getElementById("compTriage").value = first.triage;
+            document.getElementById("activePatientBadge").innerText = first.name;
+        }
+
         myPatients.forEach(pat => {
             const div = document.createElement("div");
-            div.className = `p-3 rounded-xl border cursor-pointer transition text-xs flex justify-between items-center ${activePatientId === pat.id ? 'bg-teal-500/10 border-teal-500/30' : 'bg-white/5 border-white/5 hover:bg-white/10'}`;
+            div.className = `p-3 rounded-xl border cursor-pointer transition text-xs flex justify-between items-center ${activePatientId === pat.id ? 'bg-teal-500/10 border-teal-500/30 font-semibold' : 'bg-white/5 border-white/5 hover:bg-white/10'}`;
             
             let triageColor = "bg-emerald-500/20 text-emerald-400";
             if (pat.triage === "Critical") triageColor = "bg-red-500/20 text-red-400";
@@ -2541,6 +2548,15 @@ window.openLabAnomalyModal = function() {
         MOCK_DB.patients.forEach(p => {
             select.innerHTML += `<option value="${p.id}">${p.name} (ID: ${p.id} - Bed: ${p.bed || 'OPD'})</option>`;
         });
+        
+        // Auto-select active patient if set, or default to first patient
+        if (activePatientId) {
+            select.value = activePatientId;
+            autoPopulateLabFields();
+        } else if (MOCK_DB.patients.length > 0) {
+            select.value = MOCK_DB.patients[0].id;
+            autoPopulateLabFields();
+        }
     }
     
     modal.classList.remove("hidden");
@@ -2694,6 +2710,17 @@ window.printLabAnomalyCertificate = function() {
 window.openTriageAnalyzerModal = function() {
     const modal = document.getElementById("triageAnalyzerModal");
     if (modal) {
+        // Auto-fill with active patient if available
+        const patId = activePatientId || (MOCK_DB.patients.length > 0 ? MOCK_DB.patients[0].id : null);
+        if (patId) {
+            const p = MOCK_DB.patients.find(x => x.id === patId);
+            if (p) {
+                const nameInp = document.getElementById("triagePatName");
+                const compInp = document.getElementById("triageComplaint");
+                if (nameInp) nameInp.value = p.name;
+                if (compInp) compInp.value = p.complaint || "Acute chest pain & fever";
+            }
+        }
         modal.classList.remove("hidden");
         if (window.lucide) lucide.createIcons();
     }
