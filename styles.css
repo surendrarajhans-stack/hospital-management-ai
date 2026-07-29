@@ -1032,11 +1032,12 @@ tr:last-child td {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(3, 7, 18, 0.7);
-    backdrop-filter: blur(8px);
+    background-color: rgba(3, 7, 18, 0.85);
+    backdrop-filter: blur(12px);
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 64px 16px 40px 16px;
     z-index: 1000;
     opacity: 1;
     transition: opacity var(--transition-normal);
@@ -1736,7 +1737,7 @@ select option {
 
     .modal-overlay {
         align-items: flex-start !important;
-        padding: 16px 10px 80px 10px !important;
+        padding: 64px 12px 80px 12px !important;
         overflow-y: auto !important;
         -webkit-overflow-scrolling: touch !important;
     }
