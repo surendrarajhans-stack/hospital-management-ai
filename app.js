@@ -2032,19 +2032,16 @@ window.selectCheckoutPlan = function(planKey) {
     const cards = document.querySelectorAll(".checkout-plan-card");
     cards.forEach(card => {
         card.className = "checkout-plan-card p-3 rounded-2xl border border-white/10 cursor-pointer bg-white/5 hover:border-amber-500/30 transition";
-        
-        // Remove popular label if any
-        const popularBadge = card.querySelector(".badge");
-        if (popularBadge) popularBadge.remove();
+        const oldBadge = card.querySelector(".popular-badge");
+        if (oldBadge && card.id !== "planPro") oldBadge.remove();
     });
 
     const selectedCard = document.getElementById("plan" + planKey.charAt(0).toUpperCase() + planKey.slice(1));
     if (selectedCard) {
         selectedCard.className = "checkout-plan-card active p-3 rounded-2xl border-2 border-amber-500 cursor-pointer bg-amber-500/10 transition";
-        
-        if (planKey === "pro") {
+        if (planKey === "pro" && !selectedCard.querySelector(".popular-badge")) {
             const badge = document.createElement("span");
-            badge.className = "inline-block text-[8px] bg-amber-500 text-slate-900 font-bold px-1.5 py-0.5 rounded-full mb-1";
+            badge.className = "popular-badge inline-block text-[8px] bg-amber-500 text-slate-900 font-bold px-1.5 py-0.5 rounded-full mb-1";
             badge.innerText = "POPULAR";
             selectedCard.insertBefore(badge, selectedCard.firstChild);
         }
