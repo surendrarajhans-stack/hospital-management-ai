@@ -188,16 +188,16 @@
 
                         <!-- Feature Badges Grid -->
                         <div class="flex flex-wrap justify-center gap-2 max-w-4xl mx-auto pt-2 text-[11px] font-semibold">
-                            <span class="px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 flex items-center gap-1">
-                                <i data-lucide="flask-conical" class="w-3.5 h-3.5 text-teal-400"></i> 10-Param AI Lab Anomaly Detector
+                            <span class="px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 flex items-center gap-1 cursor-pointer hover:bg-teal-500/20 hover:scale-105 transition shadow-sm" onclick="openLabAnomalyModal()" title="Click to Test AI Lab Anomaly Scanner">
+                                <i data-lucide="flask-conical" class="w-3.5 h-3.5 text-teal-400"></i> 10-Param AI Lab Anomaly Detector ⚡
                             </span>
-                            <span class="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 flex items-center gap-1">
-                                <i data-lucide="heart-pulse" class="w-3.5 h-3.5 text-amber-400"></i> AI Clinical Triage Acuity (ESI 1-5)
+                            <span class="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 flex items-center gap-1 cursor-pointer hover:bg-amber-500/20 hover:scale-105 transition shadow-sm" onclick="openTriageAnalyzerModal()" title="Click to Test AI Triage Analyzer">
+                                <i data-lucide="heart-pulse" class="w-3.5 h-3.5 text-amber-400"></i> AI Clinical Triage Acuity (ESI 1-5) ⚡
                             </span>
-                            <span class="px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 flex items-center gap-1">
-                                <i data-lucide="dna" class="w-3.5 h-3.5 text-purple-400"></i> AI Precision Oncology Agent
+                            <span class="px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 flex items-center gap-1 cursor-pointer hover:bg-purple-500/20 hover:scale-105 transition shadow-sm" onclick="openOncologyAgentModal()" title="Click to Test Oncology Assistant">
+                                <i data-lucide="dna" class="w-3.5 h-3.5 text-purple-400"></i> AI Precision Oncology Agent ⚡
                             </span>
-                            <span class="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 flex items-center gap-1">
+                            <span class="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 flex items-center gap-1 cursor-pointer hover:bg-emerald-500/20 hover:scale-105 transition shadow-sm" onclick="switchRole('doctor','Doctor')" title="Open Doctor Console">
                                 <i data-lucide="qr-code" class="w-3.5 h-3.5 text-emerald-400"></i> ABDM 14-Digit ABHA ID Generator
                             </span>
                             <span class="px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 flex items-center gap-1">
@@ -709,6 +709,53 @@
                         </div>
                     </div>
 
+                    <!-- AI Diagnostic & Triage Intelligence Row (Top Placement) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- AI Diagnostic Lab Anomaly Detector Card -->
+                        <div class="glass-card p-6 space-y-4 border border-teal-500/30 bg-teal-950/20 shadow-lg shadow-teal-500/5">
+                            <div class="card-header border-b border-white/5 pb-3">
+                                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                    <i data-lucide="flask-conical" class="text-teal-400 animate-pulse"></i>
+                                    <span>AI Diagnostic Lab Anomaly Detector</span>
+                                </h3>
+                                <p class="text-xs text-[#9ca3af] mt-1">Automated pathology scanner flagging panic lab values, electrolyte imbalances & cardiac troponin spikes.</p>
+                            </div>
+                            <div class="p-3.5 bg-teal-500/5 rounded-2xl border border-teal-500/10 space-y-2">
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="text-teal-300 font-semibold">Active Pathology Monitor:</span>
+                                    <span class="text-emerald-400 font-bold">● Live Scanner Active</span>
+                                </div>
+                                <p class="text-[11px] text-[#9ca3af]">Scans CBC, KFT, LFT, Electrolytes, Troponin-I & Arterial Blood Gas values to trigger automated doctor notifications.</p>
+                            </div>
+                            <button class="w-full btn btn-primary py-2.5 flex items-center justify-center gap-2 font-semibold text-xs shadow-md shadow-teal-500/20" onclick="openLabAnomalyModal()">
+                                <i data-lucide="activity" class="w-4 h-4"></i>
+                               <span>Run AI Pathology Anomaly Scan</span>
+                            </button>
+                        </div>
+
+                        <!-- AI Clinical Triage Analyzer Card -->
+                        <div class="glass-card p-6 space-y-4 border border-amber-500/30 bg-amber-950/20 shadow-lg shadow-amber-500/5">
+                            <div class="card-header border-b border-white/5 pb-3">
+                                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                    <i data-lucide="heart-pulse" class="text-amber-400 animate-pulse"></i>
+                                    <span>AI Clinical Triage Analyzer</span>
+                                </h3>
+                                <p class="text-xs text-[#9ca3af] mt-1">Emergency Severity Index (ESI 1-5) acuity analyzer & automated ICU/OPD bed router.</p>
+                            </div>
+                            <div class="p-3.5 bg-amber-500/5 rounded-2xl border border-amber-500/10 space-y-2">
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="text-amber-300 font-semibold">Triage Protocol:</span>
+                                    <span class="text-amber-400 font-bold">ESI Standard Level 1-5</span>
+                                </div>
+                                <p class="text-[11px] text-[#9ca3af]">Evaluates complaints & vitals (BP, Pulse, SpO2, Temp, RR) to classify acuity & escalate critical cases instantly.</p>
+                            </div>
+                            <button class="w-full btn bg-amber-500 text-slate-900 hover:bg-amber-400 py-2.5 flex items-center justify-center gap-2 font-bold text-xs transition shadow-md shadow-amber-500/20" onclick="openTriageAnalyzerModal()">
+                                <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                                <span>Launch AI Triage Acuity Analyzer</span>
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- Consultation Row -->
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <!-- Patient Queue & Walk-in OPD Register Column -->
@@ -769,7 +816,6 @@
                             </div>
                         </div>
 
-
                         <!-- Active Diagnosis File -->
                         <div class="glass-card p-6 col-span-1 lg:col-span-2 space-y-4">
                             <div class="card-header border-b border-white/5 pb-2 flex items-center justify-between">
@@ -819,53 +865,6 @@
                                     </button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- AI Diagnostic & Triage Intelligence Row -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                        <!-- AI Diagnostic Lab Anomaly Detector Card -->
-                        <div class="glass-card p-6 space-y-4 border border-teal-500/20">
-                            <div class="card-header border-b border-white/5 pb-3">
-                                <h3 class="text-base font-bold text-white flex items-center gap-2">
-                                    <i data-lucide="flask-conical" class="text-teal-400 animate-pulse"></i>
-                                    <span>AI Diagnostic Lab Anomaly Detector</span>
-                                </h3>
-                                <p class="text-xs text-[#9ca3af] mt-1">Automated pathology scanner flagging panic lab values, electrolyte imbalances & cardiac troponin spikes.</p>
-                            </div>
-                            <div class="p-3.5 bg-teal-500/5 rounded-2xl border border-teal-500/10 space-y-2">
-                                <div class="flex items-center justify-between text-xs">
-                                    <span class="text-teal-300 font-semibold">Active Pathology Monitor:</span>
-                                    <span class="text-emerald-400 font-bold">● Live Scanner Active</span>
-                                </div>
-                                <p class="text-[11px] text-[#9ca3af]">Scans CBC, KFT, LFT, Electrolytes, Troponin-I & Arterial Blood Gas values to trigger automated doctor notifications.</p>
-                            </div>
-                            <button class="w-full btn btn-primary py-2.5 flex items-center justify-center gap-2 font-semibold text-xs" onclick="openLabAnomalyModal()">
-                                <i data-lucide="activity" class="w-4 h-4"></i>
-                                <span>Run AI Pathology Anomaly Scan</span>
-                            </button>
-                        </div>
-
-                        <!-- AI Clinical Triage Analyzer Card -->
-                        <div class="glass-card p-6 space-y-4 border border-amber-500/20">
-                            <div class="card-header border-b border-white/5 pb-3">
-                                <h3 class="text-base font-bold text-white flex items-center gap-2">
-                                    <i data-lucide="heart-pulse" class="text-amber-400 animate-pulse"></i>
-                                    <span>AI Clinical Triage Analyzer</span>
-                                </h3>
-                                <p class="text-xs text-[#9ca3af] mt-1">Emergency Severity Index (ESI 1-5) acuity analyzer & automated ICU/OPD bed router.</p>
-                            </div>
-                            <div class="p-3.5 bg-amber-500/5 rounded-2xl border border-amber-500/10 space-y-2">
-                                <div class="flex items-center justify-between text-xs">
-                                    <span class="text-amber-300 font-semibold">Triage Protocol:</span>
-                                    <span class="text-amber-400 font-bold">ESI Standard Level 1-5</span>
-                                </div>
-                                <p class="text-[11px] text-[#9ca3af]">Evaluates complaints & vitals (BP, Pulse, SpO2, Temp, RR) to classify acuity & escalate critical cases instantly.</p>
-                            </div>
-                            <button class="w-full btn bg-amber-500 text-slate-900 hover:bg-amber-400 py-2.5 flex items-center justify-center gap-2 font-bold text-xs transition" onclick="openTriageAnalyzerModal()">
-                                <i data-lucide="shield-alert" class="w-4 h-4"></i>
-                                <span>Launch AI Triage Acuity Analyzer</span>
-                            </button>
                         </div>
                     </div>
                 </section>
