@@ -268,16 +268,26 @@ window.switchDashboardView = function(viewId, elementLink = null) {
         mobileSidebar.classList.add("hidden");
     }
 
-    // Hide onboarding SaaS marketing hero when navigating department views for instant top-viewport presentation
     const landingHero = document.getElementById("onboarding-role-select");
-    if (landingHero) landingHero.classList.add("hidden");
-
-    // Hide all dashboards
+    
+    // Hide all department sections first
     document.querySelectorAll("section[id^='view-']").forEach(sec => sec.classList.add("hidden"));
     
-    // Show active dashboard
-    const target = document.getElementById(viewId);
-    if (target) target.classList.remove("hidden");
+    let target = null;
+    if (viewId === "onboarding-role-select" || viewId === "view-landing" || !viewId) {
+        if (landingHero) landingHero.classList.remove("hidden");
+        state.activeDashboardView = "onboarding-role-select";
+    } else {
+        if (landingHero) landingHero.classList.add("hidden");
+        target = document.getElementById(viewId);
+        if (target) {
+            target.classList.remove("hidden");
+            state.activeDashboardView = viewId;
+        } else if (landingHero) {
+            landingHero.classList.remove("hidden");
+            state.activeDashboardView = "onboarding-role-select";
+        }
+    }
 
     // Multi-browser mobile & desktop viewport scroll reset
     setTimeout(() => {
@@ -289,12 +299,12 @@ window.switchDashboardView = function(viewId, elementLink = null) {
         if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 30);
     
-    state.activeDashboardView = viewId;
     saveLocalState();
     
     // Update header label
     let label = "Operations Control";
-    if (viewId === "view-super-admin") label = "Licensing and Setup Console";
+    if (viewId === "onboarding-role-select" || viewId === "view-landing") label = "SaaS Platform Overview";
+    else if (viewId === "view-super-admin") label = "Licensing and Setup Console";
     else if (viewId === "view-it-administrator") label = "IT Cloud Importer & Audit";
     else if (viewId === "view-doctor") label = "Clinical Diagnosis Desk";
     else if (viewId === "view-nurse") label = "Ward Monitoring & Vitals";
@@ -302,7 +312,8 @@ window.switchDashboardView = function(viewId, elementLink = null) {
     else if (viewId === "view-patient") label = "Your Care & AI Assistant";
     else if (viewId === "view-manual-patient-entry") label = "Manual Patient Entry Desk";
     
-    document.getElementById("current-view-title").innerText = label;
+    const titleElem = document.getElementById("current-view-title");
+    if (titleElem) titleElem.innerText = label;
     
     // Update active nav link classes
     document.querySelectorAll(".sidebar-link").forEach(lnk => lnk.classList.remove("active"));
