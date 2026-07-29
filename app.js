@@ -783,6 +783,10 @@ window.removeMedFromPrescription = function(idx) {
 };
 
 window.submitDoctorConsultationFile = function() {
+    if (!activePatientId && MOCK_DB.patients.length > 0) {
+        activePatientId = MOCK_DB.patients[0].id;
+    }
+    
     if (!activePatientId) {
         alert("Please select a patient from the queue first.");
         return;
@@ -791,7 +795,7 @@ window.submitDoctorConsultationFile = function() {
     const p = MOCK_DB.patients.find(x => x.id === activePatientId);
     if (!p) return;
     
-    const comp = document.getElementById("compSymptoms").value.trim();
+    const comp = document.getElementById("compSymptoms").value.trim() || "Routine Checkup";
     const tri = document.getElementById("compTriage").value;
     
     p.complaint = comp;
@@ -802,25 +806,31 @@ window.submitDoctorConsultationFile = function() {
         MOCK_DB.prescriptions.push({
             id: `PRES-${Math.floor(1000 + Math.random() * 9000)}`,
             patientId: activePatientId,
-            doctorName: state.userName,
+            doctorName: state.userName || "Dr. Rajesh Sharma",
             meds: [...currentPrescriptionMeds],
             dispatched: false
         });
         
-        // Calculate pharmacy costs to add to invoice
-        let medBill = currentPrescriptionMeds.length * 150; // Flat estimate
-        p.bill += medBill;
+        let medBill = currentPrescriptionMeds.length * 150;
+        p.bill = (p.bill || 1500) + medBill;
     }
     
     addSystemLog(`Diagnosis completed for patient "${p.name}" (Triage: ${tri})`, "Success");
-    addNotification("Diagnosis Complete", `Prescription dispatched successfully for patient ${p.name}.`, "success");
+    addNotification("Diagnosis Dispatched 📋", `Prescription & Clinical file signed for ${p.name}.`, "success");
     
-    // Clear select
-    activePatientId = "";
+    // Clear prescription meds array
     currentPrescriptionMeds = [];
     document.getElementById("addedMedsContainer").innerHTML = `<span class="text-xs text-[#6b7280]">No medication added yet.</span>`;
-    document.getElementById("activePatientBadge").innerText = "No Patient Selected";
-    document.getElementById("compSymptoms").value = "";
+    
+    // Smoothly select next patient in queue
+    const queuePats = MOCK_DB.patients.filter(pat => pat.bed || pat.doctorId === state.userId);
+    if (queuePats.length > 1) {
+        const nextPat = queuePats.find(pat => pat.id !== activePatientId) || queuePats[0];
+        activePatientId = nextPat.id;
+        document.getElementById("compSymptoms").value = nextPat.complaint || "";
+        document.getElementById("compTriage").value = nextPat.triage;
+        document.getElementById("activePatientBadge").innerText = nextPat.name;
+    }
     
     saveDatabaseState();
     populateDoctorDashboard();
