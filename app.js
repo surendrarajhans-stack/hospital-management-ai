@@ -119,8 +119,29 @@ window.addEventListener("DOMContentLoaded", () => {
     loadDatabaseState();
     if (typeof window.applyRegionalUI === 'function') window.applyRegionalUI();
     
-    // Always default to B2B SaaS Landing Page & Role Selector on initial website launch
-    resetToOnboarding();
+    // If user has an active role session, restore their console view; otherwise default to SaaS Landing Page
+    if (state.onboardingStep === 2 && state.activeDashboardView && state.activeDashboardView !== "onboarding-role-select") {
+        if (window.AppElements.header) window.AppElements.header.classList.remove("hidden");
+        if (window.AppElements.sidebar) window.AppElements.sidebar.classList.remove("hidden");
+        
+        const credElem = document.getElementById("onboarding-credentials");
+        if (credElem) credElem.classList.add("hidden");
+        
+        const name = state.userName || "Global Admin";
+        const role = state.userRole || "Super Admin";
+        
+        const nameBadge = document.getElementById("sidebar-user-name");
+        const roleBadge = document.getElementById("sidebar-user-role");
+        const avatarBadge = document.getElementById("user-badge-avatar");
+        
+        if (nameBadge) nameBadge.innerText = name;
+        if (roleBadge) roleBadge.innerText = role;
+        if (avatarBadge) avatarBadge.innerText = name.charAt(0).toUpperCase();
+        
+        switchDashboardView(state.activeDashboardView);
+    } else {
+        resetToOnboarding();
+    }
 });
 
 // 5. Onboarding / Role switching flows
@@ -1000,44 +1021,55 @@ let billingSelectedPatientId = "";
 
 function populatePharmacistDashboard() {
     const list = document.getElementById("pharmacyPrescriptionsList");
-    list.innerHTML = "";
-    
-    const activePresc = MOCK_DB.prescriptions.filter(p => !p.dispatched);
-    if (activePresc.length === 0) {
-        list.innerHTML = `<span class="text-xs text-[#6b7280]">No active pending prescriptions.</span>`;
-    } else {
-        activePresc.forEach(pr => {
-            const patient = MOCK_DB.patients.find(x => x.id === pr.patientId);
-            const div = document.createElement("div");
-            div.className = "p-3 bg-white/5 rounded-xl border border-white/5 text-xs space-y-2";
-            
-            let medsText = pr.meds.map(m => `<li>💊 ${m.name} (${m.dosage})</li>`).join("");
-            
-            div.innerHTML = `
-                <div class="flex justify-between items-center">
-                    <span class="font-bold text-white">${patient ? patient.name : 'Unknown Patient'}</span>
-                    <span class="text-teal-400 font-mono text-[10px]">${pr.id}</span>
-                </div>
-                <ul class="text-[#9ca3af] space-y-0.5 list-disc pl-4">${medsText}</ul>
-                <button class="w-full btn btn-secondary py-1 text-xs" onclick="dispenseMedicationPrescription('${pr.id}')">Dispense Medicine</button>
-            `;
-            list.appendChild(div);
-        });
+    if (list) {
+        list.innerHTML = "";
+        const activePresc = MOCK_DB.prescriptions.filter(p => !p.dispatched);
+        if (activePresc.length === 0) {
+            list.innerHTML = `<span class="text-xs text-[#6b7280]">No active pending prescriptions.</span>`;
+        } else {
+            activePresc.forEach(pr => {
+                const patient = MOCK_DB.patients.find(x => x.id === pr.patientId);
+                const div = document.createElement("div");
+                div.className = "p-3 bg-white/5 rounded-xl border border-white/5 text-xs space-y-2";
+                
+                let medsText = pr.meds.map(m => `<li>💊 ${m.name} (${m.dosage})</li>`).join("");
+                
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-white">${patient ? patient.name : 'Unknown Patient'}</span>
+                        <span class="text-teal-400 font-mono text-[10px]">${pr.id}</span>
+                    </div>
+                    <ul class="text-[#9ca3af] space-y-0.5 list-disc pl-4">${medsText}</ul>
+                    <button class="w-full btn btn-secondary py-1 text-xs" onclick="dispenseMedicationPrescription('${pr.id}')">Dispense Medicine</button>
+                `;
+                list.appendChild(div);
+            });
+        }
     }
     
     // Populate active patient billing dropdown
     const pSelect = document.getElementById("billingPatientSelect");
-    pSelect.innerHTML = `<option value="">Choose Patient...</option>`;
-    
-    MOCK_DB.patients.forEach(pat => {
-        const opt = document.createElement("option");
-        opt.value = pat.id;
-        opt.innerText = `${pat.name} (ID: ${pat.id})`;
-        if (pat.id === billingSelectedPatientId) {
-            opt.selected = true;
+    if (pSelect) {
+        pSelect.innerHTML = `<option value="">Choose Patient...</option>`;
+        
+        MOCK_DB.patients.forEach(pat => {
+            const opt = document.createElement("option");
+            opt.value = pat.id;
+            opt.innerText = `${pat.name} (ID: ${pat.id})`;
+            if (pat.id === billingSelectedPatientId) {
+                opt.selected = true;
+            }
+            pSelect.appendChild(opt);
+        });
+
+        // Auto-select first patient if none selected
+        if (!billingSelectedPatientId && MOCK_DB.patients.length > 0) {
+            billingSelectedPatientId = MOCK_DB.patients[0].id;
+            pSelect.value = billingSelectedPatientId;
         }
-        pSelect.appendChild(opt);
-    });
+        
+        loadPatientBillingInvoice();
+    }
 }
 
 window.dispenseMedicationPrescription = function(prescId) {
