@@ -288,7 +288,7 @@ app.post('/api/patient-chat', async (req, res) => {
         // Add the current query with medical receptionist context
         contents.push({
             role: "user",
-            parts: [{ text: `You are MedSphere's friendly, professional AI Clinical Receptionist & Symptom Advisor. Answer the patient's message directly, offer advice, suggest scheduling an appointment, and direct them to the appropriate department or doctor (e.g. Cardiology for chest pain, Pediatrics for children's symptoms). Always include a standard medical disclaimer at the end of the response: "Disclaimer: This is an AI advisory summary. Please seek direct medical advice from our licensed practitioners." \n\nPatient Message: ${message}` }]
+            parts: [{ text: `You are MedSphere's friendly, professional AI Clinical Receptionist & Symptom Advisor. Answer the patient's message directly. Detail potential causes, suggest appropriate clinical tests, and outline a detailed clinical prescription recommendation (specifying simulated medications, dosage, frequency, and care instructions) for their review. Include a clear disclaimer stating this is a simulated prescription recommendation requiring doctor sign-off. Always include this disclaimer at the end: "Disclaimer: This is an AI advisory summary. Please seek direct medical advice from our licensed practitioners." \n\nPatient Message: ${message}` }]
         });
         
         const headers = { 'Content-Type': 'application/json' };
@@ -438,7 +438,7 @@ app.post('/api/analyze-report', async (req, res) => {
     
     try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-        const prompt = `You are a professional clinical pathology anomaly assistant. Analyze the following patient lab values. Flag any values that fall outside standard ranges (like Troponin, Hemoglobin, WBC, Potassium, Sodium, Creatinine, etc.). Identify potential clinical risks (e.g. MI risk, Sepsis risk, Renal failure risk). Keep your summary concise and bulleted, using markdown: \n\n${reportText}`;
+        const prompt = `You are a professional clinical pathology anomaly assistant. Analyze the following patient lab values. Flag any values that fall outside standard ranges (like Troponin, Hemoglobin, WBC, Potassium, Sodium, Creatinine, etc.). Identify potential clinical risks (e.g. MI risk, Sepsis risk, Renal failure risk). Recommend a detailed corrective clinical prescription (specifying corrective medications, fluids, dosages, frequency, next-step laboratory tests, and continuous monitoring instructions). Keep your summary structured, concise, and bulleted using markdown: \n\n${reportText}`;
         
         const headers = { 'Content-Type': 'application/json' };
         const body = JSON.stringify({
