@@ -674,15 +674,18 @@ let currentPrescriptionMeds = [];function populateDoctorDashboard() {
     });
 
     if (myPatients.length === 0) {
-        queue.innerHTML = `<span class="text-xs text-[#6b7280]">No active patients in queue.</span>`;
+        if (queue) queue.innerHTML = `<span class="text-xs text-[#6b7280]">No active patients in queue.</span>`;
     } else {
         // Auto-select first patient by default if none selected
         if (!activePatientId && myPatients.length > 0) {
             const first = myPatients[0];
             activePatientId = first.id;
-            document.getElementById("compSymptoms").value = first.complaint || "";
-            document.getElementById("compTriage").value = first.triage;
-            document.getElementById("activePatientBadge").innerText = first.name;
+            const symptomsEl = document.getElementById("compSymptoms");
+            const triageEl = document.getElementById("compTriage");
+            const badgeEl = document.getElementById("activePatientBadge");
+            if (symptomsEl) symptomsEl.value = first.complaint || "";
+            if (triageEl) triageEl.value = first.triage || "Stable";
+            if (badgeEl) badgeEl.innerText = first.name || "";
         }
 
         myPatients.forEach(pat => {
@@ -706,14 +709,18 @@ let currentPrescriptionMeds = [];function populateDoctorDashboard() {
             div.onclick = () => {
                 activePatientId = pat.id;
                 currentPrescriptionMeds = [];
-                document.getElementById("addedMedsContainer").innerHTML = `<span class="text-xs text-[#6b7280]">No medication added yet.</span>`;
-                document.getElementById("compSymptoms").value = pat.complaint || "";
-                document.getElementById("compTriage").value = pat.triage;
-                document.getElementById("activePatientBadge").innerText = pat.name;
+                const medsCont = document.getElementById("addedMedsContainer");
+                const symptomsEl = document.getElementById("compSymptoms");
+                const triageEl = document.getElementById("compTriage");
+                const badgeEl = document.getElementById("activePatientBadge");
+                if (medsCont) medsCont.innerHTML = `<span class="text-xs text-[#6b7280]">No medication added yet.</span>`;
+                if (symptomsEl) symptomsEl.value = pat.complaint || "";
+                if (triageEl) triageEl.value = pat.triage || "Stable";
+                if (badgeEl) badgeEl.innerText = pat.name || "";
                 populateDoctorDashboard();
             };
             
-            queue.appendChild(div);
+            if (queue) queue.appendChild(div);
         });
     }
 
