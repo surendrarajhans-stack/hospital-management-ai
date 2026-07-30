@@ -310,13 +310,18 @@ window.switchDashboardView = function(viewId, elementLink = null) {
         }
     }
 
-    // Multi-browser mobile & desktop viewport scroll reset to top (0px gap)
+    // CRITICAL: Immediately & synchronously reset scroll position to top (0px offset)
+    const viewContainer = document.getElementById("view-container");
+    if (viewContainer) {
+        viewContainer.scrollTop = 0;
+    }
+    window.scrollTo(0, 0);
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+
     setTimeout(() => {
-        window.scrollTo(0, 0);
-        document.body.scrollTop = 0;
-        document.documentElement.scrollTop = 0;
-        const viewContainer = document.getElementById("view-container");
         if (viewContainer) viewContainer.scrollTop = 0;
+        window.scrollTo(0, 0);
     }, 10);
     
     saveLocalState();
