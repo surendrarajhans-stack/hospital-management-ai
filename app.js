@@ -447,20 +447,33 @@ function loadDatabaseState() {
 }
 
 window.clearAllSystemData = function() {
-    if (confirm("Are you sure you want to wipe all records (doctors, patients, nurses, prescriptions) and start completely fresh?")) {
-        MOCK_DB.doctors = [];
-        MOCK_DB.patients = [];
+    if (confirm("Are you sure you want to reset the system database back to default clean seed data?")) {
+        MOCK_DB.doctors = [
+            { id: "DOC-001", name: "Dr. Surendra Rajhans", specialty: "Cardiology", room: "OPD 101", shift: "Morning", phone: "+91 94394 98158" },
+            { id: "DOC-002", name: "Dr. Lakshmi Prasad", specialty: "Pediatrics", room: "OPD 105", shift: "Afternoon", phone: "+91 98765 00002" },
+            { id: "DOC-003", name: "Dr. Vikas Sharma", specialty: "Neurology", room: "OPD 202", shift: "Night", phone: "+91 98765 00003" }
+        ];
+        MOCK_DB.patients = [
+            { id: "PAT-001", name: "Ramesh Kumar", age: 45, triage: "Stable", bed: "ICU-02", bill: 12500, paid: false, complaint: "Chronic hypertension" },
+            { id: "PAT-002", name: "Sita Devi", age: 32, triage: "Under Observation", bed: "GW-05", bill: 4500, paid: false, complaint: "Post-op care, mild fever" },
+            { id: "PAT-003", name: "Kabir Khan", age: 8, triage: "Stable", bed: "PED-01", bill: 1800, paid: true, complaint: "Acute bronchitis checkup" }
+        ];
         MOCK_DB.wards = [
             { id: "ICU-01", type: "ICU", occupied: false, patientId: "" },
-            { id: "ICU-02", type: "ICU", occupied: false, patientId: "" },
+            { id: "ICU-02", type: "ICU", occupied: true, patientId: "PAT-001" },
             { id: "GW-01", type: "General Ward", occupied: false, patientId: "" },
-            { id: "GW-05", type: "General Ward", occupied: false, patientId: "" },
-            { id: "PED-01", type: "Pediatrics", occupied: false, patientId: "" }
+            { id: "GW-05", type: "General Ward", occupied: true, patientId: "PAT-002" },
+            { id: "PED-01", type: "Pediatrics", occupied: true, patientId: "PAT-003" }
         ];
-        MOCK_DB.staff = [];
+        MOCK_DB.staff = [
+            { id: "NURSE-01", name: "Sister Anjali", dept: "ICU", shift: "Day" },
+            { id: "NURSE-02", name: "Sister Mary", dept: "General Ward", shift: "Night" }
+        ];
         MOCK_DB.pharmacy = [
             { id: "DRUG-01", name: "Paracetamol 650mg", stock: 1200, price: 15 },
-            { id: "DRUG-02", name: "Amoxicillin 500mg", stock: 500, price: 80 }
+            { id: "DRUG-02", name: "Amoxicillin 500mg", stock: 500, price: 80 },
+            { id: "DRUG-03", name: "Atorvastatin 10mg", stock: 350, price: 45 },
+            { id: "DRUG-04", name: "Pantoprazole 40mg", stock: 800, price: 25 }
         ];
         MOCK_DB.prescriptions = [];
         MOCK_DB.admissions = [];
@@ -468,7 +481,7 @@ window.clearAllSystemData = function() {
         localStorage.clear();
         saveDatabaseState();
 
-        alert("All records and local cache cleared successfully!");
+        alert("System database reset successfully to clean default seed data!");
         location.reload();
     }
 };
@@ -725,6 +738,26 @@ window.processLocalFileImport = function() {
             }
             
             const headers = lines[0].split(",").map(h => h.trim());
+            const targetCollection = select.value;
+            
+            // Validate that the CSV headers match the target collection schema
+            if (targetCollection === "doctors" && !headers.includes("specialty")) {
+                alert("Validation Error: You are trying to upload a non-Doctor CSV (missing 'specialty' column) into the Doctor register. Please select the correct Target Sheet Type in the dropdown or verify your CSV file.");
+                return;
+            }
+            if (targetCollection === "patients" && !headers.includes("complaint")) {
+                alert("Validation Error: You are trying to upload a non-Patient CSV (missing 'complaint' column) into the Patient directory. Please select the correct Target Sheet Type in the dropdown or verify your CSV file.");
+                return;
+            }
+            if (targetCollection === "staff" && !headers.includes("dept")) {
+                alert("Validation Error: You are trying to upload a non-Staff/Nurse CSV (missing 'dept' column) into the Staff directory. Please select the correct Target Sheet Type in the dropdown or verify your CSV file.");
+                return;
+            }
+            if (targetCollection === "pharmacy" && !headers.includes("stock")) {
+                alert("Validation Error: You are trying to upload a non-Pharmacy CSV (missing 'stock' column) into the Drug register. Please select the correct Target Sheet Type in the dropdown or verify your CSV file.");
+                return;
+            }
+            
             const importedData = [];
             
             for (let i = 1; i < lines.length; i++) {
@@ -743,7 +776,6 @@ window.processLocalFileImport = function() {
                 importedData.push(obj);
             }
             
-            const targetCollection = select.value;
             if (MOCK_DB[targetCollection]) {
                 MOCK_DB[targetCollection] = importedData;
                 saveDatabaseState();
