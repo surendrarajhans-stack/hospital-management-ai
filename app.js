@@ -746,78 +746,97 @@ window.processLocalFileImport = function() {
         return;
     }
     
-    addSystemLog(`Executing cloud CSV import for collection: ${select.value}...`, "Warning");
+    addSystemLog(`Executing cloud import for collection: ${select.value}...`, "Warning");
     
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
-            const text = e.target.result;
-            const lines = text.split(/\r?\n/);
-            if (lines.length < 2) {
-                alert("The selected file is empty or missing headers.");
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            
+            // Parse spreadsheet into JSON objects
+            const importedData = XLSX.utils.sheet_to_json(worksheet);
+            
+            if (importedData.length === 0) {
+                alert("The selected file is empty or missing data rows.");
                 return;
             }
             
-            const headers = lines[0].split(",").map(h => h.trim());
+            // Normalize keys of first object to identify headers
+            const headers = Object.keys(importedData[0]).map(h => h.trim().toLowerCase());
             const targetCollection = select.value;
             
-            // Validate that the CSV headers match the target collection schema
+            // Validate headers (case-insensitive)
             if (targetCollection === "doctors" && !headers.includes("specialty")) {
-                alert("Validation Error: You are trying to upload a non-Doctor CSV (missing 'specialty' column) into the Doctor register. Please select the correct Target Sheet Type in the dropdown or verify your CSV file.");
+                alert("Validation Error: The uploaded sheet is missing the 'specialty' column required for Doctors. Please verify your file or select the correct Target Sheet Type.");
                 return;
             }
             if (targetCollection === "patients" && !headers.includes("complaint")) {
-                alert("Validation Error: You are trying to upload a non-Patient CSV (missing 'complaint' column) into the Patient directory. Please select the correct Target Sheet Type in the dropdown or verify your CSV file.");
+                alert("Validation Error: The uploaded sheet is missing the 'complaint' column required for Patients. Please verify your file or select the correct Target Sheet Type.");
                 return;
             }
             if (targetCollection === "staff" && !headers.includes("dept")) {
-                alert("Validation Error: You are trying to upload a non-Staff/Nurse CSV (missing 'dept' column) into the Staff directory. Please select the correct Target Sheet Type in the dropdown or verify your CSV file.");
+                alert("Validation Error: The uploaded sheet is missing the 'dept' column required for Support Staff. Please verify your file or select the correct Target Sheet Type.");
                 return;
             }
             if (targetCollection === "pharmacy" && !headers.includes("stock")) {
-                alert("Validation Error: You are trying to upload a non-Pharmacy CSV (missing 'stock' column) into the Drug register. Please select the correct Target Sheet Type in the dropdown or verify your CSV file.");
+                alert("Validation Error: The uploaded sheet is missing the 'stock' column required for Pharmacy drugs. Please verify your file or select the correct Target Sheet Type.");
                 return;
             }
             
-            const importedData = [];
+            // Normalize objects keys to match MOCK_DB property names (case-insensitive mapping)
+            const schemaKeys = {
+                doctors: ["id", "name", "specialty", "room", "shift", "phone"],
+                patients: ["id", "name", "age", "triage", "bed", "bill", "paid", "complaint"],
+                staff: ["id", "name", "dept", "shift"],
+                pharmacy: ["id", "name", "stock", "price"]
+            };
             
-            for (let i = 1; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (!line) continue;
-                
-                const cols = line.split(",").map(c => c.trim());
-                const obj = {};
-                headers.forEach((header, index) => {
-                    let val = cols[index] || "";
-                    if (val === "true") val = true;
-                    else if (val === "false") val = false;
-                    else if (!isNaN(val) && val !== "") val = Number(val);
-                    obj[header] = val;
+            const expectedKeys = schemaKeys[targetCollection] || [];
+            
+            const normalizedData = importedData.map(row => {
+                const normalizedRow = {};
+                // Map case-insensitive keys to exact model properties
+                Object.keys(row).forEach(key => {
+                    const trimmedKey = key.trim();
+                    const matchedKey = expectedKeys.find(ek => ek.toLowerCase() === trimmedKey.toLowerCase());
+                    if (matchedKey) {
+                        let val = row[key];
+                        // Convert numeric/boolean strings
+                        if (val === "true" || val === true) val = true;
+                        else if (val === "false" || val === false) val = false;
+                        else if (!isNaN(val) && val !== "" && typeof val === "string") val = Number(val);
+                        normalizedRow[matchedKey] = val;
+                    } else {
+                        normalizedRow[trimmedKey] = row[key]; // keep as-is if extra field
+                    }
                 });
-                importedData.push(obj);
-            }
+                return normalizedRow;
+            });
             
             if (MOCK_DB[targetCollection]) {
-                MOCK_DB[targetCollection] = importedData;
+                MOCK_DB[targetCollection] = normalizedData;
                 saveDatabaseState();
                 
                 populateITDashboard();
                 populateAllDoctorDropdowns();
                 
-                addSystemLog(`Import complete! Loaded ${importedData.length} records successfully to MongoDB.`, "Success");
-                addNotification("Import Successful", `Synced ${importedData.length} ${targetCollection} records to cloud.`, "success");
+                addSystemLog(`Import complete! Synced ${normalizedData.length} records successfully to MongoDB.`, "Success");
+                addNotification("Import Successful", `Synced ${normalizedData.length} ${targetCollection} records to cloud.`, "success");
             } else {
                 alert("Selected collection is invalid.");
             }
         } catch (err) {
-            console.error("CSV Import parsing error:", err);
-            alert("Error parsing CSV file: " + err.message);
+            console.error("Spreadsheet parsing error:", err);
+            alert("Error parsing spreadsheet file: " + err.message);
         }
     };
     reader.onerror = function() {
         alert("Error reading file.");
     };
-    reader.readAsText(file);
+    reader.readAsArrayBuffer(file);
 };
 
 // 10. Doctor Portal Controllers
