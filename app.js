@@ -423,33 +423,37 @@ function loadDatabaseState() {
 
 // 8. Super Admin Controllers
 function populateSuperAdminDashboard() {
-    document.getElementById("stat-active-clinics").innerText = MOCK_DB.admissions.length || 0;
-    document.getElementById("stat-issued-licenses").innerText = (MOCK_DB.admissions.length + 3) || 3;
+    const activeClinicsEl = document.getElementById("stat-active-clinics");
+    const issuedLicensesEl = document.getElementById("stat-issued-licenses");
+    if (activeClinicsEl) activeClinicsEl.innerText = MOCK_DB.admissions.length || 0;
+    if (issuedLicensesEl) issuedLicensesEl.innerText = (MOCK_DB.admissions.length + 3) || 3;
     
     // Render licenses registry
     const container = document.getElementById("licenseRegistryList");
-    container.innerHTML = "";
-    
-    if (!MOCK_DB.admissions || MOCK_DB.admissions.length === 0) {
-        container.innerHTML = `<span class="text-xs text-[#6b7280]">No licenses active. Use the form to generate one.</span>`;
-        return;
+    if (container) {
+        container.innerHTML = "";
+        
+        if (!MOCK_DB.admissions || MOCK_DB.admissions.length === 0) {
+            container.innerHTML = `<span class="text-xs text-[#6b7280]">No licenses active. Use the form to generate one.</span>`;
+            return;
+        }
+        
+        MOCK_DB.admissions.forEach((adm) => {
+            const div = document.createElement("div");
+            div.className = "p-3 bg-white/5 rounded-xl border border-white/5 flex items-center justify-between text-xs";
+            div.innerHTML = `
+                <div>
+                    <h4 class="font-bold text-white">${escapeHtml(adm.schoolName)}</h4>
+                    <span class="text-[#9ca3af] block mt-0.5">${adm.adminName} | ${adm.mobile}</span>
+                </div>
+                <div class="text-right">
+                    <code class="text-teal-300 font-bold block font-mono">${adm.licenseKey}</code>
+                    <span class="text-[10px] text-emerald-400 font-semibold uppercase mt-0.5 block">${adm.plan}</span>
+                </div>
+            `;
+            container.appendChild(div);
+        });
     }
-    
-    MOCK_DB.admissions.forEach((adm) => {
-        const div = document.createElement("div");
-        div.className = "p-3 bg-white/5 rounded-xl border border-white/5 flex items-center justify-between text-xs";
-        div.innerHTML = `
-            <div>
-                <h4 class="font-bold text-white">${escapeHtml(adm.schoolName)}</h4>
-                <span class="text-[#9ca3af] block mt-0.5">${adm.adminName} | ${adm.mobile}</span>
-            </div>
-            <div class="text-right">
-                <code class="text-teal-300 font-bold block font-mono">${adm.licenseKey}</code>
-                <span class="text-[10px] text-emerald-400 font-semibold uppercase mt-0.5 block">${adm.plan}</span>
-            </div>
-        `;
-        container.appendChild(div);
-    });
 }
 
 window.generateHospitalLicenseKey = function() {
@@ -486,47 +490,53 @@ window.generateHospitalLicenseKey = function() {
 function populateITDashboard() {
     // Render Doctor Table
     const dBody = document.getElementById("doctorsTableBody");
-    dBody.innerHTML = "";
+    if (dBody) dBody.innerHTML = "";
     
-    MOCK_DB.doctors.forEach(doc => {
-        const tr = document.createElement("tr");
-        tr.className = "border-b border-white/5 text-[#f3f4f6]";
-        tr.innerHTML = `
-            <td class="py-2.5 font-medium">${doc.name}</td>
-            <td>${doc.specialty}</td>
-            <td class="font-mono text-xs">${doc.room}</td>
-            <td><span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-400">${doc.shift}</span></td>
-        `;
-        dBody.appendChild(tr);
-    });
+    if (dBody) {
+        MOCK_DB.doctors.forEach(doc => {
+            const tr = document.createElement("tr");
+            tr.className = "border-b border-white/5 text-[#f3f4f6]";
+            tr.innerHTML = `
+                <td class="py-2.5 font-medium">${doc.name}</td>
+                <td>${doc.specialty}</td>
+                <td class="font-mono text-xs">${doc.room}</td>
+                <td><span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-400">${doc.shift}</span></td>
+            `;
+            dBody.appendChild(tr);
+        });
+    }
     
     // Render Ward beds registry
     const wReg = document.getElementById("wardMapRegistry");
-    wReg.innerHTML = "";
+    if (wReg) wReg.innerHTML = "";
     
-    MOCK_DB.wards.forEach(bed => {
-        const patient = MOCK_DB.patients.find(p => p.id === bed.patientId);
-        const div = document.createElement("div");
-        div.className = "p-3 bg-white/5 rounded-xl border border-white/5 flex items-center justify-between text-xs";
-        
-        const statusHtml = bed.occupied 
-            ? `<span class="font-semibold text-red-400">Occupied (${patient ? patient.name : 'Unknown'})</span>`
-            : `<span class="font-semibold text-emerald-400">Empty</span>`;
+    if (wReg) {
+        MOCK_DB.wards.forEach(bed => {
+            const patient = MOCK_DB.patients.find(p => p.id === bed.patientId);
+            const div = document.createElement("div");
+            div.className = "p-3 bg-white/5 rounded-xl border border-white/5 flex items-center justify-between text-xs";
             
-        div.innerHTML = `
-            <div>
-                <span class="font-bold text-white">${bed.id} (${bed.type})</span>
-            </div>
-            <div>${statusHtml}</div>
-        `;
-        wReg.appendChild(div);
-    });
+            const statusHtml = bed.occupied 
+                ? `<span class="font-semibold text-red-400">Occupied (${patient ? patient.name : 'Unknown'})</span>`
+                : `<span class="font-semibold text-emerald-400">Empty</span>`;
+                
+            div.innerHTML = `
+                <div>
+                    <span class="font-bold text-white">${bed.id} (${bed.type})</span>
+                </div>
+                <div>${statusHtml}</div>
+            `;
+            wReg.appendChild(div);
+        });
+    }
     
     // Update stats
     const totalBeds = MOCK_DB.wards.length;
     const occupied = MOCK_DB.wards.filter(b => b.occupied).length;
-    document.getElementById("statOccupiedBeds").innerText = `${occupied} / ${totalBeds}`;
-    document.getElementById("statIcuRate").innerText = `${Math.round((occupied / totalBeds) * 100)}%`;
+    const statOccupiedBedsEl = document.getElementById("statOccupiedBeds");
+    const statIcuRateEl = document.getElementById("statIcuRate");
+    if (statOccupiedBedsEl) statOccupiedBedsEl.innerText = `${occupied} / ${totalBeds}`;
+    if (statIcuRateEl) statIcuRateEl.innerText = `${Math.round((occupied / totalBeds) * 100)}%`;
 
     // Populate Doctor Selection dropdown inside Admin Manual Registration
     const adminPatDoctor = document.getElementById("adminPatDoctor");
@@ -665,7 +675,7 @@ window.processLocalFileImport = function() {
 let activePatientId = "";
 let currentPrescriptionMeds = [];function populateDoctorDashboard() {
     const queue = document.getElementById("doctorPatientQueue");
-    queue.innerHTML = "";
+    if (queue) queue.innerHTML = "";
     
     // Filter queue: show all if Super Admin, otherwise show if admitted (IPD) OR assigned to this doctor (OPD)
     const myPatients = MOCK_DB.patients.filter(pat => {
@@ -890,7 +900,7 @@ window.submitDoctorConsultationFile = function() {
 let selectedBedId = "";
 function populateNurseDashboard() {
     const grid = document.getElementById("nurseBedVisualGrid");
-    grid.innerHTML = "";
+    if (grid) grid.innerHTML = "";
     
     MOCK_DB.wards.forEach(bed => {
         const btn = document.createElement("button");
@@ -903,29 +913,34 @@ function populateNurseDashboard() {
         
         btn.onclick = () => {
             selectedBedId = bed.id;
-            document.getElementById("vitalsBedNumberLabel").innerText = `Bed: ${bed.id} (${bed.occupied ? 'Occupied' : 'Empty'})`;
+            const vitalsBedLabelEl = document.getElementById("vitalsBedNumberLabel");
+            if (vitalsBedLabelEl) vitalsBedLabelEl.innerText = `Bed: ${bed.id} (${bed.occupied ? 'Occupied' : 'Empty'})`;
             populateNurseDashboard();
         };
         
-        grid.appendChild(btn);
+        if (grid) grid.appendChild(btn);
     });
     
     // Toggle Form visibility based on bed occupancy status
+    const nurseTitleLabelEl = document.getElementById("nurseCardTitleLabel");
+    const vitalsFormFieldsEl = document.getElementById("vitalsFormFields");
+    const admissionFormFieldsEl = document.getElementById("admissionFormFields");
+
     if (selectedBedId) {
         const activeBed = MOCK_DB.wards.find(b => b.id === selectedBedId);
         if (activeBed && activeBed.occupied) {
-            document.getElementById("nurseCardTitleLabel").innerText = "Record Patient Vitals";
-            document.getElementById("vitalsFormFields").classList.remove("hidden");
-            document.getElementById("admissionFormFields").classList.add("hidden");
+            if (nurseTitleLabelEl) nurseTitleLabelEl.innerText = "Record Patient Vitals";
+            if (vitalsFormFieldsEl) vitalsFormFieldsEl.classList.remove("hidden");
+            if (admissionFormFieldsEl) admissionFormFieldsEl.classList.add("hidden");
         } else {
-            document.getElementById("nurseCardTitleLabel").innerText = "Admit & Register Patient";
-            document.getElementById("vitalsFormFields").classList.add("hidden");
-            document.getElementById("admissionFormFields").classList.remove("hidden");
+            if (nurseTitleLabelEl) nurseTitleLabelEl.innerText = "Admit & Register Patient";
+            if (vitalsFormFieldsEl) vitalsFormFieldsEl.classList.add("hidden");
+            if (admissionFormFieldsEl) admissionFormFieldsEl.classList.remove("hidden");
         }
     } else {
-        document.getElementById("nurseCardTitleLabel").innerText = "Record Patient Vitals";
-        document.getElementById("vitalsFormFields").classList.remove("hidden");
-        document.getElementById("admissionFormFields").classList.add("hidden");
+        if (nurseTitleLabelEl) nurseTitleLabelEl.innerText = "Record Patient Vitals";
+        if (vitalsFormFieldsEl) vitalsFormFieldsEl.classList.remove("hidden");
+        if (admissionFormFieldsEl) admissionFormFieldsEl.classList.add("hidden");
     }
     
     if (window.lucide) window.lucide.createIcons();
