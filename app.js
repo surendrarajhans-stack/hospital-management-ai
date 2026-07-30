@@ -2184,6 +2184,28 @@ window.launchTrialPrincipalWorkspace = function() {
     const name = document.getElementById("trialAdminName").value.trim();
     const key = document.getElementById("successLicenseKey").innerText;
     switchRole(14, name, key);
+
+    // Open the AI Onboarding Modal for trial users too!
+    const onbModal = document.getElementById("aiOnboardingModal");
+    if (onbModal) {
+        onbModal.classList.remove("hidden");
+        // Reset badges/statuses
+        ["Doctors", "Patients", "Staff", "Pharmacy"].forEach(type => {
+            const badge = document.getElementById(`onbBadge${type}`);
+            if (badge) {
+                badge.className = "status-badge bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider";
+                badge.innerText = "Pending";
+            }
+            const card = document.getElementById(`onbCard${type}`);
+            if (card) {
+                card.className = "p-4 bg-white/5 rounded-2xl border border-white/5 space-y-2 flex flex-col justify-between";
+            }
+        });
+        const finishBtn = document.getElementById("btnFinishOnboarding");
+        if (finishBtn) {
+            finishBtn.className = "btn btn-primary px-6 py-2.5 text-xs font-bold flex items-center gap-1.5 opacity-60 pointer-events-none transition";
+        }
+    }
 };
 
 window.sendAdminWhatsAppNotification = function(message) {
