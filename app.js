@@ -634,6 +634,27 @@ function populateITDashboard() {
             });
         }
     }
+
+    // Render Nurse & Clinical Support Table
+    const sBody = document.getElementById("staffTableBody");
+    if (sBody) {
+        sBody.innerHTML = "";
+        if (!MOCK_DB.staff || MOCK_DB.staff.length === 0) {
+            sBody.innerHTML = `<tr><td colspan="4" class="py-3 text-center text-xs text-[#6b7280]">No active staff members registered. Upload a staff CSV sheet to import.</td></tr>`;
+        } else {
+            MOCK_DB.staff.forEach(st => {
+                const tr = document.createElement("tr");
+                tr.className = "border-b border-white/5 text-[#f3f4f6]";
+                tr.innerHTML = `
+                    <td class="py-2.5 font-medium">${st.name}</td>
+                    <td>${st.dept}</td>
+                    <td><span class="text-xs text-[#9ca3af] font-mono">${st.id}</span></td>
+                    <td><span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-400">${st.shift || 'General'}</span></td>
+                `;
+                sBody.appendChild(tr);
+            });
+        }
+    }
 }
 
 window.toggleAdminAdmissionTypeFields = function() {
