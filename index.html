@@ -181,6 +181,32 @@
                 </div>
             </header>
 
+            <!-- Role Shortcuts Bar -->
+            <div id="role-shortcuts-bar" class="bg-slate-950 border-b border-white/10 px-4 md:px-8 py-2.5 flex flex-wrap gap-2 items-center z-30 sticky top-16 shadow-lg shadow-black/10">
+                <span class="text-xs text-slate-400 mr-2 font-semibold flex items-center gap-1">
+                    <i data-lucide="layout-grid" class="w-3.5 h-3.5 text-teal-400"></i>
+                    <span>Quick Consoles:</span>
+                </span>
+                <button onclick="selectRoleOnboarding(15, 'Super Admin')" data-clearance="15" class="role-shortcut-btn px-3 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 text-[11px] font-bold transition flex items-center gap-1">
+                    👑 Super Admin
+                </button>
+                <button onclick="selectRoleOnboarding(14, 'IT Admin')" data-clearance="14" class="role-shortcut-btn px-3 py-1 rounded-lg bg-teal-500/10 border border-teal-500/30 text-teal-300 hover:bg-teal-500/20 text-[11px] font-bold transition flex items-center gap-1">
+                    ⚙️ IT Admin
+                </button>
+                <button onclick="selectRoleOnboarding(1, 'Doctor')" data-clearance="1" class="role-shortcut-btn px-3 py-1 rounded-lg bg-sky-500/10 border border-sky-500/30 text-sky-300 hover:bg-sky-500/20 text-[11px] font-bold transition flex items-center gap-1">
+                    🩺 Doctor
+                </button>
+                <button onclick="selectRoleOnboarding(2, 'Nurse')" data-clearance="2" class="role-shortcut-btn px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20 text-[11px] font-bold transition flex items-center gap-1">
+                    🏥 Nurse
+                </button>
+                <button onclick="selectRoleOnboarding(3, 'Pharmacist')" data-clearance="3" class="role-shortcut-btn px-3 py-1 rounded-lg bg-purple-500/10 border border-purple-500/30 text-purple-300 hover:bg-purple-500/20 text-[11px] font-bold transition flex items-center gap-1">
+                    💊 Pharmacy
+                </button>
+                <button onclick="selectRoleOnboarding(4, 'Patient')" data-clearance="4" class="role-shortcut-btn px-3 py-1 rounded-lg bg-orange-500/10 border border-orange-500/30 text-orange-300 hover:bg-orange-500/20 text-[11px] font-bold transition flex items-center gap-1">
+                    👤 Patient
+                </button>
+            </div>
+
             <!-- DASHBOARD CONTAINER -->
             <div id="view-container" class="flex-1 p-4 md:p-6 overflow-y-auto">
 

@@ -139,6 +139,9 @@ window.addEventListener("DOMContentLoaded", () => {
         if (avatarBadge) avatarBadge.innerText = name.charAt(0).toUpperCase();
         
         switchDashboardView(state.activeDashboardView);
+        if (typeof highlightActiveRoleShortcut === "function" && state.roleClearance !== undefined) {
+            highlightActiveRoleShortcut(state.roleClearance);
+        }
     } else {
         resetToOnboarding();
     }
@@ -150,6 +153,9 @@ window.resetToOnboarding = function() {
     state.activeDashboardView = "onboarding-role-select";
     saveLocalState();
     switchDashboardView("onboarding-role-select");
+    if (typeof highlightActiveRoleShortcut === "function") {
+        highlightActiveRoleShortcut(null);
+    }
 };
 
 window.selectRoleOnboarding = function(clearance, roleLabel) {
@@ -277,6 +283,21 @@ window.switchRole = function(clearance, name, id) {
     }
     
     addSystemLog(`User ${name} authenticated successfully as ${state.userRole}.`, "Success");
+    if (typeof highlightActiveRoleShortcut === "function") {
+        highlightActiveRoleShortcut(clearance);
+    }
+};
+
+window.highlightActiveRoleShortcut = function(clearance) {
+    document.querySelectorAll(".role-shortcut-btn").forEach(btn => {
+        btn.classList.remove("ring-1", "ring-teal-400", "bg-teal-500/20");
+    });
+    if (clearance !== null) {
+        const activeBtn = document.querySelector(`.role-shortcut-btn[data-clearance="${clearance}"]`);
+        if (activeBtn) {
+            activeBtn.classList.add("ring-1", "ring-teal-400", "bg-teal-500/20");
+        }
+    }
 };
 
 window.toggleSidebar = function() {
