@@ -1,0 +1,5 @@
+id,name,dept,shift
+STAFF-01,Sister Clara,ICU,Day
+STAFF-02,Sister Florence,General Ward,Night
+STAFF-03,Brother Thomas,Emergency,Morning
+STAFF-04,Sister Teresa,Pediatrics,Afternoon

@@ -1,0 +1,5 @@
+id,name,age,triage,bed,bill,paid,complaint
+PAT-101,Aarav Mehta,29,Stable,GW-01,2500,false,Mild high blood pressure
+PAT-102,Meera Nair,34,Under Observation,GW-05,4500,false,Post-operative recovery
+PAT-103,Amit Patel,62,Critical,ICU-01,35000,false,Acute chest pain
+PAT-104,Pooja Rao,45,Stable,,1200,true,Routine checkup
