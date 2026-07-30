@@ -762,7 +762,12 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <div class="flex items-center gap-3">
-                                <h2 class="text-2xl md:text-3xl font-extrabold text-white">Doctor Console - <span id="doctorConsoleName" class="text-teal-400">Dr. Surendra Rajhans</span></h2>
+                                <h2 class="text-2xl md:text-3xl font-extrabold text-white flex items-center gap-2">
+                                    <span>Doctor Console -</span>
+                                    <select id="activeDoctorSwitch" class="bg-slate-900 border border-teal-500/30 rounded-xl px-3 py-1 text-teal-400 font-bold focus:outline-none text-lg md:text-xl cursor-pointer hover:border-teal-500 transition" onchange="switchDoctorProfile(this.value)">
+                                        <!-- Dynamic doctor profiles -->
+                                    </select>
+                                </h2>
                                 <span class="px-3.5 py-1.5 rounded-full text-xs md:text-sm font-black bg-teal-500/20 text-teal-300 border border-teal-500/40 uppercase tracking-wider shadow-md">Clinical Diagnosis Desk</span>
                             </div>
                             <p class="text-sm text-[#9ca3af] mt-1">Review active patients, prescribe medications, and check AI diagnostics.</p>

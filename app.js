@@ -877,12 +877,28 @@ window.processLocalFileImport = function() {
     reader.readAsArrayBuffer(file);
 };
 
-// 10. Doctor Portal Controllers
+window.switchDoctorProfile = function(docId) {
+    const doc = MOCK_DB.doctors.find(d => d.id === docId);
+    if (doc) {
+        switchRole(1, doc.name, doc.id);
+        populateDoctorDashboard();
+    }
+};
+
 let activePatientId = "";
 let currentPrescriptionMeds = [];function populateDoctorDashboard() {
-    const docNameEl = document.getElementById("doctorConsoleName");
-    if (docNameEl) {
-        docNameEl.innerText = state.userName || "Dr. Surendra Rajhans";
+    const docSwitch = document.getElementById("activeDoctorSwitch");
+    if (docSwitch) {
+        docSwitch.innerHTML = "";
+        MOCK_DB.doctors.forEach(d => {
+            const opt = document.createElement("option");
+            opt.value = d.id;
+            opt.innerText = `${d.name} (${d.specialty})`;
+            docSwitch.appendChild(opt);
+        });
+        if (state.userId && MOCK_DB.doctors.some(d => d.id === state.userId)) {
+            docSwitch.value = state.userId;
+        }
     }
 
     const queue = document.getElementById("doctorPatientQueue");
