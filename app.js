@@ -310,15 +310,14 @@ window.switchDashboardView = function(viewId, elementLink = null) {
         }
     }
 
-    // Multi-browser mobile & desktop viewport scroll reset
+    // Multi-browser mobile & desktop viewport scroll reset to top (0px gap)
     setTimeout(() => {
         window.scrollTo(0, 0);
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
         const viewContainer = document.getElementById("view-container");
         if (viewContainer) viewContainer.scrollTop = 0;
-        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 30);
+    }, 10);
     
     saveLocalState();
     

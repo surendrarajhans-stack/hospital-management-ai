@@ -282,10 +282,15 @@ body.light-mode .theme-toggle .sun-icon {
 
 .dashboard-pane {
     flex: 1;
-    padding: 20px 24px 40px 24px !important;
+    padding: 16px 24px 40px 24px !important;
     overflow-y: auto !important;
     height: 100% !important;
     margin-top: 0 !important;
+}
+
+section[id^='view-'], #onboarding-role-select {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
 }
 
 .chat-pane {
