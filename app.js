@@ -305,6 +305,45 @@ window.switchDashboardView = function(viewId, elementLink = null) {
     const titleElem = document.getElementById("current-view-title");
     if (titleElem) titleElem.innerText = label;
 
+    // Dynamically update Sidebar Profile Badge (Avatar, Name, Role) as per active role view
+    const nameBadge = document.getElementById("sidebar-user-name");
+    const roleBadge = document.getElementById("sidebar-user-role");
+    const avatarBadge = document.getElementById("user-badge-avatar");
+
+    let badgeName = "Global Admin";
+    let badgeRole = "Licensing Authority";
+    let badgeInitial = "S";
+
+    if (targetId === "view-doctor") {
+        badgeName = "Dr. Surendra Rajhans";
+        badgeRole = "Clinical Doctor Desk";
+        badgeInitial = "D";
+    } else if (targetId === "view-nurse") {
+        badgeName = "Sister Anjali";
+        badgeRole = "Nurse / Ward Manager";
+        badgeInitial = "N";
+    } else if (targetId === "view-pharmacist") {
+        badgeName = "Pharmacy Desk";
+        badgeRole = "Pharmacist / Billing";
+        badgeInitial = "P";
+    } else if (targetId === "view-patient") {
+        badgeName = "Ramesh Kumar";
+        badgeRole = "Patient Care Portal";
+        badgeInitial = "P";
+    } else if (targetId === "view-it-administrator") {
+        badgeName = "IT Director";
+        badgeRole = "IT Administrator";
+        badgeInitial = "I";
+    } else if (targetId === "view-super-admin") {
+        badgeName = "Super Admin";
+        badgeRole = "Licensing Authority";
+        badgeInitial = "S";
+    }
+
+    if (nameBadge) nameBadge.innerText = badgeName;
+    if (roleBadge) roleBadge.innerText = badgeRole;
+    if (avatarBadge) avatarBadge.innerText = badgeInitial;
+
     // Update Sidebar Link Active Highlights
     document.querySelectorAll(".sidebar-link").forEach(lnk => lnk.classList.remove("active"));
     if (elementLink) {
