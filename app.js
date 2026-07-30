@@ -271,12 +271,10 @@ window.switchDashboardView = function(viewId, elementLink = null) {
         targetId = "onboarding-role-select";
     }
 
-    // Hide ALL section children under view-container with display: none !important
-    Array.from(viewContainer.children).forEach(child => {
-        if (child.tagName.toLowerCase() === "section") {
-            child.classList.add("hidden");
-            child.style.setProperty("display", "none", "important");
-        }
+    // Hide EVERY section across the entire container/document with display: none !important
+    document.querySelectorAll("section").forEach(sec => {
+        sec.classList.add("hidden");
+        sec.style.setProperty("display", "none", "important");
     });
 
     // Un-hide ONLY the target section with display: block !important
