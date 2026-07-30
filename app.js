@@ -260,14 +260,6 @@ window.switchDashboardView = function(viewId, elementLink = null) {
     const viewContainer = document.getElementById("view-container");
     if (!viewContainer) return;
     
-    // Hide all section children cleanly
-    Array.from(viewContainer.children).forEach(child => {
-        if (child.tagName.toLowerCase() === "section") {
-            child.classList.add("hidden");
-            child.style.removeProperty("display");
-        }
-    });
-
     let targetId = viewId;
     if (!targetId || targetId === "view-landing") {
         targetId = "onboarding-role-select";
@@ -279,6 +271,15 @@ window.switchDashboardView = function(viewId, elementLink = null) {
         targetId = "onboarding-role-select";
     }
 
+    // Hide ALL section children under view-container with display: none !important
+    Array.from(viewContainer.children).forEach(child => {
+        if (child.tagName.toLowerCase() === "section") {
+            child.classList.add("hidden");
+            child.style.setProperty("display", "none", "important");
+        }
+    });
+
+    // Un-hide ONLY the target section with display: block !important
     if (target) {
         target.classList.remove("hidden");
         target.style.setProperty("display", "block", "important");
