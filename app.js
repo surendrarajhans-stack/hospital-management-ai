@@ -285,47 +285,6 @@ window.switchDashboardView = function(viewId, elementLink = null) {
         state.activeDashboardView = targetId;
     }
 
-    // Auto-sync User Role & Sidebar Badges for the selected view
-    if (targetId === "view-doctor") {
-        state.roleClearance = 1;
-        state.userRole = "Doctor";
-        state.userName = "Dr. Surendra Rajhans";
-        state.userId = "DOC-001";
-    } else if (targetId === "view-nurse") {
-        state.roleClearance = 2;
-        state.userRole = "Nurse";
-        state.userName = "Sister Anjali";
-        state.userId = "NURSE-01";
-    } else if (targetId === "view-pharmacist") {
-        state.roleClearance = 3;
-        state.userRole = "Pharmacist";
-        state.userName = "Pharmacy Desk";
-        state.userId = "PHARM-01";
-    } else if (targetId === "view-patient") {
-        state.roleClearance = 4;
-        state.userRole = "Patient";
-        state.userName = "Ramesh Kumar";
-        state.userId = "PAT-001";
-    } else if (targetId === "view-it-administrator") {
-        state.roleClearance = 14;
-        state.userRole = "IT Administrator";
-        state.userName = "IT Director";
-        state.userId = "IT-ADMIN-01";
-    } else if (targetId === "view-super-admin") {
-        state.roleClearance = 15;
-        state.userRole = "Super Admin";
-        state.userName = "Global Admin";
-        state.userId = "SUPERADMIN";
-    }
-
-    // Update Sidebar User Profile Badge & Avatar dynamically
-    const nameBadge = document.getElementById("sidebar-user-name");
-    const roleBadge = document.getElementById("sidebar-user-role");
-    const avatarBadge = document.getElementById("user-badge-avatar");
-    if (nameBadge && state.userName) nameBadge.innerText = state.userName;
-    if (roleBadge && state.userRole) roleBadge.innerText = state.userRole;
-    if (avatarBadge && state.userName) avatarBadge.innerText = state.userName.charAt(0).toUpperCase();
-
     // Synchronous Scroll Reset to 0
     viewContainer.scrollTop = 0;
     window.scrollTo(0, 0);
