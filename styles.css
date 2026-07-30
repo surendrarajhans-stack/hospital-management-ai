@@ -1591,59 +1591,27 @@ body.light-mode .map-placeholder {
 
 /* Mobile Responsive Media Queries */
 @media (max-width: 768px) {
-    body {
+    html, body {
+        overflow: hidden !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    
+    #app-container, .app-container, main, .app-main {
+        height: 100vh !important;
+        max-height: 100vh !important;
+        overflow: hidden !important;
+    }
+
+    #view-container, .dashboard-pane {
+        height: calc(100vh - 64px) !important;
+        max-height: calc(100vh - 64px) !important;
         overflow-y: auto !important;
-        overflow-x: hidden !important;
-        height: auto !important;
-        width: 100vw !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding: 12px 12px 80px 12px !important;
     }
 
-    /* Header responsiveness */
-    .app-header {
-        padding: 10px 16px;
-        height: auto;
-        min-height: 70px;
-        flex-direction: column;
-        gap: 12px;
-        align-items: center;
-        text-align: center;
-    }
-    
-    .header-left, .header-center, .header-right {
-        width: 100%;
-        justify-content: center;
-        display: flex;
-    }
-    
-    .header-center {
-        order: 2;
-    }
-    
-    .header-right {
-        order: 3;
-        flex-wrap: wrap;
-    }
-    
-    /* Main Layout Responsiveness */
-    .app-container {
-        height: auto;
-        min-height: 100vh;
-        overflow-y: auto;
-    }
-
-    .app-main {
-        flex-direction: column;
-        height: auto;
-        overflow: visible;
-    }
-    
-    .dashboard-pane {
-        padding: 16px;
-        width: 100%;
-        height: auto;
-        overflow-y: visible;
-    }
-    
     .chat-pane {
         width: 100% !important;
         height: 600px !important;
@@ -1652,45 +1620,34 @@ body.light-mode .map-placeholder {
         position: relative;
     }
 
-    /* Stats Grid */
-    .stats-grid {
+    .stats-grid, .dashboard-row-grid {
         grid-template-columns: 1fr;
         gap: 12px;
-    }
-
-    /* Row layouts */
-    .dashboard-row-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
     }
 
     .span-two {
         grid-column: span 1;
     }
 
-    /* Modal overlays */
     .modal-card {
         width: 95%;
         max-height: 95vh;
     }
-    
-    .printable-document-container {
-        padding: 16px;
+
+    .glass-card, .role-card {
+        transform: none !important;
+        will-change: auto !important;
+        backface-visibility: visible !important;
+        pointer-events: auto !important;
+        user-select: auto !important;
+        -webkit-user-select: auto !important;
     }
 
-    /* Onboarding Card styling */
-    .onboarding-card {
-        padding: 20px;
-        margin: 20px auto;
-    }
-    
-    .quick-roles-grid {
-        gap: 8px;
-    }
-    
-    .btn {
-        padding: 8px 16px;
-        font-size: 0.85rem;
+    .modal-overlay {
+        align-items: flex-start !important;
+        padding: 85px 12px 60px 12px !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
     }
 }
 
@@ -1734,70 +1691,5 @@ select option {
 }
 
 .mobile-tab-btn.active {
-    color: #3b82f6; /* Accent color */
-}
-
-@media (max-width: 768px) {
-    html, body {
-        overflow: hidden !important;
-        height: 100vh !important;
-        max-height: 100vh !important;
-        -webkit-overflow-scrolling: touch !important;
-    }
-    
-    .app-container, main {
-        height: 100vh !important;
-        max-height: 100vh !important;
-        overflow: hidden !important;
-    }
-
-    #view-container, .dashboard-pane {
-        height: calc(100vh - 64px) !important;
-        max-height: calc(100vh - 64px) !important;
-        overflow-y: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-        padding: 12px 12px 80px 12px !important;
-    }
-
-    /* Ensure hidden sections and hero remain strictly hidden on mobile when class hidden is applied */
-    section.hidden, #onboarding-role-select.hidden, .hidden {
-        display: none !important;
-    }
-
-    section[id^='view-']:not(.hidden), #onboarding-role-select:not(.hidden) {
-        display: block !important;
-        height: auto !important;
-        overflow: visible !important;
-    }
-
-    #view-container {
-        padding: 12px 12px 80px 12px !important;
-        margin-top: 0 !important;
-    }
-
-    .dashboard-pane {
-        width: 100% !important;
-        padding: 12px 12px 80px 12px !important;
-        margin-top: 0 !important;
-    }
-
-    .glass-card, .role-card {
-        transform: none !important;
-        will-change: auto !important;
-        backface-visibility: visible !important;
-        pointer-events: auto !important;
-        user-select: auto !important;
-        -webkit-user-select: auto !important;
-    }
-    
-    .overflow-y-auto {
-        -webkit-overflow-scrolling: touch !important;
-    }
-
-    .modal-overlay {
-        align-items: flex-start !important;
-        padding: 85px 12px 60px 12px !important;
-        overflow-y: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-    }
+    color: #3b82f6;
 }
