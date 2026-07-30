@@ -212,8 +212,68 @@
                         </div>
                     </div>
 
+                    <!-- 2. DIRECT ROLE SELECTION CONSOLES (Top Placement) -->
+                    <div class="space-y-4 pt-2">
+                        <div class="text-center">
+                            <h2 class="font-display font-bold text-2xl text-white">Select Your Hospital Operational Role</h2>
+                            <p class="text-xs text-[#9ca3af] mt-1">Click any Role Console below to instantly enter your dedicated workspace.</p>
+                        </div>
+                        
+                        <!-- Role Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                            <!-- Super Admin -->
+                            <div class="glass-card role-card hover:border-amber-500/30 group cursor-pointer" onclick="selectRoleOnboarding(15, 'Super Admin')">
+                                <div class="role-icon-box bg-amber-500/10 text-amber-500 group-hover:bg-amber-500/20">
+                                    <i data-lucide="shield-check" class="w-6 h-6"></i>
+                                </div>
+                                <h3>Super Admin</h3>
+                                <p>Global licensing, billing rates, localizations, and system activations.</p>
+                            </div>
+                            <!-- IT Administrator -->
+                            <div class="glass-card role-card hover:border-teal-500/30 group cursor-pointer" onclick="selectRoleOnboarding(14, 'IT Admin')">
+                                <div class="role-icon-box bg-teal-500/10 text-teal-500 group-hover:bg-teal-500/20">
+                                    <i data-lucide="terminal" class="w-6 h-6"></i>
+                                </div>
+                                <h3>IT Administrator</h3>
+                                <p>Staff profiles, shift registers, ward config, and CSV importer.</p>
+                            </div>
+                            <!-- Doctor -->
+                            <div class="glass-card role-card hover:border-sky-500/30 group cursor-pointer" onclick="selectRoleOnboarding(1, 'Doctor')">
+                                <div class="role-icon-box bg-sky-500/10 text-sky-500 group-hover:bg-sky-500/20">
+                                    <i data-lucide="stethoscope" class="w-6 h-6"></i>
+                                </div>
+                                <h3>Doctor Console</h3>
+                                <p>Consultations, symptoms analyzer, digital prescriptions, and patient files.</p>
+                            </div>
+                            <!-- Nurse -->
+                            <div class="glass-card role-card hover:border-emerald-500/30 group cursor-pointer" onclick="selectRoleOnboarding(2, 'Nurse')">
+                                <div class="role-icon-box bg-emerald-500/10 text-emerald-500 group-hover:bg-emerald-500/20">
+                                    <i data-lucide="heart-pulse" class="w-6 h-6"></i>
+                                </div>
+                                <h3>Nurse / Ward Manager</h3>
+                                <p>Vital logging, active bed maps, patient admissions, and check-ins.</p>
+                            </div>
+                            <!-- Pharmacist -->
+                            <div class="glass-card role-card hover:border-purple-500/30 group cursor-pointer" onclick="selectRoleOnboarding(3, 'Pharmacist')">
+                                <div class="role-icon-box bg-purple-500/10 text-purple-500 group-hover:bg-purple-500/20">
+                                    <i data-lucide="pill" class="w-6 h-6"></i>
+                                </div>
+                                <h3>Pharmacist / Billing</h3>
+                                <p>Medication inventory, billing ledger, receipts print, and prescriptions dispensing.</p>
+                            </div>
+                            <!-- Patient -->
+                            <div class="glass-card role-card hover:border-orange-500/30 group cursor-pointer" onclick="selectRoleOnboarding(4, 'Patient')">
+                                <div class="role-icon-box bg-orange-500/10 text-orange-500 group-hover:bg-orange-500/20">
+                                    <i data-lucide="user" class="w-6 h-6"></i>
+                                </div>
+                                <h3>Patient Portal</h3>
+                                <p>Book appointments, pay medical bills, check lab reports, and Symptom AI Chat.</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- 3 DEDICATED REGIONAL PRICING TIERS & PLANS -->
-                    <div class="space-y-4 pt-4">
+                    <div class="space-y-4 pt-6">
                         <div class="text-center">
                             <h2 class="font-display font-bold text-2xl text-white">Select Your Regional Operations & Pricing Tier</h2>
                             <p class="text-xs text-[#9ca3af] mt-1">Tailored for Indian Hospitals, International Clinics & Custom Enterprise Deployments.</p>
@@ -408,58 +468,6 @@
                                 <h4 class="font-bold text-sm text-white">Automated WhatsApp & Voice AI</h4>
                                 <p class="text-[11px] text-[#9ca3af] mt-0.5 leading-relaxed">Includes automatic patient billing WhatsApp alerts, secure payment links, and multilingual clinical intake chatbot.</p>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Role Grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                        <!-- Super Admin -->
-                        <div class="glass-card role-card hover:border-amber-500/30 group" onclick="selectRoleOnboarding(15, 'Super Admin')">
-                            <div class="role-icon-box bg-amber-500/10 text-amber-500 group-hover:bg-amber-500/20">
-                                <i data-lucide="shield-check" class="w-6 h-6"></i>
-                            </div>
-                            <h3>Super Admin</h3>
-                            <p>Global licensing, billing rates, localizations, and system activations.</p>
-                        </div>
-                        <!-- IT Administrator -->
-                        <div class="glass-card role-card hover:border-teal-500/30 group" onclick="selectRoleOnboarding(14, 'IT Admin')">
-                            <div class="role-icon-box bg-teal-500/10 text-teal-500 group-hover:bg-teal-500/20">
-                                <i data-lucide="terminal" class="w-6 h-6"></i>
-                            </div>
-                            <h3>IT Administrator</h3>
-                            <p>Staff profiles, shift registers, ward config, and CSV importer.</p>
-                        </div>
-                        <!-- Doctor -->
-                        <div class="glass-card role-card hover:border-sky-500/30 group" onclick="selectRoleOnboarding(1, 'Doctor')">
-                            <div class="role-icon-box bg-sky-500/10 text-sky-500 group-hover:bg-sky-500/20">
-                                <i data-lucide="stethoscope" class="w-6 h-6"></i>
-                            </div>
-                            <h3>Doctor Console</h3>
-                            <p>Consultations, symptoms analyzer, digital prescriptions, and patient files.</p>
-                        </div>
-                        <!-- Nurse -->
-                        <div class="glass-card role-card hover:border-emerald-500/30 group" onclick="selectRoleOnboarding(2, 'Nurse')">
-                            <div class="role-icon-box bg-emerald-500/10 text-emerald-500 group-hover:bg-emerald-500/20">
-                                <i data-lucide="heart-pulse" class="w-6 h-6"></i>
-                            </div>
-                            <h3>Nurse / Ward Manager</h3>
-                            <p>Vital logging, active bed maps, patient admissions, and check-ins.</p>
-                        </div>
-                        <!-- Pharmacist -->
-                        <div class="glass-card role-card hover:border-purple-500/30 group" onclick="selectRoleOnboarding(3, 'Pharmacist')">
-                            <div class="role-icon-box bg-purple-500/10 text-purple-500 group-hover:bg-purple-500/20">
-                                <i data-lucide="pill" class="w-6 h-6"></i>
-                            </div>
-                            <h3>Pharmacist / Billing</h3>
-                            <p>Medication inventory, billing ledger, receipts print, and prescriptions dispensing.</p>
-                        </div>
-                        <!-- Patient -->
-                        <div class="glass-card role-card hover:border-orange-500/30 group" onclick="selectRoleOnboarding(4, 'Patient')">
-                            <div class="role-icon-box bg-orange-500/10 text-orange-500 group-hover:bg-orange-500/20">
-                                <i data-lucide="user" class="w-6 h-6"></i>
-                            </div>
-                            <h3>Patient Portal</h3>
-                            <p>Book appointments, pay medical bills, check lab reports, and Symptom AI Chat.</p>
                         </div>
                     </div>
                 </section>
