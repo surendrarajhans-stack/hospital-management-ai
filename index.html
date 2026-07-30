@@ -181,34 +181,72 @@
                 </div>
             </header>
 
-            <!-- Role Shortcuts Bar -->
-            <div id="role-shortcuts-bar" class="bg-slate-950 border-b border-white/10 px-4 md:px-8 py-2.5 flex flex-wrap gap-2 items-center z-30 sticky top-16 shadow-lg shadow-black/10">
-                <span class="text-xs text-slate-400 mr-2 font-semibold flex items-center gap-1">
-                    <i data-lucide="layout-grid" class="w-3.5 h-3.5 text-teal-400"></i>
-                    <span>Quick Consoles:</span>
-                </span>
-                <button onclick="selectRoleOnboarding(15, 'Super Admin')" data-clearance="15" class="role-shortcut-btn px-3 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 text-[11px] font-bold transition flex items-center gap-1">
-                    👑 Super Admin
-                </button>
-                <button onclick="selectRoleOnboarding(14, 'IT Admin')" data-clearance="14" class="role-shortcut-btn px-3 py-1 rounded-lg bg-teal-500/10 border border-teal-500/30 text-teal-300 hover:bg-teal-500/20 text-[11px] font-bold transition flex items-center gap-1">
-                    ⚙️ IT Admin
-                </button>
-                <button onclick="selectRoleOnboarding(1, 'Doctor')" data-clearance="1" class="role-shortcut-btn px-3 py-1 rounded-lg bg-sky-500/10 border border-sky-500/30 text-sky-300 hover:bg-sky-500/20 text-[11px] font-bold transition flex items-center gap-1">
-                    🩺 Doctor
-                </button>
-                <button onclick="selectRoleOnboarding(2, 'Nurse')" data-clearance="2" class="role-shortcut-btn px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20 text-[11px] font-bold transition flex items-center gap-1">
-                    🏥 Nurse
-                </button>
-                <button onclick="selectRoleOnboarding(3, 'Pharmacist')" data-clearance="3" class="role-shortcut-btn px-3 py-1 rounded-lg bg-purple-500/10 border border-purple-500/30 text-purple-300 hover:bg-purple-500/20 text-[11px] font-bold transition flex items-center gap-1">
-                    💊 Pharmacy
-                </button>
-                <button onclick="selectRoleOnboarding(4, 'Patient')" data-clearance="4" class="role-shortcut-btn px-3 py-1 rounded-lg bg-orange-500/10 border border-orange-500/30 text-orange-300 hover:bg-orange-500/20 text-[11px] font-bold transition flex items-center gap-1">
-                    👤 Patient
-                </button>
-            </div>
+            <!-- Flex Wrapper for Shortcuts + View Content -->
+            <div class="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden">
+                <!-- Role Shortcuts Bar -->
+                <div id="role-shortcuts-bar" class="w-full md:w-72 bg-slate-950/70 border-b md:border-b-0 md:border-r border-white/10 p-5 md:p-6 flex flex-col gap-4 flex-shrink-0 z-30 overflow-y-auto">
+                    <div class="space-y-1 mb-2">
+                        <span class="text-xs text-teal-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                            <i data-lucide="layout-grid" class="w-4 h-4 text-teal-400"></i>
+                            <span>MedSphere AI</span>
+                        </span>
+                        <h3 class="text-base font-extrabold text-white">Operational Consoles</h3>
+                        <p class="text-[11px] text-[#9ca3af]">Switch between consoles to view different workflows.</p>
+                    </div>
+                    
+                    <div class="flex flex-col gap-3">
+                        <button onclick="selectRoleOnboarding(15, 'Super Admin')" data-clearance="15" class="role-shortcut-btn w-full px-4 py-3 rounded-xl bg-amber-500/5 hover:bg-amber-500/10 border border-amber-500/20 text-amber-300 hover:text-white text-xs font-bold transition flex items-center justify-between group">
+                            <div class="flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-sm group-hover:scale-110 transition">👑</span>
+                                <span class="text-left font-semibold">Super Admin</span>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-[#9ca3af] opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5 transition"></i>
+                        </button>
 
-            <!-- DASHBOARD CONTAINER -->
-            <div id="view-container" class="flex-1 p-4 md:p-6 overflow-y-auto">
+                        <button onclick="selectRoleOnboarding(14, 'IT Admin')" data-clearance="14" class="role-shortcut-btn w-full px-4 py-3 rounded-xl bg-teal-500/5 hover:bg-teal-500/10 border border-teal-500/20 text-teal-300 hover:text-white text-xs font-bold transition flex items-center justify-between group">
+                            <div class="flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-lg bg-teal-500/10 flex items-center justify-center text-sm group-hover:scale-110 transition">⚙️</span>
+                                <span class="text-left font-semibold">IT Admin</span>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-[#9ca3af] opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5 transition"></i>
+                        </button>
+
+                        <button onclick="selectRoleOnboarding(1, 'Doctor')" data-clearance="1" class="role-shortcut-btn w-full px-4 py-3 rounded-xl bg-sky-500/5 hover:bg-sky-500/10 border border-sky-500/20 text-sky-300 hover:text-white text-xs font-bold transition flex items-center justify-between group">
+                            <div class="flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center text-sm group-hover:scale-110 transition">🩺</span>
+                                <span class="text-left font-semibold">Doctor Console</span>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-[#9ca3af] opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5 transition"></i>
+                        </button>
+
+                        <button onclick="selectRoleOnboarding(2, 'Nurse')" data-clearance="2" class="role-shortcut-btn w-full px-4 py-3 rounded-xl bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 hover:text-white text-xs font-bold transition flex items-center justify-between group">
+                            <div class="flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-sm group-hover:scale-110 transition">🏥</span>
+                                <span class="text-left font-semibold">Nurse Console</span>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-[#9ca3af] opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5 transition"></i>
+                        </button>
+
+                        <button onclick="selectRoleOnboarding(3, 'Pharmacist')" data-clearance="3" class="role-shortcut-btn w-full px-4 py-3 rounded-xl bg-purple-500/5 hover:bg-purple-500/10 border border-purple-500/20 text-purple-300 hover:text-white text-xs font-bold transition flex items-center justify-between group">
+                            <div class="flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-sm group-hover:scale-110 transition">💊</span>
+                                <span class="text-left font-semibold">Pharmacy Node</span>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-[#9ca3af] opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5 transition"></i>
+                        </button>
+
+                        <button onclick="selectRoleOnboarding(4, 'Patient')" data-clearance="4" class="role-shortcut-btn w-full px-4 py-3 rounded-xl bg-orange-500/5 hover:bg-orange-500/10 border border-orange-500/20 text-orange-300 hover:text-white text-xs font-bold transition flex items-center justify-between group">
+                            <div class="flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-sm group-hover:scale-110 transition">👤</span>
+                                <span class="text-left font-semibold">Patient Portal</span>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-[#9ca3af] opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5 transition"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- DASHBOARD CONTAINER -->
+                <div id="view-container" class="flex-1 p-4 md:p-6 overflow-y-auto">
 
                 <!-- 1. ONBOARDING ROLE SELECTION & B2B MARKETING LANDING PAGE -->
                 <section id="onboarding-role-select" class="max-w-6xl mx-auto py-4 md:py-8 text-center space-y-6 md:space-y-8">
@@ -1466,6 +1504,7 @@
                 </section>
 
             </div>
+        </div>
         </main>
     </div>
 

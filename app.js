@@ -290,12 +290,14 @@ window.switchRole = function(clearance, name, id) {
 
 window.highlightActiveRoleShortcut = function(clearance) {
     document.querySelectorAll(".role-shortcut-btn").forEach(btn => {
-        btn.classList.remove("ring-1", "ring-teal-400", "bg-teal-500/20");
+        btn.classList.remove("ring-2", "ring-teal-400/50", "bg-teal-500/20", "border-teal-500/40");
+        btn.classList.add("border-white/10");
     });
     if (clearance !== null) {
         const activeBtn = document.querySelector(`.role-shortcut-btn[data-clearance="${clearance}"]`);
         if (activeBtn) {
-            activeBtn.classList.add("ring-1", "ring-teal-400", "bg-teal-500/20");
+            activeBtn.classList.remove("border-white/10");
+            activeBtn.classList.add("ring-2", "ring-teal-400/50", "bg-teal-500/20", "border-teal-500/40");
         }
     }
 };
