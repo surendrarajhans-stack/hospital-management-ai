@@ -295,7 +295,7 @@ window.switchDashboardView = function(viewId, elementLink = null) {
     if (viewContainer) {
         viewContainer.querySelectorAll("section").forEach(sec => {
             sec.classList.add("hidden");
-            sec.style.display = "none";
+            sec.style.setProperty("display", "none", "important");
         });
     }
     
@@ -313,10 +313,10 @@ window.switchDashboardView = function(viewId, elementLink = null) {
         }
     }
 
-    // Un-hide ONLY the target section with display: block
+    // Un-hide ONLY the target section with display: block !important
     if (target) {
         target.classList.remove("hidden");
-        target.style.display = "block";
+        target.style.setProperty("display", "block", "important");
     }
 
     // CRITICAL: Immediately & synchronously reset scroll position to top (0px offset) on all containers
