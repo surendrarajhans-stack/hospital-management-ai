@@ -182,11 +182,49 @@ window.submitOnboardingCredentials = function(e) {
     if (!name || !id) return;
     switchRole(state.roleClearance, name, id);
 };
-
 window.switchRole = function(clearance, name, id) {
     state.userName = name;
     state.userId = id;
     state.roleClearance = clearance;
+    
+    // Automatically register logged-in profiles into MOCK_DB if not present
+    if (clearance === 1) { // Doctor
+        if (!MOCK_DB.doctors.some(d => d.id === id)) {
+            MOCK_DB.doctors.push({
+                id: id,
+                name: name,
+                specialty: "General Medicine",
+                room: "OPD 101",
+                shift: "Morning",
+                phone: "+91 90000 00000"
+            });
+            saveDatabaseState();
+        }
+    } else if (clearance === 2) { // Nurse/Staff
+        if (!MOCK_DB.staff.some(s => s.id === id)) {
+            MOCK_DB.staff.push({
+                id: id,
+                name: name,
+                dept: "General Ward",
+                shift: "Day"
+            });
+            saveDatabaseState();
+        }
+    } else if (clearance === 4) { // Patient
+        if (!MOCK_DB.patients.some(p => p.id === id)) {
+            MOCK_DB.patients.push({
+                id: id,
+                name: name,
+                age: 30,
+                triage: "Stable",
+                bed: null,
+                bill: 0,
+                paid: true,
+                complaint: "Routine checkup"
+            });
+            saveDatabaseState();
+        }
+    }
     
     if (clearance === 15) state.userRole = "Super Admin";
     else if (clearance === 14) state.userRole = "IT Administrator";
