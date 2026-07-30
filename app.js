@@ -687,13 +687,57 @@ window.processLocalFileImport = function() {
     
     addSystemLog(`Executing cloud CSV import for collection: ${select.value}...`, "Warning");
     
-    // Simulate sheet importing process by parsing dummy headers
-    setTimeout(() => {
-        addSystemLog(`Import complete! Loaded data successfully to MongoDB collection.`, "Success");
-        addNotification("Import Successful", "Dynamic sheets records synced successfully to cloud.", "success");
-        saveDatabaseState();
-        populateITDashboard();
-    }, 1200);
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const text = e.target.result;
+            const lines = text.split(/\r?\n/);
+            if (lines.length < 2) {
+                alert("The selected file is empty or missing headers.");
+                return;
+            }
+            
+            const headers = lines[0].split(",").map(h => h.trim());
+            const importedData = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                const cols = line.split(",").map(c => c.trim());
+                const obj = {};
+                headers.forEach((header, index) => {
+                    let val = cols[index] || "";
+                    if (val === "true") val = true;
+                    else if (val === "false") val = false;
+                    else if (!isNaN(val) && val !== "") val = Number(val);
+                    obj[header] = val;
+                });
+                importedData.push(obj);
+            }
+            
+            const targetCollection = select.value;
+            if (MOCK_DB[targetCollection]) {
+                MOCK_DB[targetCollection] = importedData;
+                saveDatabaseState();
+                
+                populateITDashboard();
+                populateAllDoctorDropdowns();
+                
+                addSystemLog(`Import complete! Loaded ${importedData.length} records successfully to MongoDB.`, "Success");
+                addNotification("Import Successful", `Synced ${importedData.length} ${targetCollection} records to cloud.`, "success");
+            } else {
+                alert("Selected collection is invalid.");
+            }
+        } catch (err) {
+            console.error("CSV Import parsing error:", err);
+            alert("Error parsing CSV file: " + err.message);
+        }
+    };
+    reader.onerror = function() {
+        alert("Error reading file.");
+    };
+    reader.readAsText(file);
 };
 
 // 10. Doctor Portal Controllers
