@@ -12,6 +12,9 @@ if (dns.setDefaultResultOrder) {
 }
 
 const app = express();
+app.use(cors());
+app.use(express.json({ limit: '50mb' }));
+
 const PORT = process.env.PORT || 8081;
 const uri = process.env.MONGODB_URI;
 
