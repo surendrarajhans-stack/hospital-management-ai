@@ -1,4 +1,7 @@
 (function() {
+    if (window.__medsphereWidgetLoaded) return;
+    window.__medsphereWidgetLoaded = true;
+
     // 1. Inject Styles
     const style = document.createElement("style");
     style.innerHTML = `
