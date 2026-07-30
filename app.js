@@ -310,19 +310,32 @@ window.switchDashboardView = function(viewId, elementLink = null) {
         }
     }
 
-    // CRITICAL: Immediately & synchronously reset scroll position to top (0px offset)
+    // CRITICAL: Immediately & synchronously reset scroll position to top (0px offset) on all containers
     const viewContainer = document.getElementById("view-container");
-    if (viewContainer) {
-        viewContainer.scrollTop = 0;
-    }
+    if (viewContainer) viewContainer.scrollTop = 0;
+    
+    const dashboardPane = document.querySelector(".dashboard-pane");
+    if (dashboardPane) dashboardPane.scrollTop = 0;
+    
+    const mainElem = document.querySelector("main");
+    if (mainElem) mainElem.scrollTop = 0;
+    
     window.scrollTo(0, 0);
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
 
+    // Fast animation frame tick reset
+    requestAnimationFrame(() => {
+        if (viewContainer) viewContainer.scrollTop = 0;
+        if (dashboardPane) dashboardPane.scrollTop = 0;
+        window.scrollTo(0, 0);
+    });
+    
     setTimeout(() => {
         if (viewContainer) viewContainer.scrollTop = 0;
+        if (dashboardPane) dashboardPane.scrollTop = 0;
         window.scrollTo(0, 0);
-    }, 10);
+    }, 20);
     
     saveLocalState();
     
