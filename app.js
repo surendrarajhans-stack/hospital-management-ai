@@ -291,21 +291,32 @@ window.switchDashboardView = function(viewId, elementLink = null) {
 
     const landingHero = document.getElementById("onboarding-role-select");
     
-    // Hide all department sections first
-    document.querySelectorAll("section[id^='view-']").forEach(sec => sec.classList.add("hidden"));
+    // Hide all department sections first with explicit inline style and hidden class
+    document.querySelectorAll("section[id^='view-']").forEach(sec => {
+        sec.classList.add("hidden");
+        sec.style.setProperty("display", "none", "important");
+    });
     
     let target = null;
     if (viewId === "onboarding-role-select" || viewId === "view-landing" || !viewId) {
-        if (landingHero) landingHero.classList.remove("hidden");
+        if (landingHero) {
+            landingHero.classList.remove("hidden");
+            landingHero.style.setProperty("display", "block", "important");
+        }
         state.activeDashboardView = "onboarding-role-select";
     } else {
-        if (landingHero) landingHero.classList.add("hidden");
+        if (landingHero) {
+            landingHero.classList.add("hidden");
+            landingHero.style.setProperty("display", "none", "important");
+        }
         target = document.getElementById(viewId);
         if (target) {
             target.classList.remove("hidden");
+            target.style.setProperty("display", "block", "important");
             state.activeDashboardView = viewId;
         } else if (landingHero) {
             landingHero.classList.remove("hidden");
+            landingHero.style.setProperty("display", "block", "important");
             state.activeDashboardView = "onboarding-role-select";
         }
     }
@@ -368,14 +379,18 @@ window.switchDashboardView = function(viewId, elementLink = null) {
         });
     }
     
-    // Load and populate corresponding dashboard views
-    if (viewId === "view-super-admin") populateSuperAdminDashboard();
-    else if (viewId === "view-it-administrator") populateITDashboard();
-    else if (viewId === "view-doctor") populateDoctorDashboard();
-    else if (viewId === "view-nurse") populateNurseDashboard();
-    else if (viewId === "view-pharmacist") populatePharmacistDashboard();
-    else if (viewId === "view-patient") populatePatientPortal();
-    else if (viewId === "view-manual-patient-entry") populateDedicatedPatientEntryDashboard();
+    // Load and populate corresponding dashboard views safely with try-catch
+    try {
+        if (viewId === "view-super-admin") populateSuperAdminDashboard();
+        else if (viewId === "view-it-administrator") populateITDashboard();
+        else if (viewId === "view-doctor") populateDoctorDashboard();
+        else if (viewId === "view-nurse") populateNurseDashboard();
+        else if (viewId === "view-pharmacist") populatePharmacistDashboard();
+        else if (viewId === "view-patient") populatePatientPortal();
+        else if (viewId === "view-manual-patient-entry") populateDedicatedPatientEntryDashboard();
+    } catch (err) {
+        console.error("Dashboard render exception caught:", err);
+    }
 };
 
 function saveLocalState() {
