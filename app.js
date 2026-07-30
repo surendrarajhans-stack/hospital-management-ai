@@ -446,6 +446,33 @@ function loadDatabaseState() {
     .catch(err => console.log("Failed loading cloud state, using local copy:", err));
 }
 
+window.clearAllSystemData = function() {
+    if (confirm("Are you sure you want to wipe all records (doctors, patients, nurses, prescriptions) and start completely fresh?")) {
+        MOCK_DB.doctors = [];
+        MOCK_DB.patients = [];
+        MOCK_DB.wards = [
+            { id: "ICU-01", type: "ICU", occupied: false, patientId: "" },
+            { id: "ICU-02", type: "ICU", occupied: false, patientId: "" },
+            { id: "GW-01", type: "General Ward", occupied: false, patientId: "" },
+            { id: "GW-05", type: "General Ward", occupied: false, patientId: "" },
+            { id: "PED-01", type: "Pediatrics", occupied: false, patientId: "" }
+        ];
+        MOCK_DB.staff = [];
+        MOCK_DB.pharmacy = [
+            { id: "DRUG-01", name: "Paracetamol 650mg", stock: 1200, price: 15 },
+            { id: "DRUG-02", name: "Amoxicillin 500mg", stock: 500, price: 80 }
+        ];
+        MOCK_DB.prescriptions = [];
+        MOCK_DB.admissions = [];
+
+        localStorage.clear();
+        saveDatabaseState();
+
+        alert("All records and local cache cleared successfully!");
+        location.reload();
+    }
+};
+
 // 8. Super Admin Controllers
 function populateSuperAdminDashboard() {
     const activeClinicsEl = document.getElementById("stat-active-clinics");
