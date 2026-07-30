@@ -358,6 +358,9 @@ window.switchDashboardView = function(viewId, elementLink = null) {
         });
     }
 
+    // Populate all doctor select elements dynamically across views
+    populateAllDoctorDropdowns();
+
     // Populate dashboard data safely
     try {
         if (targetId === "view-super-admin") populateSuperAdminDashboard();
@@ -371,6 +374,28 @@ window.switchDashboardView = function(viewId, elementLink = null) {
         console.error("Dashboard population error:", err);
     }
 };
+
+function populateAllDoctorDropdowns() {
+    const dropdownIds = ["opdDoctor", "dedicatedPatDoctor", "patientChooseDoctor"];
+    dropdownIds.forEach(id => {
+        const select = document.getElementById(id);
+        if (select) {
+            select.innerHTML = "";
+            MOCK_DB.doctors.forEach(d => {
+                const opt = document.createElement("option");
+                opt.value = d.id;
+                opt.innerText = `${d.name} (${d.specialty})`;
+                select.appendChild(opt);
+            });
+            // Auto-match active doctor if applicable
+            if (state.userId && MOCK_DB.doctors.some(d => d.id === state.userId)) {
+                if (id === "opdDoctor" || id === "dedicatedPatDoctor") {
+                    select.value = state.userId;
+                }
+            }
+        }
+    });
+}
 
 function saveLocalState() {
     localStorage.setItem("medsphere_state", JSON.stringify(state));
