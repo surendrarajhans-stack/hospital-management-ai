@@ -147,28 +147,9 @@ window.addEventListener("DOMContentLoaded", () => {
 // 5. Onboarding / Role switching flows
 window.resetToOnboarding = function() {
     state.onboardingStep = 0;
+    state.activeDashboardView = "onboarding-role-select";
     saveLocalState();
-    
-    // Make sure landing hero is visible
-    const landingHero = document.getElementById("onboarding-role-select");
-    if (landingHero) landingHero.classList.remove("hidden");
-    
-    document.getElementById("onboarding-credentials").classList.add("hidden");
-    
-    // Hide all department views
-    document.querySelectorAll("section[id^='view-']").forEach(sec => sec.classList.add("hidden"));
-    
-    // Update active header label
-    const titleElem = document.getElementById("current-view-title");
-    if (titleElem) titleElem.innerText = "SaaS Platform Overview & Pricing";
-    
-    // Update active nav link
-    document.querySelectorAll(".sidebar-link").forEach(lnk => lnk.classList.remove("active"));
-
-    // Scroll viewport cleanly to top
-    const viewContainer = document.getElementById("view-container");
-    if (viewContainer) viewContainer.scrollTop = 0;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    switchDashboardView("onboarding-role-select");
 };
 
 window.selectRoleOnboarding = function(clearance, roleLabel) {
@@ -199,18 +180,6 @@ window.submitOnboardingCredentials = function(e) {
     const id = document.getElementById("user-input-id").value.trim().toUpperCase();
     
     if (!name || !id) return;
-    
-    // Verify Demo records
-    let isMatched = false;
-    for (let k in DEMO_ACCOUNTS) {
-        const acc = DEMO_ACCOUNTS[k];
-        if (acc.id === id && acc.clearance === state.roleClearance) {
-            isMatched = true;
-            break;
-        }
-    }
-    
-    // In demo environment, allow any name/id if not matching demo records
     switchRole(state.roleClearance, name, id);
 };
 
@@ -219,7 +188,6 @@ window.switchRole = function(clearance, name, id) {
     state.userId = id;
     state.roleClearance = clearance;
     
-    // Map clearance level to role title
     if (clearance === 15) state.userRole = "Super Admin";
     else if (clearance === 14) state.userRole = "IT Administrator";
     else if (clearance === 1) state.userRole = "Doctor";
@@ -230,7 +198,7 @@ window.switchRole = function(clearance, name, id) {
     state.onboardingStep = 2;
     saveLocalState();
     
-    // Show navigation layouts on desktop; hide mobile drawer overlay on mobile phones
+    // Show navigation layouts
     if (window.AppElements.header) window.AppElements.header.classList.remove("hidden");
     if (window.AppElements.sidebar) {
         if (window.innerWidth < 768) {
@@ -239,12 +207,14 @@ window.switchRole = function(clearance, name, id) {
             window.AppElements.sidebar.classList.remove("hidden");
         }
     }
-    document.getElementById("onboarding-credentials").classList.add("hidden");
     
     // Update sidebar badges
-    document.getElementById("sidebar-user-name").innerText = name;
-    document.getElementById("sidebar-user-role").innerText = state.userRole;
-    document.getElementById("user-badge-avatar").innerText = name.charAt(0).toUpperCase();
+    const nameBadge = document.getElementById("sidebar-user-name");
+    const roleBadge = document.getElementById("sidebar-user-role");
+    const avatarBadge = document.getElementById("user-badge-avatar");
+    if (nameBadge) nameBadge.innerText = name;
+    if (roleBadge) roleBadge.innerText = state.userRole;
+    if (avatarBadge) avatarBadge.innerText = name.charAt(0).toUpperCase();
     
     // Update theme body color
     document.body.className = "bg-[#0b0f19] text-[#f3f4f6] font-sans antialiased overflow-x-hidden";
@@ -280,113 +250,87 @@ window.toggleSidebar = function() {
 
 // 6. Navigation View Switching
 window.switchDashboardView = function(viewId, elementLink = null) {
-    // Strip trailing # from address bar if present
     cleanUrlHash();
 
-    // Auto-close mobile navigation drawer when a department view link is clicked on phones
     const mobileSidebar = document.getElementById("main-sidebar");
     if (window.innerWidth < 768 && mobileSidebar) {
         mobileSidebar.classList.add("hidden");
     }
 
     const viewContainer = document.getElementById("view-container");
+    if (!viewContainer) return;
     
-    // Hide ALL sections inside view-container cleanly first
-    if (viewContainer) {
-        viewContainer.querySelectorAll("section").forEach(sec => {
-            sec.classList.add("hidden");
-            sec.style.setProperty("display", "none", "important");
-        });
-    }
-    
-    let target = null;
-    if (viewId === "onboarding-role-select" || viewId === "view-landing" || !viewId) {
-        target = document.getElementById("onboarding-role-select");
-        state.activeDashboardView = "onboarding-role-select";
-    } else {
-        target = document.getElementById(viewId);
-        if (!target) {
-            target = document.getElementById("onboarding-role-select");
-            state.activeDashboardView = "onboarding-role-select";
-        } else {
-            state.activeDashboardView = viewId;
+    // Hide all section children cleanly
+    Array.from(viewContainer.children).forEach(child => {
+        if (child.tagName.toLowerCase() === "section") {
+            child.classList.add("hidden");
+            child.style.display = "none";
         }
+    });
+
+    let targetId = viewId;
+    if (!targetId || targetId === "view-landing") {
+        targetId = "onboarding-role-select";
     }
 
-    // Un-hide ONLY the target section with display: block !important
+    let target = document.getElementById(targetId);
+    if (!target) {
+        target = document.getElementById("onboarding-role-select");
+        targetId = "onboarding-role-select";
+    }
+
     if (target) {
         target.classList.remove("hidden");
-        target.style.setProperty("display", "block", "important");
+        target.style.display = "block";
+        state.activeDashboardView = targetId;
     }
 
-    // CRITICAL: Immediately & synchronously reset scroll position to top (0px offset) on all containers
-    if (viewContainer) viewContainer.scrollTop = 0;
-    
-    const dashboardPane = document.querySelector(".dashboard-pane");
-    if (dashboardPane) dashboardPane.scrollTop = 0;
-    
-    const mainElem = document.querySelector("main");
-    if (mainElem) mainElem.scrollTop = 0;
-    
+    // Synchronous Scroll Reset to 0
+    viewContainer.scrollTop = 0;
     window.scrollTo(0, 0);
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
 
-    // Fast animation frame tick reset
-    requestAnimationFrame(() => {
-        if (viewContainer) viewContainer.scrollTop = 0;
-        if (dashboardPane) dashboardPane.scrollTop = 0;
-        window.scrollTo(0, 0);
-    });
-    
-    setTimeout(() => {
-        if (viewContainer) viewContainer.scrollTop = 0;
-        if (dashboardPane) dashboardPane.scrollTop = 0;
-        window.scrollTo(0, 0);
-    }, 20);
-    
     saveLocalState();
-    
-    // Update header label
-    let label = "Operations Control";
-    if (viewId === "onboarding-role-select" || viewId === "view-landing") label = "SaaS Platform Overview";
-    else if (viewId === "view-super-admin") label = "Licensing and Setup Console";
-    else if (viewId === "view-it-administrator") label = "IT Cloud Importer & Audit";
-    else if (viewId === "view-doctor") label = "Clinical Diagnosis Desk";
-    else if (viewId === "view-nurse") label = "Ward Monitoring & Vitals";
-    else if (viewId === "view-pharmacist") label = "Pharmacy Dispensing & Invoices";
-    else if (viewId === "view-patient") label = "Your Care & AI Assistant";
-    else if (viewId === "view-manual-patient-entry") label = "Manual Patient Entry Desk";
-    
+
+    // Update Header Title Label
+    let label = "SaaS Platform Overview";
+    if (targetId === "view-super-admin") label = "Licensing and Setup Console";
+    else if (targetId === "view-it-administrator") label = "IT Cloud Importer & Audit";
+    else if (targetId === "view-doctor") label = "Clinical Diagnosis Desk";
+    else if (targetId === "view-nurse") label = "Ward Monitoring & Vitals";
+    else if (targetId === "view-pharmacist") label = "Pharmacy Dispensing & Invoices";
+    else if (targetId === "view-patient") label = "Your Care & AI Assistant";
+    else if (targetId === "view-manual-patient-entry") label = "Manual Patient Entry Desk";
+
     const titleElem = document.getElementById("current-view-title");
     if (titleElem) titleElem.innerText = label;
-    
-    // Update active nav link classes
+
+    // Update Sidebar Link Active Highlights
     document.querySelectorAll(".sidebar-link").forEach(lnk => lnk.classList.remove("active"));
     if (elementLink) {
         elementLink.classList.add("active");
     } else {
-        // Fallback matching
         const links = document.querySelectorAll(".sidebar-link");
         links.forEach(l => {
             const clickAttr = l.getAttribute("onclick");
-            if (clickAttr && clickAttr.includes(viewId)) {
+            if (clickAttr && clickAttr.includes(targetId)) {
                 l.classList.add("active");
             }
         });
     }
-    
-    // Load and populate corresponding dashboard views safely with try-catch
+
+    // Populate dashboard data safely
     try {
-        if (viewId === "view-super-admin") populateSuperAdminDashboard();
-        else if (viewId === "view-it-administrator") populateITDashboard();
-        else if (viewId === "view-doctor") populateDoctorDashboard();
-        else if (viewId === "view-nurse") populateNurseDashboard();
-        else if (viewId === "view-pharmacist") populatePharmacistDashboard();
-        else if (viewId === "view-patient") populatePatientPortal();
-        else if (viewId === "view-manual-patient-entry") populateDedicatedPatientEntryDashboard();
+        if (targetId === "view-super-admin") populateSuperAdminDashboard();
+        else if (targetId === "view-it-administrator") populateITDashboard();
+        else if (targetId === "view-doctor") populateDoctorDashboard();
+        else if (targetId === "view-nurse") populateNurseDashboard();
+        else if (targetId === "view-pharmacist") populatePharmacistDashboard();
+        else if (targetId === "view-patient") populatePatientPortal();
+        else if (targetId === "view-manual-patient-entry") populateDedicatedPatientEntryDashboard();
     } catch (err) {
-        console.error("Dashboard render exception caught:", err);
+        console.error("Dashboard population error:", err);
     }
 };
 
