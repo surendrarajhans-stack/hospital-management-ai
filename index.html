@@ -687,6 +687,71 @@
                         </div>
                     </div>
 
+                    <!-- AI & SMS API Credentials Manager -->
+                    <div class="glass-card p-6 space-y-4 border border-teal-500/20 bg-teal-950/5 mt-6">
+                        <div class="card-header border-b border-white/5 pb-3 flex items-center justify-between">
+                            <div>
+                                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                    <i data-lucide="key-round" class="text-teal-400"></i>
+                                    <span>AI & SMS API Gateway Credentials Manager</span>
+                                </h3>
+                                <p class="text-xs text-[#9ca3af] mt-0.5">Configure your Google Gemini AI and Twilio WhatsApp gateway API credentials securely.</p>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-teal-500/10 text-teal-300 border border-teal-500/20 uppercase tracking-wider">Secure Sync</span>
+                        </div>
+                        
+                        <form id="apiConfigForm" onsubmit="saveApiCredentials(event)" class="space-y-4 text-xs">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Gemini API Config -->
+                                <div class="space-y-3 p-3.5 bg-white/5 rounded-xl border border-white/5">
+                                    <h4 class="font-bold text-white flex items-center gap-1.5 text-xs">
+                                        <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i>
+                                        <span>Google Gemini AI Engine</span>
+                                    </h4>
+                                    <div>
+                                        <label class="block text-[11px] font-semibold text-[#9ca3af] mb-1">Google Gemini API Key</label>
+                                        <input type="password" id="cfgGeminiKey" placeholder="Paste your Gemini API key here..." class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-teal-500">
+                                    </div>
+                                </div>
+                                
+                                <!-- Twilio SMS / WhatsApp Config -->
+                                <div class="space-y-3 p-3.5 bg-white/5 rounded-xl border border-white/5">
+                                    <h4 class="font-bold text-white flex items-center gap-1.5 text-xs">
+                                        <i data-lucide="message-square" class="w-4 h-4 text-sky-400"></i>
+                                        <span>Twilio SMS & WhatsApp Gateway</span>
+                                    </h4>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-[11px] font-semibold text-[#9ca3af] mb-1">Twilio Account SID</label>
+                                            <input type="text" id="cfgTwilioSid" placeholder="e.g. ACxxxxxxxx" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-teal-500 font-mono">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[11px] font-semibold text-[#9ca3af] mb-1">Twilio Auth Token</label>
+                                            <input type="password" id="cfgTwilioToken" placeholder="Paste Auth Token..." class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-teal-500">
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-[11px] font-semibold text-[#9ca3af] mb-1">Twilio Sender Number</label>
+                                            <input type="text" id="cfgTwilioFrom" placeholder="e.g. whatsapp:+14155238886" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-teal-500 font-mono">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[11px] font-semibold text-[#9ca3af] mb-1">Target Admin WhatsApp Number</label>
+                                            <input type="text" id="cfgAdminPhone" placeholder="e.g. +91 99999 99999" class="w-full bg-[#0b0f19] border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-teal-500 font-mono">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-end gap-3 mt-2">
+                                <button type="submit" class="btn btn-primary px-6 py-2.5 flex items-center gap-1.5 font-bold shadow-md shadow-teal-500/20">
+                                    <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                    <span>Save & Apply Credentials</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
                     <!-- Doctors shift roster & Wards bed mapping -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Shift Roster -->
@@ -1950,6 +2015,18 @@
                     <div class="text-xs text-[#9ca3af] space-y-1" id="labResultFindingsList">
                         <!-- Dynamic findings -->
                     </div>
+                    
+                    <!-- Gemini AI Lab Diagnosis Container -->
+                    <div id="geminiAiAnalysisContainer" class="p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-xl space-y-2 mt-4 hidden">
+                        <h4 class="font-bold text-amber-400 flex items-center gap-1.5 text-xs">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i>
+                            <span>Gemini AI Lab Diagnosis (Generative AI Summary)</span>
+                        </h4>
+                        <div id="geminiAiAnalysisText" class="text-xs text-white leading-relaxed whitespace-pre-line">
+                            Analyzing pathology values with Gemini Pro AI...
+                        </div>
+                    </div>
+                    
                     <button class="w-full btn bg-white/10 hover:bg-white/20 text-white text-xs py-2 flex items-center justify-center gap-1.5 mt-2" onclick="printLabAnomalyCertificate()">
                         <i data-lucide="printer" class="w-3.5 h-3.5"></i>
                         <span>Print Pathology Anomaly Report</span>

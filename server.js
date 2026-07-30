@@ -33,6 +33,21 @@ async function connectDB() {
         await client.connect();
         db = client.db();
         console.log("Connected successfully to MedSphere MongoDB Database!");
+
+        // Load dynamically saved API credentials into process.env!
+        try {
+            const config = await db.collection('app_config').findOne({ _id: 'credentials' });
+            if (config) {
+                if (config.geminiKey) process.env.GEMINI_API_KEY = config.geminiKey;
+                if (config.twilioSid) process.env.TWILIO_ACCOUNT_SID = config.twilioSid;
+                if (config.twilioToken) process.env.TWILIO_AUTH_TOKEN = config.twilioToken;
+                if (config.twilioFrom) process.env.TWILIO_FROM_NUMBER = config.twilioFrom;
+                if (config.adminPhone) process.env.ADMIN_WHATSAPP_PHONE = config.adminPhone;
+                console.log("Dynamically loaded saved Twilio and Gemini API credentials from MongoDB.");
+            }
+        } catch (e) {
+            console.error("Config collection not initialized yet.");
+        }
     } catch (err) {
         console.error("MongoDB Atlas connection warning:", err.message);
     }
@@ -266,6 +281,128 @@ app.post('/api/import-sheet', async (req, res) => {
         res.json({ status: 'success', count: data.length });
     } catch (err) {
         console.error(`Error importing sheet ${sheetName}:`, err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Https POST helper for direct Gemini API calls
+function makeHttpsPost(url, headers, body) {
+    return new Promise((resolve, reject) => {
+        const parsedUrl = new URL(url);
+        const options = {
+            hostname: parsedUrl.hostname,
+            port: 443,
+            path: parsedUrl.pathname + parsedUrl.search,
+            method: 'POST',
+            headers: {
+                ...headers,
+                'Content-Length': Buffer.byteLength(body)
+            }
+        };
+
+        const req = https.request(options, (res) => {
+            let data = '';
+            res.on('data', (chunk) => { data += chunk; });
+            res.on('end', () => {
+                resolve({ statusCode: res.statusCode, body: data });
+            });
+        });
+
+        req.on('error', (e) => { reject(e); });
+        req.write(body);
+        req.end();
+    });
+}
+
+// 3.6. API Credentials Config endpoints
+app.post('/api/save-config', async (req, res) => {
+    const { geminiKey, twilioSid, twilioToken, twilioFrom, adminPhone } = req.body;
+    console.log("Saving dynamic API credentials to MongoDB config collection.");
+    try {
+        if (!db) {
+            return res.status(503).json({ error: "Database not connected yet" });
+        }
+        
+        await db.collection('app_config').replaceOne(
+            { _id: 'credentials' },
+            {
+                _id: 'credentials',
+                geminiKey,
+                twilioSid,
+                twilioToken,
+                twilioFrom,
+                adminPhone
+            },
+            { upsert: true }
+        );
+        
+        // Dynamically update variables in memory
+        if (geminiKey) process.env.GEMINI_API_KEY = geminiKey;
+        if (twilioSid) process.env.TWILIO_ACCOUNT_SID = twilioSid;
+        if (twilioToken) process.env.TWILIO_AUTH_TOKEN = twilioToken;
+        if (twilioFrom) process.env.TWILIO_FROM_NUMBER = twilioFrom;
+        if (adminPhone) process.env.ADMIN_WHATSAPP_PHONE = adminPhone;
+        
+        res.json({ status: "success" });
+    } catch (err) {
+        console.error("Error saving app config:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/api/get-config', async (req, res) => {
+    try {
+        if (!db) {
+            return res.status(503).json({ error: "Database not connected yet" });
+        }
+        const config = await db.collection('app_config').findOne({ _id: 'credentials' }) || {};
+        
+        // Return masked keys for security
+        res.json({
+            geminiKey: config.geminiKey ? "••••••••" + config.geminiKey.substring(config.geminiKey.length - 4) : "",
+            twilioSid: config.twilioSid ? "••••••••" + config.twilioSid.substring(config.twilioSid.length - 4) : "",
+            twilioToken: config.twilioToken ? "••••••••" : "",
+            twilioFrom: config.twilioFrom || "",
+            adminPhone: config.adminPhone || ""
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 3.7. Gemini AI Pathology Scanner analysis endpoint
+app.post('/api/analyze-report', async (req, res) => {
+    const { reportText } = req.body;
+    const apiKey = process.env.GEMINI_API_KEY;
+    
+    if (!apiKey) {
+        return res.status(400).json({ error: "Gemini API key is required. Please set it in IT config or your .env file." });
+    }
+    
+    try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const prompt = `You are a professional clinical pathology anomaly assistant. Analyze the following patient lab values. Flag any values that fall outside standard ranges (like Troponin, Hemoglobin, WBC, Potassium, Sodium, Creatinine, etc.). Identify potential clinical risks (e.g. MI risk, Sepsis risk, Renal failure risk). Keep your summary concise and bulleted, using markdown: \n\n${reportText}`;
+        
+        const headers = { 'Content-Type': 'application/json' };
+        const body = JSON.stringify({
+            contents: [{
+                parts: [{ text: prompt }]
+            }]
+        });
+        
+        const response = await makeHttpsPost(url, headers, body);
+        const result = JSON.parse(response.body);
+        
+        if (result.candidates && result.candidates[0].content.parts[0].text) {
+            const aiSummary = result.candidates[0].content.parts[0].text;
+            res.json({ success: true, analysis: aiSummary });
+        } else if (result.error) {
+            res.status(500).json({ error: result.error.message || "Gemini API Error" });
+        } else {
+            res.status(500).json({ error: "Gemini API returned an unexpected response format." });
+        }
+    } catch (err) {
+        console.error("Gemini API call failed:", err);
         res.status(500).json({ error: err.message });
     }
 });

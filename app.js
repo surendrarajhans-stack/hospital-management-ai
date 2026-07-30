@@ -693,6 +693,9 @@ function populateITDashboard() {
             });
         }
     }
+    
+    // Load dynamic credentials in configuration fields
+    if (typeof loadApiCredentials === 'function') loadApiCredentials();
 }
 
 window.toggleAdminAdmissionTypeFields = function() {
@@ -3002,6 +3005,50 @@ window.runAiLabAnomalyScan = function() {
         badge.innerHTML = "🟢 NORMAL PATHOLOGY PROFILE";
     }
     
+    // Call Gemini AI lab report analysis endpoint dynamically
+    const reportText = `Patient ID: ${patId}
+Lab Panel Values:
+- Hemoglobin (Hb): ${hb} g/dL
+- White Blood Cells (WBC): ${wbc} /uL
+- Platelets (Plt): ${plt} /uL
+- Potassium (K+): ${k} mEq/L
+- Sodium (Na+): ${na} mEq/L
+- Troponin-I: ${trop} ng/mL
+- Serum Creatinine: ${creat} mg/dL
+- Random Blood Sugar (RBS): ${rbs} mg/dL
+- SGPT/ALT: ${sgpt} U/L
+- Lactate: ${lac} mmol/L`;
+
+    const geminiContainer = document.getElementById("geminiAiAnalysisContainer");
+    const geminiText = document.getElementById("geminiAiAnalysisText");
+    
+    if (geminiContainer && geminiText) {
+        geminiContainer.classList.remove("hidden");
+        geminiText.innerHTML = `<span class="flex items-center gap-1.5 text-amber-300 animate-pulse"><i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i> Analyzing pathology panel with Gemini Pro AI...</span>`;
+        if (window.lucide) lucide.createIcons();
+        
+        fetch(API_BASE_URL + "/api/analyze-report", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ reportText })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success && data.analysis) {
+                geminiText.innerHTML = data.analysis
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/\n/g, '<br>');
+            } else {
+                geminiText.innerHTML = `<span class="text-amber-400">Rule-based pathology check completed. (Input your Gemini API Key in the IT Administrator credentials card to enable live Generative AI summaries)</span>`;
+            }
+        })
+        .catch(err => {
+            console.error("Gemini scan error:", err);
+            geminiText.innerHTML = `<span class="text-amber-400">Rule-based pathology check completed. (Input your Gemini API Key in the IT Administrator credentials card to enable live Generative AI summaries)</span>`;
+        });
+    }
+    
     if (window.lucide) lucide.createIcons();
 };
 
@@ -3355,4 +3402,66 @@ window.printOncologyReport = function() {
         </html>
     `);
     printWin.document.close();
+};
+
+window.saveApiCredentials = function(e) {
+    e.preventDefault();
+    const geminiKey = document.getElementById("cfgGeminiKey").value.trim();
+    const twilioSid = document.getElementById("cfgTwilioSid").value.trim();
+    const twilioToken = document.getElementById("cfgTwilioToken").value.trim();
+    const twilioFrom = document.getElementById("cfgTwilioFrom").value.trim();
+    const adminPhone = document.getElementById("cfgAdminPhone").value.trim();
+    
+    fetch(API_BASE_URL + "/api/save-config", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ geminiKey, twilioSid, twilioToken, twilioFrom, adminPhone })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.status === "success") {
+            addSystemLog("API & SMS Gateway Credentials saved successfully!", "Success");
+            addNotification("Credentials Saved", "Your Gemini AI and Twilio API keys are now securely configured.", "success");
+            
+            // Clear passwords fields, leave placeholders
+            document.getElementById("cfgGeminiKey").value = "";
+            document.getElementById("cfgTwilioToken").value = "";
+            
+            loadApiCredentials();
+        } else {
+            alert("Error saving configurations: " + data.error);
+        }
+    })
+    .catch(err => {
+        console.error("Save config error:", err);
+        alert("Configuration saved locally. Server sync failed.");
+    });
+};
+
+window.loadApiCredentials = function() {
+    fetch(API_BASE_URL + "/api/get-config")
+    .then(r => r.json())
+    .then(config => {
+        if (config) {
+            const geminiEl = document.getElementById("cfgGeminiKey");
+            const sidEl = document.getElementById("cfgTwilioSid");
+            const tokenEl = document.getElementById("cfgTwilioToken");
+            const fromEl = document.getElementById("cfgTwilioFrom");
+            const adminEl = document.getElementById("cfgAdminPhone");
+            
+            if (geminiEl && config.geminiKey) geminiEl.placeholder = config.geminiKey;
+            if (sidEl && config.twilioSid) {
+                if (config.twilioSid.startsWith("••••")) {
+                    sidEl.value = "";
+                    sidEl.placeholder = config.twilioSid;
+                } else {
+                    sidEl.value = config.twilioSid;
+                }
+            }
+            if (tokenEl && config.twilioToken) tokenEl.placeholder = config.twilioToken;
+            if (fromEl && config.twilioFrom) fromEl.value = config.twilioFrom;
+            if (adminEl && config.adminPhone) adminEl.value = config.adminPhone;
+        }
+    })
+    .catch(err => console.error("Error loading credentials config:", err));
 };
