@@ -1849,6 +1849,8 @@ window.triggerSpeechToText = function() {
     };
 };
 
+let patientChatHistory = [];
+
 window.handleSendChatMessage = function(e) {
     e.preventDefault();
     const input = document.getElementById("chatInput");
@@ -1858,28 +1860,51 @@ window.handleSendChatMessage = function(e) {
     addChatMessage("outgoing", val, state.userName);
     input.value = "";
     
-    // Simple Medical NLP Symptoms check response
-    setTimeout(() => {
-        let answer = "I have analyzed your description. If you are experiencing persistent discomfort, I highly advise scheduling a clinical consultation with one of our specialized doctors.";
-        let engAnswer = answer;
+    // Show typing status
+    const typingId = "typing-" + Math.floor(Math.random() * 10000);
+    const typingMsg = addChatMessage("incoming", "<em>MedSphere AI is typing...</em>", "MedSphere AI");
+    if (typingMsg) typingMsg.id = typingId;
+    
+    fetch(API_BASE_URL + "/api/patient-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: val, history: patientChatHistory })
+    })
+    .then(r => r.json())
+    .then(data => {
+        const typingEl = document.getElementById(typingId);
+        if (typingEl) typingEl.remove();
         
-        const q = val.toLowerCase();
-        if (q.includes("chest") || q.includes("heart") || q.includes("pain in chest")) {
-            answer = "⚠️ **Warning:** Symptoms of chest discomfort require urgent clinical check. Please visit the cardiology ward immediately or book an OPD consultation.";
-            engAnswer = answer;
-        } else if (q.includes("cough") || q.includes("bronchitis") || q.includes("fever")) {
-            answer = "You describe general cold or respiratory symptoms. I recommend resting, keeping hydrated, and consulting Dr. Lakshmi Prasad in Pediatrics/GP.";
-            engAnswer = answer;
+        if (data.success && data.analysis) {
+            let answer = data.analysis;
+            
+            // Translate answer to selected chat language if applicable
+            let localizedAnswer = answer;
+            if (state.chatLanguage && state.chatLanguage !== "en") {
+                localizedAnswer = translateChatMessage(answer, state.chatLanguage);
+            }
+            
+            // Remove markdown double-stars for visual compatibility in the main chat bubbles
+            localizedAnswer = localizedAnswer
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>');
+                
+            addChatMessage("incoming", localizedAnswer, "MedSphere AI", answer);
+            
+            // Update history
+            patientChatHistory.push({ role: "user", text: val });
+            patientChatHistory.push({ role: "model", text: answer });
+        } else {
+            addChatMessage("incoming", "I describe standard clinical support offline. If you have a medical emergency, please contact us directly.", "MedSphere AI");
         }
+    })
+    .catch(err => {
+        console.error("Patient chat API error:", err);
+        const typingEl = document.getElementById(typingId);
+        if (typingEl) typingEl.remove();
         
-        // Translate answer to selected chat language
-        let localizedAnswer = answer;
-        if (state.chatLanguage && state.chatLanguage !== "en") {
-            localizedAnswer = translateChatMessage(answer, state.chatLanguage);
-        }
-        
-        addChatMessage("incoming", localizedAnswer, "MedSphere AI", engAnswer);
-    }, 800);
+        addChatMessage("incoming", "I describe standard clinical support offline. If you have a medical emergency, please contact us directly.", "MedSphere AI");
+    });
 };
 
 // 15. Helper Utilities
@@ -2205,6 +2230,7 @@ let stripeCardElement = null;
     if (type === "incoming" || type === "system") {
         speakAIText(content, rawEnglish);
     }
+    return bubble;
 }
 
 // 15. Online Checkout & Subscriptions Logic

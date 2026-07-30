@@ -741,6 +741,18 @@
                                         </div>
                                     </div>
                                 </div>
+                                
+                                <!-- Deploy Widget Embed -->
+                                <div class="space-y-3 p-3.5 bg-white/5 rounded-xl border border-white/5 md:col-span-2">
+                                    <h4 class="font-bold text-white flex items-center gap-1.5 text-xs">
+                                        <i data-lucide="globe" class="w-4 h-4 text-teal-400"></i>
+                                        <span>Deploy AI Assistant on your Hospital Website (hospital.com)</span>
+                                    </h4>
+                                    <p class="text-[11px] text-[#9ca3af]">Attach this clinical receptionist & symptom advising agent to any external HTML website (e.g. hospital.com) by pasting this script tag before your <code>&lt;/body&gt;</code> closing tag:</p>
+                                    <div class="flex gap-2 items-center bg-[#0b0f19] border border-white/10 rounded-xl px-4 py-3 font-mono text-teal-300 text-[11px] select-all">
+                                        &lt;script src="https://hospital.technocons.com/widget.js"&gt;&lt;/script>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div class="flex justify-end gap-3 mt-2">
@@ -1720,6 +1732,7 @@
 
     <!-- Main Client Engine Script -->
     <script src="app.js"></script>
+    <script src="widget.js"></script>
     <!-- MODAL: AI HEALTH INSURANCE & CASHLESS TPA VERIFIER -->
     <div id="insuranceVerifierModal" class="modal-overlay hidden">
         <div class="glass-card max-w-2xl w-full p-8 space-y-6 animate-scale max-h-[90vh] overflow-y-auto">

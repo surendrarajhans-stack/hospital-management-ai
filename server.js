@@ -254,6 +254,63 @@ app.post('/api/notify-whatsapp', async (req, res) => {
     res.json({ status: 'success', results });
 });
 
+// 3.4. Patient AI Chatbot assistant endpoint
+app.post('/api/patient-chat', async (req, res) => {
+    const { message, history } = req.body;
+    const apiKey = process.env.GEMINI_API_KEY;
+    
+    if (!apiKey) {
+        // Fallback: rule-based response if Gemini API key is missing
+        let answer = "I have analyzed your description. If you are experiencing persistent discomfort, I highly advise scheduling a clinical consultation with one of our specialized doctors.";
+        const q = message.toLowerCase();
+        if (q.includes("chest") || q.includes("heart") || q.includes("pain in chest")) {
+            answer = "⚠️ Warning: Symptoms of chest discomfort require urgent clinical check. Please visit the cardiology ward immediately or book an OPD consultation.";
+        } else if (q.includes("cough") || q.includes("bronchitis") || q.includes("fever")) {
+            answer = "You describe general cold or respiratory symptoms. I recommend resting, keeping hydrated, and consulting Dr. Lakshmi Prasad in Pediatrics/GP.";
+        }
+        return res.json({ success: true, analysis: answer });
+    }
+    
+    try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        
+        // Map history to Gemini format
+        const contents = [];
+        if (history && Array.isArray(history)) {
+            history.forEach(h => {
+                contents.push({
+                    role: h.role === "user" ? "user" : "model",
+                    parts: [{ text: h.text }]
+                });
+            });
+        }
+        
+        // Add the current query with medical receptionist context
+        contents.push({
+            role: "user",
+            parts: [{ text: `You are MedSphere's friendly, professional AI Clinical Receptionist & Symptom Advisor. Answer the patient's message directly, offer advice, suggest scheduling an appointment, and direct them to the appropriate department or doctor (e.g. Cardiology for chest pain, Pediatrics for children's symptoms). Always include a standard medical disclaimer at the end of the response: "Disclaimer: This is an AI advisory summary. Please seek direct medical advice from our licensed practitioners." \n\nPatient Message: ${message}` }]
+        });
+        
+        const headers = { 'Content-Type': 'application/json' };
+        const body = JSON.stringify({ contents });
+        
+        const response = await makeHttpsPost(url, headers, body);
+        const result = JSON.parse(response.body);
+        
+        if (result.candidates && result.candidates[0].content.parts[0].text) {
+            const aiSummary = result.candidates[0].content.parts[0].text;
+            res.json({ success: true, analysis: aiSummary });
+        } else if (result.error) {
+            res.status(500).json({ error: result.error.message || "Gemini API Error" });
+        } else {
+            res.status(500).json({ error: "Gemini API returned an unexpected response format." });
+        }
+    } catch (err) {
+        console.error("Gemini Patient Chat failed:", err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // 3.5. Import database sheet endpoint
 app.post('/api/import-sheet', async (req, res) => {
     const { sheetName, data } = req.body;
