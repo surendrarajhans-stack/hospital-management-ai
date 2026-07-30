@@ -43,7 +43,8 @@
         }
         .medsphere-chat-box {
             width: 360px;
-            height: 500px;
+            height: auto;
+            max-height: 500px;
             background: #0f172a;
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 24px;
@@ -131,9 +132,9 @@
             color: #ffffff;
         }
         .medsphere-chat-messages {
-            flex: 1;
-            padding: 16px;
+            max-height: 380px;
             overflow-y: auto;
+            padding: 16px;
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -182,38 +183,6 @@
         .medsphere-chat-input:focus {
             border-color: #0d9488;
         }
-        .medsphere-quick-actions {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 8px;
-            margin-top: 12px;
-            margin-bottom: 4px;
-        }
-        @media(min-width: 320px) {
-            .medsphere-quick-actions {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-        .medsphere-action-btn {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 8px 10px;
-            color: #d1d5db;
-            font-size: 11px;
-            text-align: left;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .medsphere-action-btn:hover {
-            background: rgba(13, 148, 136, 0.15);
-            border-color: rgba(13, 148, 136, 0.4);
-            color: #ffffff;
-            transform: translateY(-1px);
-        }
         .medsphere-send-btn {
             background: #0d9488;
             border: none;
@@ -258,13 +227,7 @@
             </div>
             <div class="medsphere-chat-messages" id="medsphereChatMessages">
                 <div class="medsphere-msg incoming">
-                    Hello! I am your MedSphere AI assistant. How can I help you today?
-                </div>
-                <div class="medsphere-quick-actions" id="medsphereQuickActions">
-                    <button type="button" class="medsphere-action-btn" onclick="window.sendWidgetQuickQuery('I have loose motion, fever, vomiting. Give a detailed prescription.')">🤢 Food Poisoning</button>
-                    <button type="button" class="medsphere-action-btn" onclick="window.sendWidgetQuickQuery('I have a severe headache and dry cough.')">🤒 Cold & Fever</button>
-                    <button type="button" class="medsphere-action-btn" onclick="window.sendWidgetQuickQuery('How do I book an OPD appointment?')">📅 Book OPD visit</button>
-                    <button type="button" class="medsphere-action-btn" onclick="window.sendWidgetQuickQuery('Tell me about cashless TPA coverage.')">🛡️ Cashless Insurance</button>
+                    Hello! I am your MedSphere AI assistant. How can I help you today? You can ask me about symptoms, services, or bookings!
                 </div>
             </div>
             <form class="medsphere-chat-input-area" id="medsphereChatForm">
@@ -356,12 +319,6 @@
         });
     });
 
-    window.sendWidgetQuickQuery = function(queryText) {
-        if (chatInput) {
-            chatInput.value = queryText;
-            chatForm.dispatchEvent(new Event("submit"));
-        }
-    };
 
     function appendMessage(sender, text) {
         const msg = document.createElement("div");
