@@ -783,11 +783,19 @@ let currentPrescriptionMeds = [];function populateDoctorDashboard() {
 }
 
 window.registerOPDPatient = function() {
-    const name = document.getElementById("opdName").value.trim();
-    const age = parseInt(document.getElementById("opdAge").value);
-    const triage = document.getElementById("opdTriage").value;
-    const docId = document.getElementById("opdDoctor").value;
-    const complaint = document.getElementById("opdComplaint").value.trim();
+    const nameEl = document.getElementById("opdName");
+    const ageEl = document.getElementById("opdAge");
+    const triageEl = document.getElementById("opdTriage");
+    const docEl = document.getElementById("opdDoctor");
+    const complaintEl = document.getElementById("opdComplaint");
+
+    if (!nameEl || !ageEl || !triageEl || !docEl || !complaintEl) return;
+
+    const name = nameEl.value.trim();
+    const age = parseInt(ageEl.value);
+    const triage = triageEl.value;
+    const docId = docEl.value;
+    const complaint = complaintEl.value.trim();
 
     if (!name || isNaN(age) || !complaint) {
         alert("Please fill in all OPD patient registration fields.");
