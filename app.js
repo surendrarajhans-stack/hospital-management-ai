@@ -264,7 +264,7 @@ window.switchDashboardView = function(viewId, elementLink = null) {
     Array.from(viewContainer.children).forEach(child => {
         if (child.tagName.toLowerCase() === "section") {
             child.classList.add("hidden");
-            child.style.display = "none";
+            child.style.removeProperty("display");
         }
     });
 
@@ -281,7 +281,7 @@ window.switchDashboardView = function(viewId, elementLink = null) {
 
     if (target) {
         target.classList.remove("hidden");
-        target.style.display = "block";
+        target.style.setProperty("display", "block", "important");
         state.activeDashboardView = targetId;
     }
 
