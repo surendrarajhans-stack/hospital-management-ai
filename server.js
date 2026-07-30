@@ -275,7 +275,7 @@ app.post('/api/patient-chat', async (req, res) => {
     }
     
     try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`;
         
         // Map history to Gemini format
         const contents = [];
@@ -440,7 +440,7 @@ app.post('/api/analyze-report', async (req, res) => {
     }
     
     try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`;
         const prompt = `You are a professional clinical pathology anomaly assistant. Analyze the following patient lab values. Flag any values that fall outside standard ranges (like Troponin, Hemoglobin, WBC, Potassium, Sodium, Creatinine, etc.). Identify potential clinical risks (e.g. MI risk, Sepsis risk, Renal failure risk). Recommend a detailed corrective clinical prescription (specifying corrective medications, fluids, dosages, frequency, next-step laboratory tests, and continuous monitoring instructions). Keep your summary structured, concise, and bulleted using markdown: \n\n${reportText}`;
         
         const headers = { 'Content-Type': 'application/json' };
