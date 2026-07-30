@@ -674,6 +674,11 @@ window.processLocalFileImport = function() {
 // 10. Doctor Portal Controllers
 let activePatientId = "";
 let currentPrescriptionMeds = [];function populateDoctorDashboard() {
+    const docNameEl = document.getElementById("doctorConsoleName");
+    if (docNameEl) {
+        docNameEl.innerText = state.userName || "Dr. Surendra Rajhans";
+    }
+
     const queue = document.getElementById("doctorPatientQueue");
     if (queue) queue.innerHTML = "";
     
