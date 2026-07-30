@@ -2244,5 +2244,140 @@
             </div>
         </div>
     </div>
+    <!-- MODAL: AI DATA MIGRATION & ONBOARDING AGENT -->
+    <div id="aiOnboardingModal" class="modal-overlay hidden">
+        <div class="glass-card max-w-3xl w-full p-6 space-y-5 animate-scale max-h-[90vh] overflow-y-auto border border-teal-500/30 shadow-lg shadow-teal-500/5">
+            <div class="flex items-center justify-between border-b border-white/5 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-teal-500/20 border border-teal-500/40 flex items-center justify-center text-teal-400">
+                        <i data-lucide="bot" class="w-6 h-6 animate-bounce"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                            <span>MedSphere AI Data Migration & Onboarding Agent</span>
+                        </h3>
+                        <p class="text-xs text-teal-400 font-semibold mt-0.5">Automated Biometric & Cloud Database Schema Syncer</p>
+                    </div>
+                </div>
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-teal-500/10 text-teal-300 border border-teal-500/20 uppercase tracking-wider">Step 2 of 2</span>
+            </div>
+
+            <!-- Onboarding Agent Greeting -->
+            <div class="p-4 bg-teal-500/5 border border-teal-500/10 rounded-2xl flex gap-3 text-xs text-teal-200/90 leading-relaxed">
+                <i data-lucide="sparkles" class="w-5 h-5 text-amber-400 shrink-0"></i>
+                <div>
+                    <strong>Welcome, Healthcare Partner!</strong> Congratulations on activating your permanent database node. I am your onboarding assistant. Let's upload your existing hospital rosters below to instantly synchronize them with your MongoDB Atlas cloud.
+                </div>
+            </div>
+
+            <!-- Import Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- 1. Doctor Import -->
+                <div class="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-2 flex flex-col justify-between" id="onbCardDoctors">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-sm font-bold text-white flex items-center gap-1.5">
+                                <i data-lucide="user-round-cog" class="w-4 h-4 text-teal-400"></i>
+                                <span>1. Doctor Shift Roster</span>
+                            </h4>
+                            <span class="status-badge bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider" id="onbBadgeDoctors">Pending</span>
+                        </div>
+                        <p class="text-xs text-[#9ca3af] mt-1">Upload excel/csv sheet to sync names, specialty shifts, rooms, and roster schedules.</p>
+                    </div>
+                    <div class="pt-2">
+                        <input type="file" id="onbFileDoctors" accept=".csv,.xlsx" onchange="runOnboardingSync('doctors')" class="hidden">
+                        <button onclick="document.getElementById('onbFileDoctors').click()" class="w-full btn bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs py-2 hover:bg-teal-500/20 transition flex items-center justify-center gap-1.5 font-semibold">
+                            <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                            <span>Upload Doctor Roster</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. Patient Import -->
+                <div class="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-2 flex flex-col justify-between" id="onbCardPatients">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-sm font-bold text-white flex items-center gap-1.5">
+                                <i data-lucide="users" class="w-4 h-4 text-teal-400"></i>
+                                <span>2. Patient Registrations</span>
+                            </h4>
+                            <span class="status-badge bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider" id="onbBadgePatients">Pending</span>
+                        </div>
+                        <p class="text-xs text-[#9ca3af] mt-1">Upload admissions directory containing names, age, complaints, and contact metrics.</p>
+                    </div>
+                    <div class="pt-2">
+                        <input type="file" id="onbFilePatients" accept=".csv,.xlsx" onchange="runOnboardingSync('patients')" class="hidden">
+                        <button onclick="document.getElementById('onbFilePatients').click()" class="w-full btn bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs py-2 hover:bg-teal-500/20 transition flex items-center justify-center gap-1.5 font-semibold">
+                            <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                            <span>Upload Admissions Register</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. Nurses/Staff Import -->
+                <div class="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-2 flex flex-col justify-between" id="onbCardStaff">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-sm font-bold text-white flex items-center gap-1.5">
+                                <i data-lucide="activity" class="w-4 h-4 text-teal-400"></i>
+                                <span>3. Support & Nurses</span>
+                            </h4>
+                            <span class="status-badge bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider" id="onbBadgeStaff">Pending</span>
+                        </div>
+                        <p class="text-xs text-[#9ca3af] mt-1">Upload clinical nurse shifts, ward helpers, duty times, and departments.</p>
+                    </div>
+                    <div class="pt-2">
+                        <input type="file" id="onbFileStaff" accept=".csv,.xlsx" onchange="runOnboardingSync('staff')" class="hidden">
+                        <button onclick="document.getElementById('onbFileStaff').click()" class="w-full btn bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs py-2 hover:bg-teal-500/20 transition flex items-center justify-center gap-1.5 font-semibold">
+                            <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                            <span>Upload Support Roster</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4. Pharmacy Medicine Import -->
+                <div class="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-2 flex flex-col justify-between" id="onbCardPharmacy">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-sm font-bold text-white flex items-center gap-1.5">
+                                <i data-lucide="pill" class="w-4 h-4 text-teal-400"></i>
+                                <span>4. Pharmacy Drugs</span>
+                            </h4>
+                            <span class="status-badge bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider" id="onbBadgePharmacy">Pending</span>
+                        </div>
+                        <p class="text-xs text-[#9ca3af] mt-1">Upload drug list containing pharmacy stock, shelf labels, costs, and availability.</p>
+                    </div>
+                    <div class="pt-2">
+                        <input type="file" id="onbFilePharmacy" accept=".csv,.xlsx" onchange="runOnboardingSync('pharmacy')" class="hidden">
+                        <button onclick="document.getElementById('onbFilePharmacy').click()" class="w-full btn bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs py-2 hover:bg-teal-500/20 transition flex items-center justify-center gap-1.5 font-semibold">
+                            <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                            <span>Upload Pharmacy Inventory</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer controls -->
+            <div class="flex items-center justify-between pt-3 border-t border-white/5">
+                <span class="text-xs text-[#9ca3af]">Templates: 
+                    <a href="/sample_doctors.csv" download class="text-teal-400 hover:underline mx-0.5">Doc.csv</a> • 
+                    <a href="/sample_patients.csv" download class="text-teal-400 hover:underline mx-0.5">Pat.csv</a> • 
+                    <a href="/sample_staff.csv" download class="text-teal-400 hover:underline mx-0.5">Staff.csv</a> • 
+                    <a href="/sample_pharmacy.csv" download class="text-teal-400 hover:underline mx-0.5">Drug.csv</a>
+                </span>
+                <div class="flex gap-3">
+                    <button onclick="skipOnboardingSync()" class="bg-white/5 hover:bg-white/10 text-[#9ca3af] hover:text-white px-5 py-2.5 rounded-xl text-xs font-bold transition">
+                        Skip Sync
+                    </button>
+                    <button id="btnFinishOnboarding" onclick="finalizeOnboardingSync()" class="btn btn-primary px-6 py-2.5 text-xs font-bold flex items-center gap-1.5 opacity-60 pointer-events-none transition">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i>
+                        <span>Finalize Cloud Sync & Launch</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="widget.js"></script>
 </body>
 </html>

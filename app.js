@@ -2483,11 +2483,33 @@ window.completePaymentOrder = function(payId, schoolName, gatewayName, total, gs
     // Log the user directly into IT admin workspace with the new license key!
     switchRole(14, "IT Director", permLicenseKey);
 
+    // Open the AI Onboarding Modal!
+    const onbModal = document.getElementById("aiOnboardingModal");
+    if (onbModal) {
+        onbModal.classList.remove("hidden");
+        // Reset badges/statuses
+        ["Doctors", "Patients", "Staff", "Pharmacy"].forEach(type => {
+            const badge = document.getElementById(`onbBadge${type}`);
+            if (badge) {
+                badge.className = "status-badge bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider";
+                badge.innerText = "Pending";
+            }
+            const card = document.getElementById(`onbCard${type}`);
+            if (card) {
+                card.className = "p-4 bg-white/5 rounded-2xl border border-white/5 space-y-2 flex flex-col justify-between";
+            }
+        });
+        const finishBtn = document.getElementById("btnFinishOnboarding");
+        if (finishBtn) {
+            finishBtn.className = "btn btn-primary px-6 py-2.5 text-xs font-bold flex items-center gap-1.5 opacity-60 pointer-events-none transition";
+        }
+    }
+
     // Welcome message in Chat AI
-    addChatMessage("incoming", `🎉 <strong>Subscription Payment Successful!</strong><br><br><strong>Transaction ID:</strong> <code>${payId}</code><br><strong>Official ${loc.taxName} Tax Invoice:</strong> <code>${invoiceNo}</code><br><strong>Permanent MedSphere License Key:</strong> <code style="color: #fbbf24; font-weight: bold;">${permLicenseKey}</code><br><strong>Total Paid:</strong> ${formatCurrency(total)} (Includes ${loc.taxRate}% ${loc.taxName})<br><br><span class="text-xs text-[#9ca3af]">A permanent clinical database node has been provisioned.</span>`);
+    addChatMessage("incoming", `🎉 <strong>Subscription Payment Successful!</strong><br><br><strong>Transaction ID:</strong> <code>${payId}</code><br><strong>Official ${loc.taxName} Tax Invoice:</strong> <code>${invoiceNo}</code><br><strong>Permanent MedSphere License Key:</strong> <code style="color: #fbbf24; font-weight: bold;">${permLicenseKey}</code><br><strong>Total Paid:</strong> ${formatCurrency(calculatedTotal)} (Includes ${loc.taxRate}% ${loc.taxName})<br><br><span class="text-xs text-[#9ca3af]">A permanent clinical database node has been provisioned.</span>`);
 
     // Trigger WhatsApp notification to Admin
-    sendAdminWhatsAppNotification(`💳 *New MedSphere License Purchase!*\n🏥 *Hospital:* ${schoolName}\n💸 *Plan:* ${selectedPlan.toUpperCase()}\n💰 *Total Paid:* ${formatCurrency(total)}\n🧾 *Invoice:* ${invoiceNo}\n🔑 *License Key:* ${permLicenseKey}`);
+    sendAdminWhatsAppNotification(`💳 *New MedSphere License Purchase!*\n🏥 *Hospital:* ${schoolName}\n💸 *Plan:* ${selectedPlan.toUpperCase()}\n💰 *Total Paid:* ${formatCurrency(calculatedTotal)}\n🧾 *Invoice:* ${invoiceNo}\n🔑 *License Key:* ${permLicenseKey}`);
 
     addSystemLog(`Razorpay Payment Complete (${payId}): ${schoolName} purchased ${selectedPlan.toUpperCase()} Plan (${invoiceNo})`, "Success");
     addNotification("Payment Successful!", `Permanent license ${permLicenseKey} activated for ${schoolName}.`, "success");
@@ -3490,4 +3512,126 @@ window.loadApiCredentials = function() {
         }
     })
     .catch(err => console.error("Error loading credentials config:", err));
+};
+
+let onboardingSyncedCounts = { doctors: 0, patients: 0, staff: 0, pharmacy: 0 };
+
+window.runOnboardingSync = function(sheetType) {
+    const typeKeyMap = {
+        doctors: "Doctors",
+        patients: "Patients",
+        staff: "Staff",
+        pharmacy: "Pharmacy"
+    };
+    const key = typeKeyMap[sheetType];
+    const fileInput = document.getElementById(`onbFile${key}`);
+    if (!fileInput || !fileInput.files || fileInput.files.length === 0) return;
+    
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        try {
+            const dataBytes = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(dataBytes, { type: 'array' });
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+            
+            if (jsonData.length === 0) {
+                alert("The selected file is empty. Please upload a valid CSV or Excel sheet.");
+                return;
+            }
+            
+            // Normalize column keys to lowercase
+            const normalizedData = jsonData.map(row => {
+                const newRow = {};
+                for (let k in row) {
+                    newRow[k.toLowerCase().trim()] = row[k];
+                }
+                return newRow;
+            });
+            
+            // Validate headers schema
+            const firstRowKeys = Object.keys(normalizedData[0]);
+            
+            if (sheetType === "doctors" && !firstRowKeys.includes("specialty")) {
+                alert("Invalid format! Doctor templates must contain a 'specialty' column header.");
+                return;
+            }
+            if (sheetType === "patients" && !firstRowKeys.includes("complaint")) {
+                alert("Invalid format! Patient templates must contain a 'complaint' column header.");
+                return;
+            }
+            if (sheetType === "staff" && !firstRowKeys.includes("dept")) {
+                alert("Invalid format! Clinical support templates must contain a 'dept' column header.");
+                return;
+            }
+            if (sheetType === "pharmacy" && !firstRowKeys.includes("stock")) {
+                alert("Invalid format! Drug templates must contain a 'stock' column header.");
+                return;
+            }
+            
+            // Send sheet data to server to save in MongoDB
+            fetch(API_BASE_URL + "/api/import-sheet", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ sheetName: sheetType, data: normalizedData })
+            })
+            .then(res => res.json())
+            .then(resData => {
+                if (resData.status === "success") {
+                    MOCK_DB[sheetType] = normalizedData;
+                    onboardingSyncedCounts[sheetType] = resData.count;
+                    
+                    // Update visual state
+                    const card = document.getElementById(`onbCard${key}`);
+                    if (card) card.className = "p-4 bg-emerald-950/20 rounded-2xl border border-emerald-500/40 space-y-2 flex flex-col justify-between shadow-md shadow-emerald-500/5";
+                    
+                    const badge = document.getElementById(`onbBadge${key}`);
+                    if (badge) {
+                        badge.className = "status-badge bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider animate-pulse";
+                        badge.innerText = `Synced (${resData.count})`;
+                    }
+                    
+                    addSystemLog(`AI Onboarding synced ${resData.count} ${sheetType} to cloud database`, "Success");
+                    
+                    // Enable finish button
+                    const finishBtn = document.getElementById("btnFinishOnboarding");
+                    if (finishBtn) {
+                        finishBtn.className = "btn btn-primary px-6 py-2.5 text-xs font-bold flex items-center gap-1.5 transition shadow-lg shadow-teal-500/20";
+                    }
+                } else {
+                    alert("Sync failed: " + resData.error);
+                }
+            })
+            .catch(err => {
+                console.error("Onboarding sync failed:", err);
+                alert("Database sync failed. The database might not be connected yet.");
+            });
+            
+        } catch (error) {
+            console.error("Sheet parsing failed:", error);
+            alert("Error parsing file. Please make sure it is a valid CSV or Excel sheet.");
+        }
+    };
+    
+    reader.readAsArrayBuffer(file);
+};
+
+window.skipOnboardingSync = function() {
+    const modal = document.getElementById("aiOnboardingModal");
+    if (modal) modal.classList.add("hidden");
+    addNotification("Onboarding Completed", "You have launched MedSphere AI dashboard.", "success");
+    populateITDashboard();
+};
+
+window.finalizeOnboardingSync = function() {
+    const modal = document.getElementById("aiOnboardingModal");
+    if (modal) modal.classList.add("hidden");
+    
+    addNotification("Cloud Database Synced", "All imported clinical directories are now live!", "success");
+    addSystemLog("AI Data Migration completed successfully. Initial hospital rosters seeded.", "Success");
+    
+    populateITDashboard();
 };
