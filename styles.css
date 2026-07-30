@@ -323,11 +323,11 @@ main {
 }
 
 /* Global Display Rules for Active & Hidden Console Sections */
-.hidden, section.hidden, #onboarding-role-select.hidden {
+.hidden, section.hidden, #onboarding-role-select.hidden, #onboarding-credentials.hidden {
     display: none !important;
 }
 
-section[id^='view-']:not(.hidden), #onboarding-role-select:not(.hidden) {
+#view-container > section:not(.hidden) {
     display: block !important;
     width: 100% !important;
     margin-top: 0 !important;

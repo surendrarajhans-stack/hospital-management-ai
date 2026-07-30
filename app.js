@@ -289,40 +289,37 @@ window.switchDashboardView = function(viewId, elementLink = null) {
         mobileSidebar.classList.add("hidden");
     }
 
-    const landingHero = document.getElementById("onboarding-role-select");
+    const viewContainer = document.getElementById("view-container");
     
-    // Hide all department sections first with explicit inline style and hidden class
-    document.querySelectorAll("section[id^='view-']").forEach(sec => {
-        sec.classList.add("hidden");
-        sec.style.setProperty("display", "none", "important");
-    });
+    // Hide ALL sections inside view-container cleanly first
+    if (viewContainer) {
+        viewContainer.querySelectorAll("section").forEach(sec => {
+            sec.classList.add("hidden");
+            sec.style.display = "none";
+        });
+    }
     
     let target = null;
     if (viewId === "onboarding-role-select" || viewId === "view-landing" || !viewId) {
-        if (landingHero) {
-            landingHero.classList.remove("hidden");
-            landingHero.style.setProperty("display", "block", "important");
-        }
+        target = document.getElementById("onboarding-role-select");
         state.activeDashboardView = "onboarding-role-select";
     } else {
-        if (landingHero) {
-            landingHero.classList.add("hidden");
-            landingHero.style.setProperty("display", "none", "important");
-        }
         target = document.getElementById(viewId);
-        if (target) {
-            target.classList.remove("hidden");
-            target.style.setProperty("display", "block", "important");
-            state.activeDashboardView = viewId;
-        } else if (landingHero) {
-            landingHero.classList.remove("hidden");
-            landingHero.style.setProperty("display", "block", "important");
+        if (!target) {
+            target = document.getElementById("onboarding-role-select");
             state.activeDashboardView = "onboarding-role-select";
+        } else {
+            state.activeDashboardView = viewId;
         }
     }
 
+    // Un-hide ONLY the target section with display: block
+    if (target) {
+        target.classList.remove("hidden");
+        target.style.display = "block";
+    }
+
     // CRITICAL: Immediately & synchronously reset scroll position to top (0px offset) on all containers
-    const viewContainer = document.getElementById("view-container");
     if (viewContainer) viewContainer.scrollTop = 0;
     
     const dashboardPane = document.querySelector(".dashboard-pane");
