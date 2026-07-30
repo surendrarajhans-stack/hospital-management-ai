@@ -15,29 +15,30 @@ const app = express();
 const PORT = process.env.PORT || 8081;
 const uri = process.env.MONGODB_URI;
 
-if (!uri) {
-    console.error("Error: MONGODB_URI is not defined in .env file");
-    process.exit(1);
+let db;
+let client;
+
+if (uri) {
+    client = new MongoClient(uri);
 }
 
-app.use(cors());
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
-
-let db;
-const client = new MongoClient(uri);
-
-// Connect to MongoDB
+// Connect to MongoDB safely if URI is available
 async function connectDB() {
+    if (!uri || !client) {
+        console.warn("MONGODB_URI not provided. Server running with local file/memory data store.");
+        return;
+    }
     try {
         console.log("Connecting to MongoDB Atlas...");
         await client.connect();
         db = client.db();
         console.log("Connected successfully to MedSphere MongoDB Database!");
     } catch (err) {
-        console.error("Failed to connect to MongoDB:", err.message);
+        console.error("MongoDB Atlas connection warning:", err.message);
     }
 }
+
+connectDB();
 
 function getLocalIPs() {
     const interfaces = os.networkInterfaces();
