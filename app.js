@@ -3686,3 +3686,32 @@ window.finalizeOnboardingSync = function() {
     addNotification("Cloud Database Synced", "All imported clinical directories are now live!", "success");
     addSystemLog("AI Data Migration completed successfully. Initial hospital rosters seeded.", "Success");
 };
+
+// DIAGNOSTIC LAYOUT MONITOR
+setInterval(() => {
+    let diag = document.getElementById("medsphere-layout-diag");
+    if (!diag) {
+        diag = document.createElement("div");
+        diag.id = "medsphere-layout-diag";
+        diag.style.cssText = "position: fixed; bottom: 80px; left: 20px; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 12px; font-family: monospace; font-size: 10px; color: #38bdf8; z-index: 99999; pointer-events: none; line-height: 1.4;";
+        document.body.appendChild(diag);
+    }
+    const vc = document.getElementById("view-container");
+    const wrapper = document.getElementById("console-layout-wrapper");
+    const main = document.querySelector("main");
+    if (vc && wrapper && main) {
+        const vcStyle = window.getComputedStyle(vc);
+        const wrStyle = window.getComputedStyle(wrapper);
+        const mStyle = window.getComputedStyle(main);
+        diag.innerHTML = `
+            <strong>Medsphere Layout Diagnostic:</strong><br>
+            Main Height: ${mStyle.height} | MaxH: ${mStyle.maxHeight} | Overflow: ${mStyle.overflow}<br>
+            Wrapper Height: ${wrStyle.height} | MaxH: ${wrStyle.maxHeight} | Overflow: ${wrStyle.overflow}<br>
+            View Container Height: ${vcStyle.height} | MaxH: ${vcStyle.maxHeight} | Overflow: ${vcStyle.overflowY}<br>
+            View ScrollH: ${vc.scrollHeight}px | ClientH: ${vc.clientHeight}px | ScrollTop: ${vc.scrollTop}px<br>
+            Scrollable: ${vc.scrollHeight > vc.clientHeight ? "YES ✅" : "NO ❌ (Height not constrained)"}
+        `;
+    } else {
+        diag.innerHTML = "Elements not found";
+    }
+}, 1000);
