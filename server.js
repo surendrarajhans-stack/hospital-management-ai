@@ -107,18 +107,31 @@ app.get(Object.keys(collectionMap), async (req, res) => {
 
 // 2. State loading endpoint
 app.get('/api/load', async (req, res) => {
-    console.log("GET /api/load -> Querying MongoDB for global_state");
+    console.log("GET /api/load -> Querying MongoDB for global_state and individual collections");
     try {
         if (!db) {
             return res.status(503).json({ error: "Database not connected yet" });
         }
-        const state = await db.collection('db_state').findOne({ _id: 'global_state' });
-        if (state) {
-            const { _id, ...rest } = state;
-            res.json(rest);
-        } else {
-            res.status(404).json({ error: "No state found" });
+        
+        let state = await db.collection('db_state').findOne({ _id: 'global_state' });
+        if (!state) {
+            state = { _id: 'global_state' };
         }
+        
+        // Query individual synced collections
+        const doctors = await db.collection('doctors').find({}).toArray();
+        const patients = await db.collection('patients').find({}).toArray();
+        const staff = await db.collection('staff').find({}).toArray();
+        const pharmacy = await db.collection('pharmacy').find({}).toArray();
+        
+        // Merge individual collections if they contain data to ensure consistency
+        if (doctors.length > 0) state.doctors = doctors;
+        if (patients.length > 0) state.patients = patients;
+        if (staff.length > 0) state.staff = staff;
+        if (pharmacy.length > 0) state.pharmacy = pharmacy;
+        
+        const { _id, ...rest } = state;
+        res.json(rest);
     } catch (err) {
         console.error("Error loading state from MongoDB:", err.message);
         res.status(500).json({ error: err.message });
@@ -127,18 +140,50 @@ app.get('/api/load', async (req, res) => {
 
 // 3. State saving endpoint
 app.post('/api/save', async (req, res) => {
-    console.log("POST /api/save -> Updating global_state in MongoDB");
+    console.log("POST /api/save -> Updating global_state and individual collections in MongoDB");
     try {
         if (!db) {
             return res.status(503).json({ error: "Database not connected yet" });
         }
         const stateData = req.body;
         
+        // Save the global state
         await db.collection('db_state').replaceOne(
             { _id: 'global_state' },
             { _id: 'global_state', ...stateData },
             { upsert: true }
         );
+
+        // Sync individual collections to prevent data drift
+        if (stateData.doctors && Array.isArray(stateData.doctors)) {
+            const coll = db.collection('doctors');
+            try { await coll.drop(); } catch(e) {}
+            if (stateData.doctors.length > 0) {
+                await coll.insertMany(stateData.doctors);
+            }
+        }
+        if (stateData.patients && Array.isArray(stateData.patients)) {
+            const coll = db.collection('patients');
+            try { await coll.drop(); } catch(e) {}
+            if (stateData.patients.length > 0) {
+                await coll.insertMany(stateData.patients);
+            }
+        }
+        if (stateData.staff && Array.isArray(stateData.staff)) {
+            const coll = db.collection('staff');
+            try { await coll.drop(); } catch(e) {}
+            if (stateData.staff.length > 0) {
+                await coll.insertMany(stateData.staff);
+            }
+        }
+        if (stateData.pharmacy && Array.isArray(stateData.pharmacy)) {
+            const coll = db.collection('pharmacy');
+            try { await coll.drop(); } catch(e) {}
+            if (stateData.pharmacy.length > 0) {
+                await coll.insertMany(stateData.pharmacy);
+            }
+        }
+
         res.json({ status: "success" });
     } catch (err) {
         console.error("Error saving state to MongoDB:", err.message);

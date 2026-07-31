@@ -3675,8 +3675,14 @@ window.finalizeOnboardingSync = function() {
     const modal = document.getElementById("aiOnboardingModal");
     if (modal) modal.classList.add("hidden");
     
+    // Save imported data to cloud database permanently!
+    saveDatabaseState();
+    
+    // Populate all dashboards and selectors with fresh data!
+    populateITDashboard();
+    populateAllDoctorDropdowns();
+    populateDoctorDashboard();
+    
     addNotification("Cloud Database Synced", "All imported clinical directories are now live!", "success");
     addSystemLog("AI Data Migration completed successfully. Initial hospital rosters seeded.", "Success");
-    
-    populateITDashboard();
 };
