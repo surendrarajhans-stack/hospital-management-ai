@@ -340,7 +340,7 @@ main {
 }
 
 /* Global Display Rules for Active & Hidden Console Sections */
-section.hidden, #onboarding-role-select.hidden, #onboarding-credentials.hidden {
+.hidden, section.hidden, #onboarding-role-select.hidden, #onboarding-credentials.hidden {
     display: none !important;
 }
 
@@ -1717,4 +1717,14 @@ select option {
 
 .mobile-tab-btn.active {
     color: #3b82f6;
+}
+
+/* Ensure responsive display utilities override the hidden class on desktop screens */
+@media (min-width: 768px) {
+    .md\:flex {
+        display: flex !important;
+    }
+    .md\:block {
+        display: block !important;
+    }
 }
