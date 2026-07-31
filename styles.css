@@ -317,9 +317,14 @@ main {
 #console-layout-wrapper {
     display: flex;
     flex: 1;
-    height: 100% !important;
-    max-height: 100% !important;
+    height: calc(100vh - 64px) !important;
+    max-height: calc(100vh - 64px) !important;
     overflow: hidden !important;
+}
+
+#role-shortcuts-bar {
+    height: calc(100vh - 64px) !important;
+    max-height: calc(100vh - 64px) !important;
 }
 
 .dashboard-pane, #view-container {
@@ -327,8 +332,8 @@ main {
     padding: 16px 24px 60px 24px !important;
     margin-top: 0 !important;
     width: 100% !important;
-    height: 100% !important;
-    max-height: 100% !important;
+    height: calc(100vh - 64px) !important;
+    max-height: calc(100vh - 64px) !important;
     overflow-y: auto !important;
 }
 
