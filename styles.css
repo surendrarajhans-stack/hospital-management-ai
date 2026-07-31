@@ -332,7 +332,6 @@ main {
     flex: 1;
     padding: 16px 24px 60px 24px !important;
     margin-top: 0 !important;
-    width: 100% !important;
     height: 100% !important;
     max-height: 100% !important;
     overflow-y: auto !important;
