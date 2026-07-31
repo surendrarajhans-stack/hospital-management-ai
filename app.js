@@ -3705,9 +3705,9 @@ setInterval(() => {
         const mStyle = window.getComputedStyle(main);
         diag.innerHTML = `
             <strong>Medsphere Layout Diagnostic:</strong><br>
-            Main Height: ${mStyle.height} | MaxH: ${mStyle.maxHeight} | Overflow: ${mStyle.overflow}<br>
-            Wrapper Height: ${wrStyle.height} | MaxH: ${wrStyle.maxHeight} | Overflow: ${wrStyle.overflow}<br>
-            View Container Height: ${vcStyle.height} | MaxH: ${vcStyle.maxHeight} | Overflow: ${vcStyle.overflowY}<br>
+            Main Height: ${mStyle.height} | MaxH: ${mStyle.maxHeight} | Display: ${mStyle.display}<br>
+            Wrapper Height: ${wrStyle.height} | MaxH: ${wrStyle.maxHeight} | Display: ${wrStyle.display} | Position: ${wrStyle.position} | Visibility: ${wrStyle.visibility}<br>
+            View Container Height: ${vcStyle.height} | MaxH: ${vcStyle.maxHeight} | Overflow: ${vcStyle.overflowY} | Display: ${vcStyle.display}<br>
             View ScrollH: ${vc.scrollHeight}px | ClientH: ${vc.clientHeight}px | ScrollTop: ${vc.scrollTop}px<br>
             Scrollable: ${vc.scrollHeight > vc.clientHeight ? "YES ✅" : "NO ❌ (Height not constrained)"}
         `;
