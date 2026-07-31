@@ -159,8 +159,6 @@ window.resetToOnboarding = function() {
 };
 
 window.selectRoleOnboarding = function(clearance, roleLabel) {
-    if (!window.medsphereLogs) window.medsphereLogs = [];
-    window.medsphereLogs.push(`selectRoleOnboarding(${clearance}, '${roleLabel}')`);
     state.roleClearance = clearance;
     state.userRole = roleLabel;
     
@@ -191,8 +189,6 @@ window.submitOnboardingCredentials = function(e) {
     switchRole(state.roleClearance, name, id);
 };
 window.switchRole = function(clearance, name, id) {
-    if (!window.medsphereLogs) window.medsphereLogs = [];
-    window.medsphereLogs.push(`switchRole(${clearance}, '${name}')`);
     // Ensure all tables are initialized as arrays to prevent switchRole crashes
     if (!MOCK_DB.admissions || !Array.isArray(MOCK_DB.admissions)) MOCK_DB.admissions = [];
     if (!MOCK_DB.doctors || !Array.isArray(MOCK_DB.doctors)) MOCK_DB.doctors = [];
@@ -323,8 +319,6 @@ window.toggleSidebar = function() {
 
 // 6. Navigation View Switching
 window.switchDashboardView = function(viewId, elementLink = null) {
-    if (!window.medsphereLogs) window.medsphereLogs = [];
-    window.medsphereLogs.push(`switchDashboardView('${viewId}')`);
     cleanUrlHash();
 
     const mobileSidebar = document.getElementById("main-sidebar");
@@ -3710,54 +3704,3 @@ window.finalizeOnboardingSync = function() {
     addNotification("Cloud Database Synced", "All imported clinical directories are now live!", "success");
     addSystemLog("AI Data Migration completed successfully. Initial hospital rosters seeded.", "Success");
 };
-
-// Global error logging for layout diagnostics
-window.medsphereErrors = [];
-window.addEventListener("error", (e) => {
-    window.medsphereErrors.push(e.message + " (" + e.filename.split('/').pop() + ":" + e.lineno + ")");
-});
-const originalConsoleError = console.error;
-console.error = function(...args) {
-    window.medsphereErrors.push("Console: " + args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(" "));
-    originalConsoleError.apply(console, args);
-};
-
-// DIAGNOSTIC LAYOUT MONITOR
-setInterval(() => {
-    let diag = document.getElementById("medsphere-layout-diag");
-    if (!diag) {
-        diag = document.createElement("div");
-        diag.id = "medsphere-layout-diag";
-        diag.style.cssText = "position: fixed; bottom: 80px; left: 20px; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 12px; font-family: monospace; font-size: 10px; color: #38bdf8; z-index: 99999; pointer-events: none; line-height: 1.4; max-width: 90vw; word-wrap: break-word;";
-        document.body.appendChild(diag);
-    }
-    const vc = document.getElementById("view-container");
-    const wrapper = document.getElementById("console-layout-wrapper");
-    const main = document.querySelector("main");
-    const roleSelectSec = document.getElementById("onboarding-role-select");
-    const doctorSec = document.getElementById("view-doctor");
-    const pharmacistSec = document.getElementById("view-pharmacist");
-    if (vc && wrapper && main) {
-        const vcStyle = window.getComputedStyle(vc);
-        const wrStyle = window.getComputedStyle(wrapper);
-        const mStyle = window.getComputedStyle(main);
-        const rsStyle = roleSelectSec ? window.getComputedStyle(roleSelectSec) : null;
-        const docStyle = doctorSec ? window.getComputedStyle(doctorSec) : null;
-        const pharmStyle = pharmacistSec ? window.getComputedStyle(pharmacistSec) : null;
-        diag.innerHTML = `
-            <strong>Medsphere Layout Diagnostic:</strong><br>
-            Main Height: ${mStyle.height} | MaxH: ${mStyle.maxHeight} | Display: ${mStyle.display}<br>
-            Wrapper Height: ${wrStyle.height} | MaxH: ${wrStyle.maxHeight} | Display: ${wrStyle.display}<br>
-            View Container Height: ${vcStyle.height} | MaxH: ${vcStyle.maxHeight} | Overflow: ${vcStyle.overflowY} | Display: ${vcStyle.display}<br>
-            View ScrollH: ${vc.scrollHeight}px | ClientH: ${vc.clientHeight}px | ScrollTop: ${vc.scrollTop}px<br>
-            Scrollable: ${vc.scrollHeight > vc.clientHeight ? "YES ✅" : "NO ❌"}<br>
-            Onboarding Sec Display: ${rsStyle ? rsStyle.display : "null"} | Parent: ${roleSelectSec ? roleSelectSec.parentNode.id : "null"}<br>
-            Doctor Sec Display: ${docStyle ? docStyle.display : "null"} | Parent: ${doctorSec ? doctorSec.parentNode.id : "null"} | Height: ${docStyle ? docStyle.height : "null"}<br>
-            Pharmacist Sec Display: ${pharmStyle ? pharmStyle.display : "null"} | Parent: ${pharmacistSec ? pharmacistSec.parentNode.id : "null"} | Height: ${pharmStyle ? pharmStyle.height : "null"}<br>
-            <span style="color: #60a5fa; font-weight: bold;">Logs: ${window.medsphereLogs && window.medsphereLogs.length > 0 ? window.medsphereLogs.slice(-3).join(" → ") : "No clicks registered ❌"}</span><br>
-            <span style="color: #f87171; font-weight: bold;">Errors: ${window.medsphereErrors.length > 0 ? window.medsphereErrors.join(" | ") : "None ✅"}</span>
-        `;
-    } else {
-        diag.innerHTML = "Elements not found";
-    }
-}, 1000);
