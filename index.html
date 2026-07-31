@@ -50,7 +50,7 @@
     <div class="fixed top-20 -right-20 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
     <!-- Main Container -->
-    <div id="app-container" class="min-h-screen md:h-screen w-full overflow-x-hidden md:overflow-hidden flex flex-col md:flex-row">
+    <div id="app-container" class="min-h-screen w-full overflow-x-hidden flex flex-col md:flex-row">
         
         <!-- SIDEBAR (Unified Navigation & Mobile Drawer) -->
         <aside id="main-sidebar" class="w-full md:w-64 bg-slate-950/95 md:bg-slate-950/40 border-b md:border-b-0 md:border-r border-white/10 backdrop-blur-md flex flex-col hidden md:flex z-50 fixed md:relative top-16 md:top-0 left-0 h-[calc(100vh-4rem)] md:h-full">
@@ -139,7 +139,7 @@
         </aside>
 
         <!-- MAIN CONTENT AREA -->
-        <main class="flex-1 flex flex-col h-screen max-h-screen overflow-hidden">
+        <main class="flex-1 flex flex-col min-h-screen overflow-visible">
             
             <!-- TOP BAR (Sticky & Always Visible on Mobile) -->
             <header id="main-header" class="h-16 bg-slate-950/80 border-b border-white/10 backdrop-blur-md px-4 md:px-8 flex items-center justify-between gap-3 md:gap-12 z-40 sticky top-0">
@@ -182,7 +182,7 @@
             </header>
 
             <!-- Flex Wrapper for Shortcuts + View Content -->
-            <div id="console-layout-wrapper" class="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden h-[calc(100vh-64px)] max-h-[calc(100vh-64px)]">
+            <div id="console-layout-wrapper" class="flex-1 flex flex-col md:flex-row overflow-visible">
                 <!-- Role Shortcuts Bar -->
                 <div id="role-shortcuts-bar" class="hidden md:flex md:w-72 bg-slate-950/70 border-r border-white/10 p-6 flex-col gap-4 flex-shrink-0 z-30 overflow-y-auto">
                     <div class="space-y-1 mb-2">
@@ -246,7 +246,7 @@
                 </div>
 
                 <!-- DASHBOARD CONTAINER -->
-                <div id="view-container" class="flex-1 p-4 md:p-6 overflow-y-auto h-[calc(100vh-64px)] max-h-[calc(100vh-64px)] min-h-0 min-w-0">
+                <div id="view-container" class="flex-1 p-4 md:p-6 overflow-visible">
 
                 <!-- 1. ONBOARDING ROLE SELECTION & B2B MARKETING LANDING PAGE -->
                 <section id="onboarding-role-select" class="max-w-6xl mx-auto py-4 md:py-8 text-center space-y-6 md:space-y-8">
