@@ -159,6 +159,8 @@ window.resetToOnboarding = function() {
 };
 
 window.selectRoleOnboarding = function(clearance, roleLabel) {
+    if (!window.medsphereLogs) window.medsphereLogs = [];
+    window.medsphereLogs.push(`selectRoleOnboarding(${clearance}, '${roleLabel}')`);
     state.roleClearance = clearance;
     state.userRole = roleLabel;
     
@@ -189,6 +191,8 @@ window.submitOnboardingCredentials = function(e) {
     switchRole(state.roleClearance, name, id);
 };
 window.switchRole = function(clearance, name, id) {
+    if (!window.medsphereLogs) window.medsphereLogs = [];
+    window.medsphereLogs.push(`switchRole(${clearance}, '${name}')`);
     // Ensure all tables are initialized as arrays to prevent switchRole crashes
     if (!MOCK_DB.admissions || !Array.isArray(MOCK_DB.admissions)) MOCK_DB.admissions = [];
     if (!MOCK_DB.doctors || !Array.isArray(MOCK_DB.doctors)) MOCK_DB.doctors = [];
@@ -319,6 +323,8 @@ window.toggleSidebar = function() {
 
 // 6. Navigation View Switching
 window.switchDashboardView = function(viewId, elementLink = null) {
+    if (!window.medsphereLogs) window.medsphereLogs = [];
+    window.medsphereLogs.push(`switchDashboardView('${viewId}')`);
     cleanUrlHash();
 
     const mobileSidebar = document.getElementById("main-sidebar");
@@ -3734,6 +3740,7 @@ setInterval(() => {
             View Container Height: ${vcStyle.height} | MaxH: ${vcStyle.maxHeight} | Overflow: ${vcStyle.overflowY} | Display: ${vcStyle.display}<br>
             View ScrollH: ${vc.scrollHeight}px | ClientH: ${vc.clientHeight}px | ScrollTop: ${vc.scrollTop}px<br>
             Scrollable: ${vc.scrollHeight > vc.clientHeight ? "YES ✅" : "NO ❌"}<br>
+            <span style="color: #60a5fa; font-weight: bold;">Logs: ${window.medsphereLogs && window.medsphereLogs.length > 0 ? window.medsphereLogs.slice(-3).join(" → ") : "No clicks registered ❌"}</span><br>
             <span style="color: #f87171; font-weight: bold;">Errors: ${window.medsphereErrors.length > 0 ? window.medsphereErrors.join(" | ") : "None ✅"}</span>
         `;
     } else {
