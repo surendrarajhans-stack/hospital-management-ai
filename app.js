@@ -62,9 +62,14 @@ const MOCK_DB = {
     wards: [
         { id: "ICU-01", type: "ICU", occupied: false, patientId: "" },
         { id: "ICU-02", type: "ICU", occupied: true, patientId: "PAT-001" },
+        { id: "ICU-03", type: "ICU", occupied: false, patientId: "" },
         { id: "GW-01", type: "General Ward", occupied: false, patientId: "" },
+        { id: "GW-02", type: "General Ward", occupied: false, patientId: "" },
+        { id: "GW-03", type: "General Ward", occupied: false, patientId: "" },
+        { id: "GW-04", type: "General Ward", occupied: false, patientId: "" },
         { id: "GW-05", type: "General Ward", occupied: true, patientId: "PAT-002" },
-        { id: "PED-01", type: "Pediatrics", occupied: true, patientId: "PAT-003" }
+        { id: "PED-01", type: "Pediatrics", occupied: true, patientId: "PAT-003" },
+        { id: "PED-02", type: "Pediatrics", occupied: false, patientId: "" }
     ],
     staff: [
         { id: "NURSE-01", name: "Sister Anjali", dept: "ICU", shift: "Day" },
