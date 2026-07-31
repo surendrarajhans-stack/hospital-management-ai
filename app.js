@@ -189,6 +189,14 @@ window.submitOnboardingCredentials = function(e) {
     switchRole(state.roleClearance, name, id);
 };
 window.switchRole = function(clearance, name, id) {
+    // Ensure all tables are initialized as arrays to prevent switchRole crashes
+    if (!MOCK_DB.admissions || !Array.isArray(MOCK_DB.admissions)) MOCK_DB.admissions = [];
+    if (!MOCK_DB.doctors || !Array.isArray(MOCK_DB.doctors)) MOCK_DB.doctors = [];
+    if (!MOCK_DB.patients || !Array.isArray(MOCK_DB.patients)) MOCK_DB.patients = [];
+    if (!MOCK_DB.wards || !Array.isArray(MOCK_DB.wards)) MOCK_DB.wards = [];
+    if (!MOCK_DB.staff || !Array.isArray(MOCK_DB.staff)) MOCK_DB.staff = [];
+    if (!MOCK_DB.pharmacy || !Array.isArray(MOCK_DB.pharmacy)) MOCK_DB.pharmacy = [];
+
     state.userName = name;
     state.userId = id;
     state.roleClearance = clearance;
@@ -442,16 +450,18 @@ function populateAllDoctorDropdowns() {
         const select = document.getElementById(id);
         if (select) {
             select.innerHTML = "";
-            MOCK_DB.doctors.forEach(d => {
-                const opt = document.createElement("option");
-                opt.value = d.id;
-                opt.innerText = `${d.name} (${d.specialty})`;
-                select.appendChild(opt);
-            });
-            // Auto-match active doctor if applicable
-            if (state.userId && MOCK_DB.doctors.some(d => d.id === state.userId)) {
-                if (id === "opdDoctor" || id === "dedicatedPatDoctor") {
-                    select.value = state.userId;
+            if (MOCK_DB && Array.isArray(MOCK_DB.doctors)) {
+                MOCK_DB.doctors.forEach(d => {
+                    const opt = document.createElement("option");
+                    opt.value = d.id;
+                    opt.innerText = `${d.name} (${d.specialty})`;
+                    select.appendChild(opt);
+                });
+                // Auto-match active doctor if applicable
+                if (state.userId && MOCK_DB.doctors.some(d => d.id === state.userId)) {
+                    if (id === "opdDoctor" || id === "dedicatedPatDoctor") {
+                        select.value = state.userId;
+                    }
                 }
             }
         }
@@ -485,6 +495,14 @@ function loadDatabaseState() {
             Object.assign(MOCK_DB, parsed);
         } catch (e) {}
     }
+
+    // Ensure all tables are initialized as arrays to prevent crashes on undefined arrays
+    if (!MOCK_DB.admissions || !Array.isArray(MOCK_DB.admissions)) MOCK_DB.admissions = [];
+    if (!MOCK_DB.doctors || !Array.isArray(MOCK_DB.doctors)) MOCK_DB.doctors = [];
+    if (!MOCK_DB.patients || !Array.isArray(MOCK_DB.patients)) MOCK_DB.patients = [];
+    if (!MOCK_DB.wards || !Array.isArray(MOCK_DB.wards)) MOCK_DB.wards = [];
+    if (!MOCK_DB.staff || !Array.isArray(MOCK_DB.staff)) MOCK_DB.staff = [];
+    if (!MOCK_DB.pharmacy || !Array.isArray(MOCK_DB.pharmacy)) MOCK_DB.pharmacy = [];
     
     // 2. Fetch fresh cloud state
     fetch(API_BASE_URL + "/api/load")
