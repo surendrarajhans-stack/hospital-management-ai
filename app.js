@@ -3734,17 +3734,26 @@ setInterval(() => {
     const vc = document.getElementById("view-container");
     const wrapper = document.getElementById("console-layout-wrapper");
     const main = document.querySelector("main");
+    const roleSelectSec = document.getElementById("onboarding-role-select");
+    const doctorSec = document.getElementById("view-doctor");
+    const pharmacistSec = document.getElementById("view-pharmacist");
     if (vc && wrapper && main) {
         const vcStyle = window.getComputedStyle(vc);
         const wrStyle = window.getComputedStyle(wrapper);
         const mStyle = window.getComputedStyle(main);
+        const rsStyle = roleSelectSec ? window.getComputedStyle(roleSelectSec) : null;
+        const docStyle = doctorSec ? window.getComputedStyle(doctorSec) : null;
+        const pharmStyle = pharmacistSec ? window.getComputedStyle(pharmacistSec) : null;
         diag.innerHTML = `
             <strong>Medsphere Layout Diagnostic:</strong><br>
             Main Height: ${mStyle.height} | MaxH: ${mStyle.maxHeight} | Display: ${mStyle.display}<br>
-            Wrapper Height: ${wrStyle.height} | MaxH: ${wrStyle.maxHeight} | Display: ${wrStyle.display} | Position: ${wrStyle.position} | Visibility: ${wrStyle.visibility}<br>
+            Wrapper Height: ${wrStyle.height} | MaxH: ${wrStyle.maxHeight} | Display: ${wrStyle.display}<br>
             View Container Height: ${vcStyle.height} | MaxH: ${vcStyle.maxHeight} | Overflow: ${vcStyle.overflowY} | Display: ${vcStyle.display}<br>
             View ScrollH: ${vc.scrollHeight}px | ClientH: ${vc.clientHeight}px | ScrollTop: ${vc.scrollTop}px<br>
             Scrollable: ${vc.scrollHeight > vc.clientHeight ? "YES ✅" : "NO ❌"}<br>
+            Onboarding Sec Display: ${rsStyle ? rsStyle.display : "null"} | Class: ${roleSelectSec ? roleSelectSec.className : "null"}<br>
+            Doctor Sec Display: ${docStyle ? docStyle.display : "null"} | Class: ${doctorSec ? doctorSec.className : "null"}<br>
+            Pharmacist Sec Display: ${pharmStyle ? pharmStyle.display : "null"} | Class: ${pharmacistSec ? pharmacistSec.className : "null"}<br>
             <span style="color: #60a5fa; font-weight: bold;">Logs: ${window.medsphereLogs && window.medsphereLogs.length > 0 ? window.medsphereLogs.slice(-3).join(" → ") : "No clicks registered ❌"}</span><br>
             <span style="color: #f87171; font-weight: bold;">Errors: ${window.medsphereErrors.length > 0 ? window.medsphereErrors.join(" | ") : "None ✅"}</span>
         `;
