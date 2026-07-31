@@ -3716,6 +3716,11 @@ window.medsphereErrors = [];
 window.addEventListener("error", (e) => {
     window.medsphereErrors.push(e.message + " (" + e.filename.split('/').pop() + ":" + e.lineno + ")");
 });
+const originalConsoleError = console.error;
+console.error = function(...args) {
+    window.medsphereErrors.push("Console: " + args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(" "));
+    originalConsoleError.apply(console, args);
+};
 
 // DIAGNOSTIC LAYOUT MONITOR
 setInterval(() => {
