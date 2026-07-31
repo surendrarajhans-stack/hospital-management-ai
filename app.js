@@ -3751,9 +3751,9 @@ setInterval(() => {
             View Container Height: ${vcStyle.height} | MaxH: ${vcStyle.maxHeight} | Overflow: ${vcStyle.overflowY} | Display: ${vcStyle.display}<br>
             View ScrollH: ${vc.scrollHeight}px | ClientH: ${vc.clientHeight}px | ScrollTop: ${vc.scrollTop}px<br>
             Scrollable: ${vc.scrollHeight > vc.clientHeight ? "YES ✅" : "NO ❌"}<br>
-            Onboarding Sec Display: ${rsStyle ? rsStyle.display : "null"} | Class: ${roleSelectSec ? roleSelectSec.className : "null"}<br>
-            Doctor Sec Display: ${docStyle ? docStyle.display : "null"} | Height: ${docStyle ? docStyle.height : "null"} | Children: ${doctorSec ? doctorSec.children.length : "null"}<br>
-            Pharmacist Sec Display: ${pharmStyle ? pharmStyle.display : "null"} | Height: ${pharmStyle ? pharmStyle.height : "null"} | Children: ${pharmacistSec ? pharmacistSec.children.length : "null"}<br>
+            Onboarding Sec Display: ${rsStyle ? rsStyle.display : "null"} | Parent: ${roleSelectSec ? roleSelectSec.parentNode.id : "null"}<br>
+            Doctor Sec Display: ${docStyle ? docStyle.display : "null"} | Parent: ${doctorSec ? doctorSec.parentNode.id : "null"} | Height: ${docStyle ? docStyle.height : "null"}<br>
+            Pharmacist Sec Display: ${pharmStyle ? pharmStyle.display : "null"} | Parent: ${pharmacistSec ? pharmacistSec.parentNode.id : "null"} | Height: ${pharmStyle ? pharmStyle.height : "null"}<br>
             <span style="color: #60a5fa; font-weight: bold;">Logs: ${window.medsphereLogs && window.medsphereLogs.length > 0 ? window.medsphereLogs.slice(-3).join(" → ") : "No clicks registered ❌"}</span><br>
             <span style="color: #f87171; font-weight: bold;">Errors: ${window.medsphereErrors.length > 0 ? window.medsphereErrors.join(" | ") : "None ✅"}</span>
         `;
