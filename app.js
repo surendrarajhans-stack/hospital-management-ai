@@ -861,8 +861,8 @@ window.processLocalFileImport = function() {
             const targetCollection = select.value;
             
             // Validate headers (case-insensitive)
-            if (targetCollection === "doctors" && !headers.includes("specialty")) {
-                alert("Validation Error: The uploaded sheet is missing the 'specialty' column required for Doctors. Please verify your file or select the correct Target Sheet Type.");
+            if (targetCollection === "doctors" && !headers.includes("specialty") && !headers.includes("speciality")) {
+                alert("Validation Error: The uploaded sheet is missing the 'specialty' (or 'speciality') column required for Doctors. Please verify your file or select the correct Target Sheet Type.");
                 return;
             }
             if (targetCollection === "patients" && !headers.includes("complaint")) {
@@ -893,7 +893,10 @@ window.processLocalFileImport = function() {
                 // Map case-insensitive keys to exact model properties
                 Object.keys(row).forEach(key => {
                     const trimmedKey = key.trim();
-                    const matchedKey = expectedKeys.find(ek => ek.toLowerCase() === trimmedKey.toLowerCase());
+                    const matchedKey = expectedKeys.find(ek => {
+                        if (ek === "specialty" && trimmedKey.toLowerCase() === "speciality") return true;
+                        return ek.toLowerCase() === trimmedKey.toLowerCase();
+                    });
                     if (matchedKey) {
                         let val = row[key];
                         // Convert numeric/boolean strings
