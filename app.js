@@ -1759,7 +1759,7 @@ window.printPatientReceipt = function() {
         <!DOCTYPE html>
         <html>
         <head>
-            <title>MedSphere AI - Official Hospital Tax Invoice & Discharge Receipt</title>
+            <title>Sai Nursing Home - Official Hospital Tax Invoice & Discharge Receipt</title>
             <style>
                 body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; color: #1e293b; background: #fff; line-height: 1.5; }
                 .invoice-box { max-width: 800px; margin: auto; padding: 30px; border: 1px solid #eee; border-radius: 12px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); }
@@ -1784,7 +1784,7 @@ window.printPatientReceipt = function() {
                 <table class="header-table">
                     <tr>
                         <td>
-                            <div class="hospital-name">MedSphere with Sai Nursing Home</div>
+                            <div class="hospital-name">Sai Nursing Home</div>
                             <div class="hospital-sub">NABH Accredited Tertiary Care Center</div>
                             <div style="font-size: 11px; color: #64748b; margin-top: 4px;">Node: ${state.localization.country} • Currency: ${state.localization.currency} (${state.localization.currencySymbol})</div>
                         </td>
