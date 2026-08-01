@@ -1405,7 +1405,7 @@ window.printPrescriptionDoc = function() {
         <body>
             <div class="header">
                 <div>
-                    <span class="hosp-name">MEDSPHERE AI</span>
+                    <span class="hosp-name">MEDSPHERE WITH SAI NURSING HOME</span>
                     <div style="font-size: 11px; color: #64748b; margin-top: 2px;">Smart Health Information System</div>
                 </div>
                 <div class="doc-info">
@@ -1784,7 +1784,7 @@ window.printPatientReceipt = function() {
                 <table class="header-table">
                     <tr>
                         <td>
-                            <div class="hospital-name">MedSphere Healthcare OS</div>
+                            <div class="hospital-name">MedSphere with Sai Nursing Home</div>
                             <div class="hospital-sub">NABH Accredited Tertiary Care Center</div>
                             <div style="font-size: 11px; color: #64748b; margin-top: 4px;">Node: ${state.localization.country} • Currency: ${state.localization.currency} (${state.localization.currencySymbol})</div>
                         </td>
@@ -3207,7 +3207,7 @@ window.printPreAuthLetter = function() {
         <body>
             <div class="header">
                 <div>
-                    <div class="logo">🏥 MedSphere AI Health System</div>
+                    <div class="logo">🏥 MedSphere with Sai Nursing Home</div>
                     <div style="font-size: 12px; color: #64748b;">Hospital Subdomain: hospital.technocons.com</div>
                 </div>
                 <div style="text-align: right; font-size: 12px;">
