@@ -1,5 +1,5 @@
-id,name,specialty,room,shift,phone
-DOC-101,Dr. John Doe,Cardiology,OPD 101,Morning,+91 90000 00001
-DOC-102,Dr. Jane Smith,Pediatrics,OPD 102,Afternoon,+91 90000 00002
-DOC-103,Dr. Alice Johnson,Neurology,OPD 103,Night,+91 90000 00003
-DOC-104,Dr. Bob Wilson,Orthopedics,OPD 104,Morning,+91 90000 00004
+id,name,specialty,room,shift,phone,experience
+DOC-101,Dr. John Doe,Cardiology,OPD 101,Morning,+91 90000 00001,15
+DOC-102,Dr. Jane Smith,Pediatrics,OPD 102,Afternoon,+91 90000 00002,8
+DOC-103,Dr. Alice Johnson,Neurology,OPD 103,Night,+91 90000 00003,12
+DOC-104,Dr. Bob Wilson,Orthopedics,OPD 104,Morning,+91 90000 00004,6

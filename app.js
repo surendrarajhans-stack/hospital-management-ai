@@ -50,9 +50,9 @@ const state = {
 const MOCK_DB = {
     admissions: [],
     doctors: [
-        { id: "DOC-001", name: "Dr. Surendra Rajhans", specialty: "Cardiology", room: "OPD 101", shift: "Morning", phone: "+91 94394 98158" },
-        { id: "DOC-002", name: "Dr. Lakshmi Prasad", specialty: "Pediatrics", room: "OPD 105", shift: "Afternoon", phone: "+91 98765 00002" },
-        { id: "DOC-003", name: "Dr. Vikas Sharma", specialty: "Neurology", room: "OPD 202", shift: "Night", phone: "+91 98765 00003" }
+        { id: "DOC-001", name: "Dr. Surendra Rajhans", specialty: "Cardiology", room: "OPD 101", shift: "Morning", phone: "+91 94394 98158", experience: 15 },
+        { id: "DOC-002", name: "Dr. Lakshmi Prasad", specialty: "Pediatrics", room: "OPD 105", shift: "Afternoon", phone: "+91 98765 00002", experience: 8 },
+        { id: "DOC-003", name: "Dr. Vikas Sharma", specialty: "Neurology", room: "OPD 202", shift: "Night", phone: "+91 98765 00003", experience: 12 }
     ],
     patients: [
         { id: "PAT-001", name: "Ramesh Kumar", age: 45, triage: "Stable", bed: "ICU-02", bill: 12500, paid: false, complaint: "Chronic hypertension" },
@@ -533,9 +533,9 @@ function loadDatabaseState() {
 window.clearAllSystemData = function() {
     if (confirm("Are you sure you want to reset the system database back to default clean seed data?")) {
         MOCK_DB.doctors = [
-            { id: "DOC-001", name: "Dr. Surendra Rajhans", specialty: "Cardiology", room: "OPD 101", shift: "Morning", phone: "+91 94394 98158" },
-            { id: "DOC-002", name: "Dr. Lakshmi Prasad", specialty: "Pediatrics", room: "OPD 105", shift: "Afternoon", phone: "+91 98765 00002" },
-            { id: "DOC-003", name: "Dr. Vikas Sharma", specialty: "Neurology", room: "OPD 202", shift: "Night", phone: "+91 98765 00003" }
+            { id: "DOC-001", name: "Dr. Surendra Rajhans", specialty: "Cardiology", room: "OPD 101", shift: "Morning", phone: "+91 94394 98158", experience: 15 },
+            { id: "DOC-002", name: "Dr. Lakshmi Prasad", specialty: "Pediatrics", room: "OPD 105", shift: "Afternoon", phone: "+91 98765 00002", experience: 8 },
+            { id: "DOC-003", name: "Dr. Vikas Sharma", specialty: "Neurology", room: "OPD 202", shift: "Night", phone: "+91 98765 00003", experience: 12 }
         ];
         MOCK_DB.patients = [
             { id: "PAT-001", name: "Ramesh Kumar", age: 45, triage: "Stable", bed: "ICU-02", bill: 12500, paid: false, complaint: "Chronic hypertension" },
@@ -655,6 +655,7 @@ function populateITDashboard() {
                 <td>${doc.specialty}</td>
                 <td class="font-mono text-xs">${doc.room}</td>
                 <td><span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-400">${doc.shift}</span></td>
+                <td class="text-xs text-[#9ca3af]">${doc.experience ? doc.experience + ' Yrs' : 'N/A'}</td>
             `;
             dBody.appendChild(tr);
         });
@@ -897,7 +898,7 @@ window.processLocalFileImport = function() {
             
             // Normalize objects keys to match MOCK_DB property names (case-insensitive mapping)
             const schemaKeys = {
-                doctors: ["id", "name", "specialty", "room", "shift", "phone"],
+                doctors: ["id", "name", "specialty", "room", "shift", "phone", "experience"],
                 patients: ["id", "name", "age", "triage", "bed", "bill", "paid", "complaint"],
                 staff: ["id", "name", "dept", "shift"],
                 pharmacy: ["id", "name", "stock", "price"]
