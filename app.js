@@ -2655,11 +2655,11 @@ window.populateDedicatedPatientEntryDashboard = function() {
     document.getElementById("statDedicatedOpdCount").innerText = opdCount;
     document.getElementById("statDedicatedOccupancyRate").innerText = `${occupancyRate}%`;
 
-    // 4. Render Recently Registered Patient list (last 3 items)
+    // 4. Render Recently Registered Patient list (last 15 items)
     const recentList = document.getElementById("dedicatedRecentPatientsList");
     if (recentList) {
         recentList.innerHTML = "";
-        const recentPatients = [...MOCK_DB.patients].reverse().slice(0, 3);
+        const recentPatients = [...MOCK_DB.patients].reverse().slice(0, 15);
         if (recentPatients.length === 0) {
             recentList.innerHTML = `<span class="text-xs text-[#6b7280]">No patients registered yet.</span>`;
         } else {
