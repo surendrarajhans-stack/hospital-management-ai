@@ -1177,10 +1177,10 @@ window.registerOPDPatient = function() {
 
 window.addMedicationToPrescription = function() {
     const medName = document.getElementById("prescMedName").value.trim();
-    const dosage = document.getElementById("prescDosage").value.trim();
-    const duration = document.getElementById("prescDuration").value.trim();
+    const dosage = document.getElementById("prescDosage").value.trim() || "As directed";
+    const duration = document.getElementById("prescDuration").value.trim() || "5 Days";
     
-    if (!medName || !dosage) return;
+    if (!medName) return;
     
     currentPrescriptionMeds.push({ name: medName, dosage, duration });
     
@@ -1232,55 +1232,61 @@ window.removeMedFromPrescription = function(idx) {
 };
 
 function checkDrugInteractions() {
-    const warnContainer = document.getElementById("drugInteractionWarningContainer");
-    const warnText = document.getElementById("drugInteractionWarningText");
-    if (!warnContainer || !warnText) return;
+    try {
+        const warnContainer = document.getElementById("drugInteractionWarningContainer");
+        const warnText = document.getElementById("drugInteractionWarningText");
+        if (!warnContainer || !warnText) return;
 
-    warnContainer.classList.add("hidden");
+        warnContainer.classList.add("hidden");
 
-    if (currentPrescriptionMeds.length < 2) return;
+        if (!currentPrescriptionMeds || currentPrescriptionMeds.length < 2) return;
 
-    const severeInteractions = [
-        {
-            drugs: ["aspirin", "warfarin"],
-            desc: "Co-administration of Aspirin and Warfarin significantly increases the risk of severe gastrointestinal and systemic bleeding. Monitor INR closely."
-        },
-        {
-            drugs: ["sildenafil", "nitroglycerin"],
-            desc: "Critical risk of profound, life-threatening systemic hypotension due to synergistic vasodilation. Do not co-prescribe."
-        },
-        {
-            drugs: ["ibuprofen", "aspirin"],
-            desc: "Ibuprofen may inhibit the cardioprotective antiplatelet effect of low-dose Aspirin. Concomitant use also increases GI mucosal bleeding risk."
-        },
-        {
-            drugs: ["clopidogrel", "omeprazole"],
-            desc: "Omeprazole decreases the active metabolite of Clopidogrel (via CYP2C19 inhibition), reducing its therapeutic antiplatelet efficacy."
-        },
-        {
-            drugs: ["simvastatin", "amlodipine"],
-            desc: "Amlodipine increases systemic exposure to Simvastatin, raising the risk of statin-induced myopathy. Limit Simvastatin to 20mg daily."
+        const severeInteractions = [
+            {
+                drugs: ["aspirin", "warfarin"],
+                desc: "Co-administration of Aspirin and Warfarin significantly increases the risk of severe gastrointestinal and systemic bleeding. Monitor INR closely."
+            },
+            {
+                drugs: ["sildenafil", "nitroglycerin"],
+                desc: "Critical risk of profound, life-threatening systemic hypotension due to synergistic vasodilation. Do not co-prescribe."
+            },
+            {
+                drugs: ["ibuprofen", "aspirin"],
+                desc: "Ibuprofen may inhibit the cardioprotective antiplatelet effect of low-dose Aspirin. Concomitant use also increases GI mucosal bleeding risk."
+            },
+            {
+                drugs: ["clopidogrel", "omeprazole"],
+                desc: "Omeprazole decreases the active metabolite of Clopidogrel (via CYP2C19 inhibition), reducing its therapeutic antiplatelet efficacy."
+            },
+            {
+                drugs: ["simvastatin", "amlodipine"],
+                desc: "Amlodipine increases systemic exposure to Simvastatin, raising the risk of statin-induced myopathy. Limit Simvastatin to 20mg daily."
+            }
+        ];
+
+        const prescribedNames = currentPrescriptionMeds
+            .filter(m => m && m.name)
+            .map(m => m.name.toLowerCase().trim());
+
+        for (const interaction of severeInteractions) {
+            const drugA = interaction.drugs[0];
+            const drugB = interaction.drugs[1];
+
+            const hasA = prescribedNames.some(name => name.includes(drugA));
+            const hasB = prescribedNames.some(name => name.includes(drugB));
+
+            if (hasA && hasB) {
+                warnText.innerText = interaction.desc;
+                warnContainer.classList.remove("hidden");
+                if (window.lucide) lucide.createIcons();
+                
+                addSystemLog(`AI Safety Warning: Critical drug interaction detected between ${drugA.toUpperCase()} and ${drugB.toUpperCase()}!`, "Error");
+                addNotification("Drug Interaction Warning 🚨", `Concomitant use of ${drugA.toUpperCase()} and ${drugB.toUpperCase()} is contraindicated.`, "danger");
+                break;
+            }
         }
-    ];
-
-    const prescribedNames = currentPrescriptionMeds.map(m => m.name.toLowerCase().trim());
-
-    for (const interaction of severeInteractions) {
-        const drugA = interaction.drugs[0];
-        const drugB = interaction.drugs[1];
-
-        const hasA = prescribedNames.some(name => name.includes(drugA));
-        const hasB = prescribedNames.some(name => name.includes(drugB));
-
-        if (hasA && hasB) {
-            warnText.innerText = interaction.desc;
-            warnContainer.classList.remove("hidden");
-            if (window.lucide) lucide.createIcons();
-            
-            addSystemLog(`AI Safety Warning: Critical drug interaction detected between ${drugA.toUpperCase()} and ${drugB.toUpperCase()}!`, "Error");
-            addNotification("Drug Interaction Warning 🚨", `Concomitant use of ${drugA.toUpperCase()} and ${drugB.toUpperCase()} is contraindicated.`, "danger");
-            break;
-        }
+    } catch (e) {
+        console.error("Safety check error:", e);
     }
 }
 

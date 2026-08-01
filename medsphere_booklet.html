@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedSphere AI - Hospital & Clinic Operating System Booklet</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 30px;
+            background-color: #ffffff;
+        }
+        
+        /* Cover Page Styling */
+        .cover-page {
+            text-align: center;
+            padding: 100px 0;
+            border-bottom: 3px double #0f766e;
+            page-break-after: always;
+        }
+        .logo-text {
+            font-size: 42px;
+            font-weight: 800;
+            color: #0f766e;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .tagline {
+            font-size: 18px;
+            color: #4b5563;
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+        .meta-info {
+            margin-top: 80px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        /* General Section Styling */
+        h2 {
+            color: #111827;
+            font-size: 22px;
+            margin-top: 40px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 8px;
+        }
+        h3 {
+            color: #0f766e;
+            font-size: 16px;
+            margin-top: 25px;
+            margin-bottom: 5px;
+        }
+        p, li {
+            font-size: 14px;
+            color: #374151;
+            text-align: justify;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+
+        /* Features Box Styling */
+        .feature-card {
+            border: 1px solid #e5e7eb;
+            border-left: 5px solid #0f766e;
+            padding: 18px;
+            margin: 20px 0;
+            border-radius: 6px;
+            background-color: #fafafa;
+        }
+        .feature-title {
+            font-weight: bold;
+            color: #0f766e;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 13px;
+        }
+        th, td {
+            border: 1px solid #d1d5db;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f3f4f6;
+            color: #111827;
+            font-weight: bold;
+        }
+
+        .pricing-box {
+            background-color: #f0fdfa;
+            border: 1.5px dashed #0f766e;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        .pricing-title {
+            color: #0f766e;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .btn-print {
+            display: block;
+            width: fit-content;
+            background-color: #0f766e;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 6px -1px rgba(15, 118, 110, 0.2);
+        }
+
+        /* Page Breaks for Booklet Format */
+        .page-break {
+            page-break-after: always;
+        }
+
+        @media print {
+            .btn-print {
+                display: none;
+            }
+            body {
+                margin: 20px;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="btn-print" onclick="window.print()">Print Booklet (Ctrl + P)</button>
+
+    <!-- COVER PAGE -->
+    <div class="cover-page">
+        <div class="logo-text">MEDSPHERE AI</div>
+        <div class="tagline">Next-Generation Hospital & Clinic Information Operating System</div>
+        <div style="width: 80px; height: 4px; background-color: #0f766e; margin: 30px auto;"></div>
+        <p style="max-width: 500px; margin: 0 auto; text-align: center; font-size: 15px; color: #4b5563;">An intelligent, clinical decision-support and billing suite designed to empower doctors, optimize ward occupancy, and secure patient checkouts.</p>
+        
+        <div class="meta-info">
+            <p style="text-align: center;"><strong>Technoconsultancy and services</strong></p>
+            <p style="text-align: center;">B2B Product Overview & Feature Documentation</p>
+        </div>
+    </div>
+
+    <!-- INTRODUCTION -->
+    <h2>1. Executive Summary & Overview</h2>
+    <p>MedSphere AI is a cloud-based, comprehensive Hospital Information System (HIS) and clinical workspace designed for modern medical institutions, diagnostic centers, and nursing homes. Built to scale with your healthcare facility, MedSphere AI integrates patient registration, active ward bed mapping, automated diagnostic anomalies detection, drug safety warnings, pharmacy inventory control, and checkout billing desks into a unified, secure portal.</p>
+    <p>By shifting focus from per-employee software licensing to a flat bed-based model, MedSphere AI enables clinics to scale their physician, nurse, and admin rosters without incurring rising recurring software costs.</p>
+
+    <!-- CORE CLINICAL FEATURES -->
+    <h2>2. Clinical & Doctor Modules</h2>
+    <p>The Doctor Console operates as an intuitive clinical workspace featuring advanced decision-support layers to maximize patient safety and consultation speeds.</p>
+
+    <div class="feature-card">
+        <div class="feature-title">🚨 Real-time Drug-Drug Interaction Warning</div>
+        <p>An automated safety net. As physicians build digital prescriptions, the safety desk cross-references medications in real-time. If contraindicated drugs (such as <em>Sildenafil + Nitroglycerin</em> or <em>Aspirin + Warfarin</em>) are co-prescribed, a red clinical warning flashes instantly on screen outlining the cardiac or bleeding risks to prevent errors.</p>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-title">🔬 Automated Pathology Anomaly Detector</div>
+        <p>Instantly scans laboratory panel reports. Critical parameters like hemoglobin counts, WBC, platelets, and kidney indicators (creatinine, blood urea) are checked against clinical ranges. Any out-of-bound values are highlighted in bold red with advisory indicators, supporting quick, accurate triage.</p>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-title">📝 Digital OPD Prescriber Desk</div>
+        <p>A swift OPD consultation deck that allows doctors to quickly check patient symptoms, choose diagnostic codes, build itemized medicine prescriptions, sign, and dispatch clinical charts to the pharmacy desk in one click.</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- OPERATIONS & WARD MODULES -->
+    <h2>3. Ward & Nursing Bed Map Desk</h2>
+    <p>Ensures smooth inpatient (IPD) flow and optimal ward occupancy mapping through graphical bedside monitoring.</p>
+
+    <div class="feature-card">
+        <div class="feature-title">🏥 Interactive Ward Grid</div>
+        <p>A color-coded visual map of all active beds across departments (ICU, General Wards, Pediatrics). It allows nurses to check occupancy at a glance (Green for vacant, Red for occupied) and admit patients directly to empty beds.</p>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-title">📈 Real-time Bedside Vitals Logger</div>
+        <p>Enables nurses to log temperature, heart rate, blood pressure, and SpO2 levels. If critical parameters are met (such as SpO2 dropping below 93%), the system triggers a flashing alarm on the nurse's screen and dispatches an emergency WhatsApp notification to the administrator.</p>
+    </div>
+
+    <!-- WEBSITE INTEGRATION -->
+    <h2>4. Website AI Assistant & Triage Bot</h2>
+    <div class="feature-card">
+        <div class="feature-title">🌐 24/7 Public Portal Widget</div>
+        <p>MedSphere AI includes an embeddable website script tag. By pasting one line of code, your hospital's public website (hospital.com) is equipped with a multilingual AI Receptionist. The bot interacts with patients, collects clinical symptoms, performs an ESI Standard Triage assessment (ESI-1 to ESI-5), and suggests the correct ward/doctor department for check-in.</p>
+    </div>
+
+    <!-- BILLING & DISCHARGE -->
+    <h2>5. Pharmacy, TPA, & WhatsApp Billing</h2>
+    <p>Discharge management is centralized to streamline patient payout and pharmacy checkout workflows.</p>
+
+    <div class="feature-card">
+        <div class="feature-title">📲 Automated WhatsApp Invoicing</div>
+        <p>Upon patient discharge, the billing desk computes the final ledger (OPD, ward stay, diagnostics, pharmacy) and auto-generates a secure payment checkout link (UPI/Card). Once paid, the tax-compliant PDF receipt is delivered directly to the patient's WhatsApp, reducing queues.</p>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-title">🛡️ AI Cashless TPA Insurance Verifier</div>
+        <p>Quickly maps patient policy numbers against major cashless insurance providers (e.g., Star Health, HDFC ERGO Cashless, Ayushman Bharat PM-JAY), checking coverage status and processing pre-authorization logs.</p>
+    </div>
+
+    <!-- COMPLIANCE & PRICING -->
+    <div class="page-break"></div>
+    
+    <h2>6. Commercial Structure & Technical Specs</h2>
+    
+    <div class="pricing-box">
+        <div class="pricing-title">💎 Flat Bed-Based Pricing Structure</div>
+        <p>Traditional software penalizes growth by charging per doctor or staff profile. MedSphere AI offers flat pricing based on your operational bed count:</p>
+        <ul>
+            <li><strong>Unlimited Staff Profiles:</strong> Register as many doctors, visiting consultants, nursing shifts, and reception desks as you need.</li>
+            <li><strong>Pay Only for Capacity:</strong> Licenses are calculated strictly on your physical capacity (bed roster).</li>
+            <li><strong>White-Label Ready:</strong> Completely customized branding with your hospital's logo, colors, and official hospital.com domain.</li>
+        </ul>
+    </div>
+
+    <h3>🛡️ Security & National Health Compliance</h3>
+    <ul>
+        <li><strong>ABDM & ABHA ID Ready:</strong> Fully compliant with India's Ayushman Bharat Digital Mission (ABDM M3) interoperability guidelines for linking health cards.</li>
+        <li><strong>Data Protection & Privacy:</strong> Aligned with the Digital Personal Data Protection (DPDP) Act 2023 and HIPAA guidelines.</li>
+        <li><strong>Encrypted Databases:</strong> Secure SSL/TLS 256-bit data transit. Maintained persistently on MongoDB Atlas servers.</li>
+    </ul>
+
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedSphere AI - Doctor Presentation & Demo Playbook</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background-color: #ffffff;
+        }
+        h1 {
+            color: #0f766e;
+            border-bottom: 2px solid #0f766e;
+            padding-bottom: 10px;
+            font-size: 28px;
+        }
+        h2 {
+            color: #111827;
+            font-size: 20px;
+            margin-top: 30px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 5px;
+        }
+        h3 {
+            color: #0f766e;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        p, li {
+            font-size: 14px;
+            color: #4b5563;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+        th, td {
+            border: 1px solid #d1d5db;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f3f4f6;
+            color: #111827;
+            font-weight: bold;
+        }
+        .note-box {
+            background-color: #f0fdfa;
+            border-left: 4px solid #0f766e;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .note-box strong {
+            color: #0f766e;
+        }
+        .btn-print {
+            display: block;
+            width: fit-content;
+            background-color: #0f766e;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+        }
+        @media print {
+            .btn-print {
+                display: none;
+            }
+            body {
+                margin: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="btn-print" onclick="window.print()">Print This Playbook (Ctrl + P)</button>
+
+    <h1>MedSphere AI — Doctor Presentation & Demo Playbook</h1>
+    <p>A step-by-step guide to running a successful product demonstration and negotiation meeting with clinical heads and hospital administration.</p>
+
+    <h2>1. Pre-Meeting Check-list (Tonight's Setup)</h2>
+    <ul>
+        <li><strong>Clean Database State:</strong> Open the application in your browser and click the red <strong>"Reset System Data"</strong> button in the top header. This ensures the dashboard displays clean, standardized templates with no random test entries.</li>
+        <li><strong>Pre-seeded Doctor Profile:</strong> Make sure your local code contains the head doctor's name on <code>DOC-001</code>. <em>(We have already renamed <code>DOC-001</code> to "Dr. Agrawal Sir" across the entire codebase!)</em></li>
+        <li><strong>Device Ready:</strong> Ensure you have the dashboard loaded on a laptop (or tablet) with an active internet connection.</li>
+    </ul>
+
+    <h2>2. The 10-Minute Demo Flow</h2>
+    <p>Doctors value efficiency and clinical utility. Do not explain technical code—walk them through a single patient's clinical lifecycle:</p>
+
+    <h3>Step 1: Registrar Check-in (The Intake)</h3>
+    <ul>
+        <li>Open the <strong>Manual Patient Entry Desk</strong> (OPD Registrar portal).</li>
+        <li>Register a new mock patient (e.g., <code>Amit Patel, 62 Years, Complaint: Acute chest pain</code>).</li>
+        <li>Click <strong>"Generate ABHA ID"</strong> to simulate a real-time government digital health ID mapping.</li>
+        <li><strong>The Pitch:</strong> <em>"Our intake panel takes less than 60 seconds. It is Indian ABDM compliant, allowing you to instantly generate or link patients' ABHA health cards."</em></li>
+    </ul>
+
+    <h3>Step 2: Ward Bed Grid (The Nurse Desk)</h3>
+    <ul>
+        <li>Navigate to the <strong>Nurse Console & Ward Manager</strong>.</li>
+        <li>Point out the color-coded <strong>Interactive Ward Bed Grid</strong> (vacant beds are green, occupied beds are red).</li>
+        <li>Click on the bed assigned to your mock patient. Log fresh vitals (Temp, Heart Rate, BP, SpO2).</li>
+        <li><strong>The Pitch:</strong> <em>"Your nursing staff gets an interactive map of all active beds (ICU, General Wards, Pediatrics). Logging vitals updates the database in real-time, syncing to the cloud so you can review them from anywhere."</em></li>
+    </ul>
+
+    <h3>Step 3: Clinical Safety Copilot (Doctor Desk)</h3>
+    <ul>
+        <li>Go to the <strong>Doctor Console</strong> (logged in as <em>Dr. Agrawal Sir</em>). Click on the patient from the queue.</li>
+        <li><strong>AI Lab Report Scan:</strong> Show the pathology values, click check, and watch the system highlight anomalies (high glucose/creatinine) in red.</li>
+        <li><strong>Drug-Drug Interaction Alert:</strong> In the medication field, add <strong>Sildenafil</strong>, then add <strong>Nitroglycerin</strong>. The red warning banner will instantly flash.</li>
+        <li><strong>The Pitch:</strong> <em>"Our software acts as a clinical copilot. It alerts you to dangerous abnormal lab results and flags contraindicated drug combinations before you sign the digital prescription."</em></li>
+    </ul>
+
+    <h3>Step 4: Discharging & Payments (The Checkout)</h3>
+    <ul>
+        <li>Navigate to the <strong>Pharmacist & Discharge Billing Desk</strong>.</li>
+        <li>Select the patient from the dropdown list. Click <strong>"Compute Discharge Bill"</strong>.</li>
+        <li>Point out the "WhatsApp Bill Receipt" function.</li>
+        <li><strong>The Pitch:</strong> <em>"When the patient is discharged, we don't print paper. A secure UPI/Card checkout link and digital GST invoice are sent directly to their WhatsApp. Your clinic gets paid faster, and patients don't stand in long checkout lines."</em></li>
+    </ul>
+
+    <h2>3. How to Pitch the Commercials (Value Proposition)</h2>
+    <div class="note-box">
+        <strong>No Per-User Licensing Fees:</strong><br>
+        Standard hospital software charges <em>per doctor</em> or <em>per consultant</em>, which penalizes hospital growth. MedSphere AI uses a <strong>Flat Bed-Based Rate</strong>. The hospital pays only for their operational beds. They can add unlimited doctors, nurses, and receptionists at zero extra cost.
+    </div>
+
+    <h2>4. Handling Objections (FAQs)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Objection</th>
+                <th>How to Answer</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>"Where is our patient data stored?"</strong></td>
+                <td><em>"All data is encrypted (AES-256) and stored on secure cloud servers using MongoDB Atlas. It is fully compliant with Indian DPDP Act 2023 guidelines."</em></td>
+            </tr>
+            <tr>
+                <td><strong>"Is it hard for nurses or billing staff to learn?"</strong></td>
+                <td><em>"The software is designed to look like everyday messaging apps. If a staff member knows how to use WhatsApp or a smartphone, they can learn to use MedSphere in less than 15 minutes."</em></td>
+            </tr>
+            <tr>
+                <td><strong>"Can we integrate our existing diagnostic lab software?"</strong></td>
+                <td><em>"Yes, our IT importer allows you to drag-and-drop standard CSV/Excel roster logs directly, mapping them to the database in seconds."</em></td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>
