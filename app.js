@@ -50,7 +50,7 @@ const state = {
 const MOCK_DB = {
     admissions: [],
     doctors: [
-        { id: "DOC-001", name: "Dr. Surendra Rajhans", specialty: "Cardiology", room: "OPD 101", shift: "Morning", phone: "+91 94394 98158", experience: 15 },
+        { id: "DOC-001", name: "Dr. Agrawal Sir", specialty: "Cardiology", room: "OPD 101", shift: "Morning", phone: "+91 94394 98158", experience: 15 },
         { id: "DOC-002", name: "Dr. Lakshmi Prasad", specialty: "Pediatrics", room: "OPD 105", shift: "Afternoon", phone: "+91 98765 00002", experience: 8 },
         { id: "DOC-003", name: "Dr. Vikas Sharma", specialty: "Neurology", room: "OPD 202", shift: "Night", phone: "+91 98765 00003", experience: 12 }
     ],
@@ -88,7 +88,7 @@ const MOCK_DB = {
 const DEMO_ACCOUNTS = {
     "superadmin": { name: "Global Admin", id: "SUPERADMIN", role: "Super Admin", clearance: 15 },
     "itadmin": { name: "IT Director", id: "IT-ADMIN-01", role: "IT Admin", clearance: 14 },
-    "doc01": { name: "Dr. Surendra Rajhans", id: "DOC-001", role: "Doctor", clearance: 1 },
+    "doc01": { name: "Dr. Agrawal Sir", id: "DOC-001", role: "Doctor", clearance: 1 },
     "nurse01": { name: "Sister Anjali", id: "NURSE-01", role: "Nurse", clearance: 2 },
     "pharm01": { name: "Pharmacy Desk", id: "PHARM-01", role: "Pharmacist", clearance: 3 },
     "pat01": { name: "Ramesh Kumar", id: "PAT-001", role: "Patient", clearance: 4 }
@@ -172,7 +172,7 @@ window.selectRoleOnboarding = function(clearance, roleLabel) {
     
     if (clearance === 15) { name = "Global Admin"; id = "SUPERADMIN"; }
     else if (clearance === 14) { name = "IT Director"; id = "IT-ADMIN-01"; }
-    else if (clearance === 1) { name = "Dr. Surendra Rajhans"; id = "DOC-001"; }
+    else if (clearance === 1) { name = "Dr. Agrawal Sir"; id = "DOC-001"; }
     else if (clearance === 2) { name = "Sister Anjali"; id = "NURSE-01"; }
     else if (clearance === 3) { name = "Pharmacy Desk"; id = "PHARM-01"; }
     else if (clearance === 4) { name = "Ramesh Kumar"; id = "PAT-001"; }
@@ -533,7 +533,7 @@ function loadDatabaseState() {
 window.clearAllSystemData = function() {
     if (confirm("Are you sure you want to reset the system database back to default clean seed data?")) {
         MOCK_DB.doctors = [
-            { id: "DOC-001", name: "Dr. Surendra Rajhans", specialty: "Cardiology", room: "OPD 101", shift: "Morning", phone: "+91 94394 98158", experience: 15 },
+            { id: "DOC-001", name: "Dr. Agrawal Sir", specialty: "Cardiology", room: "OPD 101", shift: "Morning", phone: "+91 94394 98158", experience: 15 },
             { id: "DOC-002", name: "Dr. Lakshmi Prasad", specialty: "Pediatrics", room: "OPD 105", shift: "Afternoon", phone: "+91 98765 00002", experience: 8 },
             { id: "DOC-003", name: "Dr. Vikas Sharma", specialty: "Neurology", room: "OPD 202", shift: "Night", phone: "+91 98765 00003", experience: 12 }
         ];
