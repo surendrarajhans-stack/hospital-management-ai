@@ -862,6 +862,7 @@ window.processLocalFileImport = function() {
             
             // Validate headers (case-insensitive) using alias mapping
             const keyAliases = {
+                name: ["name", "doctor name", "doc name", "patient name", "staff name", "full name", "employee name", "medicine name", "drug name"],
                 specialty: ["specialty", "speciality"],
                 complaint: ["complaint", "complaints", "symptom", "symptoms", "diagnosis", "disease"],
                 dept: ["dept", "department", "unit"],
