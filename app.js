@@ -1202,6 +1202,8 @@ window.addMedicationToPrescription = function() {
         `;
         container.appendChild(div);
     });
+
+    checkDrugInteractions();
 };
 
 window.removeMedFromPrescription = function(idx) {
@@ -1211,6 +1213,8 @@ window.removeMedFromPrescription = function(idx) {
     
     if (currentPrescriptionMeds.length === 0) {
         container.innerHTML = `<span class="text-xs text-[#6b7280]">No medication added yet.</span>`;
+        const warnContainer = document.getElementById("drugInteractionWarningContainer");
+        if (warnContainer) warnContainer.classList.add("hidden");
         return;
     }
     
@@ -1223,7 +1227,62 @@ window.removeMedFromPrescription = function(idx) {
         `;
         container.appendChild(div);
     });
+
+    checkDrugInteractions();
 };
+
+function checkDrugInteractions() {
+    const warnContainer = document.getElementById("drugInteractionWarningContainer");
+    const warnText = document.getElementById("drugInteractionWarningText");
+    if (!warnContainer || !warnText) return;
+
+    warnContainer.classList.add("hidden");
+
+    if (currentPrescriptionMeds.length < 2) return;
+
+    const severeInteractions = [
+        {
+            drugs: ["aspirin", "warfarin"],
+            desc: "Co-administration of Aspirin and Warfarin significantly increases the risk of severe gastrointestinal and systemic bleeding. Monitor INR closely."
+        },
+        {
+            drugs: ["sildenafil", "nitroglycerin"],
+            desc: "Critical risk of profound, life-threatening systemic hypotension due to synergistic vasodilation. Do not co-prescribe."
+        },
+        {
+            drugs: ["ibuprofen", "aspirin"],
+            desc: "Ibuprofen may inhibit the cardioprotective antiplatelet effect of low-dose Aspirin. Concomitant use also increases GI mucosal bleeding risk."
+        },
+        {
+            drugs: ["clopidogrel", "omeprazole"],
+            desc: "Omeprazole decreases the active metabolite of Clopidogrel (via CYP2C19 inhibition), reducing its therapeutic antiplatelet efficacy."
+        },
+        {
+            drugs: ["simvastatin", "amlodipine"],
+            desc: "Amlodipine increases systemic exposure to Simvastatin, raising the risk of statin-induced myopathy. Limit Simvastatin to 20mg daily."
+        }
+    ];
+
+    const prescribedNames = currentPrescriptionMeds.map(m => m.name.toLowerCase().trim());
+
+    for (const interaction of severeInteractions) {
+        const drugA = interaction.drugs[0];
+        const drugB = interaction.drugs[1];
+
+        const hasA = prescribedNames.some(name => name.includes(drugA));
+        const hasB = prescribedNames.some(name => name.includes(drugB));
+
+        if (hasA && hasB) {
+            warnText.innerText = interaction.desc;
+            warnContainer.classList.remove("hidden");
+            if (window.lucide) lucide.createIcons();
+            
+            addSystemLog(`AI Safety Warning: Critical drug interaction detected between ${drugA.toUpperCase()} and ${drugB.toUpperCase()}!`, "Error");
+            addNotification("Drug Interaction Warning 🚨", `Concomitant use of ${drugA.toUpperCase()} and ${drugB.toUpperCase()} is contraindicated.`, "danger");
+            break;
+        }
+    }
+}
 
 window.submitDoctorConsultationFile = function() {
     if (!activePatientId && MOCK_DB.patients.length > 0) {
@@ -1261,9 +1320,11 @@ window.submitDoctorConsultationFile = function() {
     addSystemLog(`Diagnosis completed for patient "${p.name}" (Triage: ${tri})`, "Success");
     addNotification("Diagnosis Dispatched 📋", `Prescription & Clinical file signed for ${p.name}.`, "success");
     
-    // Clear prescription meds array
+    // Clear prescription meds array and hide warning
     currentPrescriptionMeds = [];
     document.getElementById("addedMedsContainer").innerHTML = `<span class="text-xs text-[#6b7280]">No medication added yet.</span>`;
+    const warnContainer = document.getElementById("drugInteractionWarningContainer");
+    if (warnContainer) warnContainer.classList.add("hidden");
     
     // Smoothly select next patient in queue
     const queuePats = MOCK_DB.patients.filter(pat => pat.bed || pat.doctorId === state.userId);

@@ -1104,6 +1104,14 @@
                                     <div id="addedMedsContainer" class="p-3 bg-white/5 rounded-xl border border-white/5 min-h-[50px] space-y-1.5">
                                         <span class="text-xs text-[#6b7280]">No medication added yet.</span>
                                     </div>
+                                    <!-- Drug-Drug Interaction Warning Alert -->
+                                    <div id="drugInteractionWarningContainer" class="hidden p-3.5 bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-xl text-xs space-y-1 flex items-start gap-2.5">
+                                        <i data-lucide="shield-alert" class="w-4 h-4 text-rose-400 mt-0.5 shrink-0"></i>
+                                        <div>
+                                            <span class="font-bold block text-[#f43f5e]">🚨 CRITICAL DRUG INTERACTION DETECTED</span>
+                                            <span id="drugInteractionWarningText">Warning details...</span>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="flex gap-4 pt-2">
