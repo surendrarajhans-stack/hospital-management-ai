@@ -748,7 +748,61 @@ function populateITDashboard() {
     
     // Load dynamic credentials in configuration fields
     if (typeof loadApiCredentials === 'function') loadApiCredentials();
+    
+    // Render Master Patients Registry
+    populateMasterPatientsTable();
 }
+
+function populateMasterPatientsTable() {
+    const tbody = document.getElementById("masterPatientsTableBody");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+
+    const searchVal = document.getElementById("patientSearchInput") ? document.getElementById("patientSearchInput").value.toLowerCase().trim() : "";
+    const filterTriage = document.getElementById("patientTriageFilter") ? document.getElementById("patientTriageFilter").value : "";
+
+    const filtered = MOCK_DB.patients.filter(p => {
+        const matchesSearch = !searchVal || 
+            (p.name && p.name.toLowerCase().includes(searchVal)) || 
+            (p.id && p.id.toLowerCase().includes(searchVal)) || 
+            (p.bed && p.bed.toLowerCase().includes(searchVal)) || 
+            (p.complaint && p.complaint.toLowerCase().includes(searchVal));
+
+        const matchesTriage = !filterTriage || p.triage === filterTriage;
+
+        return matchesSearch && matchesTriage;
+    });
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-xs text-[#6b7280]">No matching patient records found in the database.</td></tr>`;
+        return;
+    }
+
+    filtered.forEach(p => {
+        const tr = document.createElement("tr");
+        tr.className = "border-b border-white/5 text-[#f3f4f6] hover:bg-white/[0.02] transition";
+        
+        let triageColor = "bg-emerald-500/20 text-emerald-400";
+        if (p.triage === "Critical") triageColor = "bg-red-500/20 text-red-400";
+        else if (p.triage === "Under Observation") triageColor = "bg-amber-500/20 text-amber-400";
+
+        const paymentText = p.paid ? "Paid ✅" : "Unpaid ❌";
+        const paymentColor = p.paid ? "text-emerald-400" : "text-red-400";
+
+        tr.innerHTML = `
+            <td class="py-3 font-mono text-xs text-teal-400">${p.id}</td>
+            <td class="font-bold text-white">${p.name}</td>
+            <td>${p.age} Yrs</td>
+            <td><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${triageColor}">${p.triage}</span></td>
+            <td class="font-semibold text-xs">${p.bed ? p.bed : "OPD Walk-in"}</td>
+            <td class="font-mono text-xs">₹${p.bill}</td>
+            <td class="font-bold text-xs ${paymentColor}">${paymentText}</td>
+            <td class="text-xs text-[#9ca3af] max-w-[200px] truncate" title="${p.complaint}">${p.complaint}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+window.filterMasterPatients = populateMasterPatientsTable;
 
 window.toggleAdminAdmissionTypeFields = function() {
     const type = document.getElementById("adminPatType").value;

@@ -873,6 +873,47 @@
                         </div>
                     </div>
 
+                    <!-- MASTER PATIENT DIRECTORY -->
+                    <div class="glass-card p-6 flex flex-col mt-6">
+                        <div class="card-header border-b border-white/5 pb-3 mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                    <i data-lucide="users" class="w-5 h-5 text-teal-400"></i>
+                                    <span>Master Patients Registry</span>
+                                </h3>
+                                <p class="text-xs text-[#9ca3af] mt-0.5">Search and retrieve all patient records currently saved in the MongoDB cloud database.</p>
+                            </div>
+                            <div class="flex flex-wrap gap-2.5 items-center">
+                                <input type="text" id="patientSearchInput" oninput="filterMasterPatients()" placeholder="Search Name, ID, Bed, or Complaint..." class="bg-[#0b0f19] border border-white/10 rounded-xl px-3.5 py-1.5 text-xs text-white focus:outline-none focus:border-teal-500 w-64">
+                                <select id="patientTriageFilter" onchange="filterMasterPatients()" class="bg-[#0b0f19] border border-white/10 rounded-xl px-3.5 py-1.5 text-xs text-white focus:outline-none focus:border-teal-500">
+                                    <option value="">All Triage Status</option>
+                                    <option value="Critical">Critical</option>
+                                    <option value="Under Observation">Under Observation</option>
+                                    <option value="Stable">Stable</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead>
+                                    <tr class="border-b border-white/5 text-[#9ca3af] font-bold text-xs">
+                                        <th class="py-2.5">ID</th>
+                                        <th>Name</th>
+                                        <th>Age</th>
+                                        <th>Triage Status</th>
+                                        <th>Location / Bed</th>
+                                        <th>Pending Bill</th>
+                                        <th>Payment Status</th>
+                                        <th>Clinical Complaint</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="masterPatientsTableBody">
+                                    <!-- Dynamic list -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                     <!-- Nurse & Clinical Support Shift Roster -->
                     <div class="glass-card p-6 flex flex-col mt-6">
                         <div class="card-header border-b border-white/5 pb-3 mb-3 flex items-center justify-between">
