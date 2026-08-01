@@ -1346,6 +1346,113 @@ window.submitDoctorConsultationFile = function() {
     populateDoctorDashboard();
 };
 
+window.printPrescriptionDoc = function() {
+    if (!activePatientId && MOCK_DB.patients.length > 0) {
+        activePatientId = MOCK_DB.patients[0].id;
+    }
+    
+    if (!activePatientId) {
+        alert("Please select a patient from the queue first.");
+        return;
+    }
+    
+    const p = MOCK_DB.patients.find(x => x.id === activePatientId);
+    if (!p) return;
+
+    const comp = document.getElementById("compSymptoms").value.trim() || "General Checkup";
+    
+    if (currentPrescriptionMeds.length === 0) {
+        alert("Please add at least one medication to the prescription before printing.");
+        return;
+    }
+
+    const printWin = window.open("", "_blank", "width=800,height=900");
+    
+    let medsHtml = "";
+    currentPrescriptionMeds.forEach(m => {
+        medsHtml += `
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; font-weight: bold;">💊 ${m.name}</td>
+                <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; text-align: center;">${m.dosage}</td>
+                <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; text-align: right;">${m.duration}</td>
+            </tr>
+        `;
+    });
+
+    const docName = state.userName || "Dr. Agrawal Sir";
+    const dateStr = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+    printWin.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Rx Prescription - ${p.name}</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 40px; color: #1e293b; background: #fff; line-height: 1.5; }
+                .header { border-bottom: 3px solid #0f766e; padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
+                .doc-info { text-align: right; }
+                .doc-name { font-size: 20px; font-weight: bold; color: #0f766e; }
+                .doc-meta { font-size: 12px; color: #64748b; }
+                .hosp-name { font-size: 24px; font-weight: 800; color: #0f766e; }
+                .patient-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin-bottom: 25px; display: grid; grid-template-cols: 1fr 1fr; gap: 10px; font-size: 13px; }
+                .rx-symbol { font-size: 32px; font-weight: bold; color: #0f766e; margin-bottom: 15px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+                th { background-color: #f1f5f9; padding: 10px; text-align: left; border-bottom: 2px solid #cbd5e1; color: #475569; }
+                .footer { margin-top: 60px; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: right; }
+                .signature-line { width: 180px; border-top: 2px solid #94a3b8; display: inline-block; margin-top: 40px; text-align: center; font-size: 12px; color: #64748b; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div>
+                    <span class="hosp-name">MEDSPHERE AI</span>
+                    <div style="font-size: 11px; color: #64748b; margin-top: 2px;">Smart Health Information System</div>
+                </div>
+                <div class="doc-info">
+                    <span class="doc-name">${docName}</span>
+                    <div class="doc-meta">Cardiology Specialist<br>Reg No: MCI-98315<br>Phone: +91 94394 98158</div>
+                </div>
+            </div>
+
+            <div class="patient-box">
+                <div><strong>Patient Name:</strong> ${p.name}</div>
+                <div><strong>Patient ID:</strong> ${p.id}</div>
+                <div><strong>Age/Gender:</strong> ${p.age} Yrs</div>
+                <div><strong>Date:</strong> ${dateStr}</div>
+                <div style="grid-column: span 2;"><strong>Chief Complaint / Symptoms:</strong> ${comp}</div>
+            </div>
+
+            <div class="rx-symbol">Rx</div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">Medicine Name</th>
+                        <th style="text-align: center;">Dosage / Instructions</th>
+                        <th style="text-align: right;">Duration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${medsHtml}
+                </tbody>
+            </table>
+
+            <div class="footer">
+                <div class="signature-line">
+                    Authorized Signatory<br><strong>${docName}</strong>
+                </div>
+            </div>
+
+            <script>
+                window.onload = function() { window.print(); }
+            </script>
+        </body>
+        </html>
+    `);
+    
+    printWin.document.close();
+};
+
 // 11. Nurse & Ward Panel Controllers
 let selectedBedId = "";
 function populateNurseDashboard() {
