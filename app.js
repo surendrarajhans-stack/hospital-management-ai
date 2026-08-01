@@ -758,6 +758,12 @@ function populateMasterPatientsTable() {
     if (!tbody) return;
     tbody.innerHTML = "";
 
+    const totalCount = MOCK_DB.patients.length;
+    const titleEl = document.getElementById("masterPatientCountSubtitle");
+    if (titleEl) {
+        titleEl.innerText = `Search and retrieve all patient records currently saved in the MongoDB cloud database. (Total: ${totalCount} Patients)`;
+    }
+
     const searchVal = document.getElementById("patientSearchInput") ? document.getElementById("patientSearchInput").value.toLowerCase().trim() : "";
     const filterTriage = document.getElementById("patientTriageFilter") ? document.getElementById("patientTriageFilter").value : "";
 
