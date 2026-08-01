@@ -55,9 +55,9 @@ const MOCK_DB = {
         { id: "DOC-003", name: "Dr. Vikas Sharma", specialty: "Neurology", room: "OPD 202", shift: "Night", phone: "+91 98765 00003", experience: 12 }
     ],
     patients: [
-        { id: "PAT-001", name: "Ramesh Kumar", age: 45, triage: "Stable", bed: "ICU-02", bill: 12500, paid: false, complaint: "Chronic hypertension" },
-        { id: "PAT-002", name: "Sita Devi", age: 32, triage: "Under Observation", bed: "GW-05", bill: 4500, paid: false, complaint: "Post-op care, mild fever" },
-        { id: "PAT-003", name: "Kabir Khan", age: 8, triage: "Stable", bed: "PED-01", bill: 1800, paid: true, complaint: "Acute bronchitis checkup" }
+        { id: "PAT-001", name: "Ramesh Kumar", age: 45, triage: "Stable", bed: "ICU-02", bill: 12500, paid: false, complaint: "Chronic hypertension", phone: "+91 98765 43210", address: "Sector 15, Noida, UP", email: "ramesh.kumar@gmail.com" },
+        { id: "PAT-002", name: "Sita Devi", age: 32, triage: "Under Observation", bed: "GW-05", bill: 4500, paid: false, complaint: "Post-op care, mild fever", phone: "+91 94321 09876", address: "DLF Phase 3, Gurugram, HR", email: "sita.devi@outlook.com" },
+        { id: "PAT-003", name: "Kabir Khan", age: 8, triage: "Stable", bed: "PED-01", bill: 1800, paid: true, complaint: "Acute bronchitis checkup", phone: "+91 91234 56789", address: "Saket, New Delhi", email: "kabir.khan@yahoo.com" }
     ],
     wards: [
         { id: "ICU-01", type: "ICU", occupied: false, patientId: "" },
@@ -538,9 +538,9 @@ window.clearAllSystemData = function() {
             { id: "DOC-003", name: "Dr. Vikas Sharma", specialty: "Neurology", room: "OPD 202", shift: "Night", phone: "+91 98765 00003", experience: 12 }
         ];
         MOCK_DB.patients = [
-            { id: "PAT-001", name: "Ramesh Kumar", age: 45, triage: "Stable", bed: "ICU-02", bill: 12500, paid: false, complaint: "Chronic hypertension" },
-            { id: "PAT-002", name: "Sita Devi", age: 32, triage: "Under Observation", bed: "GW-05", bill: 4500, paid: false, complaint: "Post-op care, mild fever" },
-            { id: "PAT-003", name: "Kabir Khan", age: 8, triage: "Stable", bed: "PED-01", bill: 1800, paid: true, complaint: "Acute bronchitis checkup" }
+            { id: "PAT-001", name: "Ramesh Kumar", age: 45, triage: "Stable", bed: "ICU-02", bill: 12500, paid: false, complaint: "Chronic hypertension", phone: "+91 98765 43210", address: "Sector 15, Noida, UP", email: "ramesh.kumar@gmail.com" },
+            { id: "PAT-002", name: "Sita Devi", age: 32, triage: "Under Observation", bed: "GW-05", bill: 4500, paid: false, complaint: "Post-op care, mild fever", phone: "+91 94321 09876", address: "DLF Phase 3, Gurugram, HR", email: "sita.devi@outlook.com" },
+            { id: "PAT-003", name: "Kabir Khan", age: 8, triage: "Stable", bed: "PED-01", bill: 1800, paid: true, complaint: "Acute bronchitis checkup", phone: "+91 91234 56789", address: "Saket, New Delhi", email: "kabir.khan@yahoo.com" }
         ];
         MOCK_DB.wards = [
             { id: "ICU-01", type: "ICU", occupied: false, patientId: "" },
@@ -801,9 +801,14 @@ function populateMasterPatientsTable() {
             <td>${p.age} Yrs</td>
             <td><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${triageColor}">${p.triage}</span></td>
             <td class="font-semibold text-xs">${p.bed ? p.bed : "OPD Walk-in"}</td>
+            <td>
+                <div class="font-mono text-xs font-semibold text-white">${p.phone || 'N/A'}</div>
+                <div class="text-[10px] text-[#9ca3af]">${p.email || 'No Email'}</div>
+            </td>
+            <td class="text-xs text-[#d1d5db]">${p.address || 'N/A'}</td>
             <td class="font-mono text-xs">₹${p.bill}</td>
             <td class="font-bold text-xs ${paymentColor}">${paymentText}</td>
-            <td class="text-xs text-[#9ca3af] max-w-[200px] truncate" title="${p.complaint}">${p.complaint}</td>
+            <td class="text-xs text-[#9ca3af] max-w-[150px] truncate" title="${p.complaint}">${p.complaint}</td>
         `;
         tbody.appendChild(tr);
     });
@@ -825,11 +830,14 @@ window.toggleAdminAdmissionTypeFields = function() {
 };
 
 window.executeAdminPatientAdmit = function() {
-    const name = document.getElementById("adminPatName").value.trim();
-    const age = parseInt(document.getElementById("adminPatAge").value);
-    const triage = document.getElementById("adminPatTriage").value;
-    const type = document.getElementById("adminPatType").value;
-    const complaint = document.getElementById("adminPatComplaint").value.trim();
+    const name = document.getElementById("adminPatName") ? document.getElementById("adminPatName").value.trim() : "";
+    const age = document.getElementById("adminPatAge") ? parseInt(document.getElementById("adminPatAge").value) : NaN;
+    const triage = document.getElementById("adminPatTriage") ? document.getElementById("adminPatTriage").value : "Stable";
+    const type = document.getElementById("adminPatType") ? document.getElementById("adminPatType").value : "OPD";
+    const complaint = document.getElementById("adminPatComplaint") ? document.getElementById("adminPatComplaint").value.trim() : "";
+    const phone = document.getElementById("adminPatPhone") ? document.getElementById("adminPatPhone").value.trim() : "";
+    const email = document.getElementById("adminPatEmail") ? document.getElementById("adminPatEmail").value.trim() : "";
+    const address = document.getElementById("adminPatAddress") ? document.getElementById("adminPatAddress").value.trim() : "";
 
     if (!name || isNaN(age) || !complaint) {
         alert("Please fill in all manual patient registration fields.");
@@ -843,7 +851,10 @@ window.executeAdminPatientAdmit = function() {
         age: age,
         triage: triage,
         paid: false,
-        complaint: complaint
+        complaint: complaint,
+        phone: phone,
+        address: address,
+        email: email
     };
 
     if (type === "OPD") {
@@ -928,10 +939,12 @@ window.processLocalFileImport = function() {
                 complaint: ["complaint", "complaints", "symptom", "symptoms", "diagnosis", "disease"],
                 dept: ["dept", "department", "unit"],
                 stock: ["stock", "quantity", "qty", "inventory", "available"],
-                phone: ["phone", "phone number", "contact", "mobile", "mobile number"],
+                phone: ["phone", "phone number", "contact", "mobile", "mobile number", "mob no", "mobile no", "phone no"],
                 price: ["price", "cost", "rate", "charge"],
                 bill: ["bill", "amount", "fee", "cost", "total"],
-                paid: ["paid", "payment", "status", "is paid", "settled"]
+                paid: ["paid", "payment", "status", "is paid", "settled"],
+                address: ["address", "residence", "location", "city"],
+                email: ["email", "email id", "email address", "mail"]
             };
 
             const hasDoctorSpecialty = headers.some(h => keyAliases.specialty.includes(h));
@@ -959,7 +972,7 @@ window.processLocalFileImport = function() {
             // Normalize objects keys to match MOCK_DB property names (case-insensitive mapping)
             const schemaKeys = {
                 doctors: ["id", "name", "specialty", "room", "shift", "phone", "experience"],
-                patients: ["id", "name", "age", "triage", "bed", "bill", "paid", "complaint"],
+                patients: ["id", "name", "age", "triage", "bed", "bill", "paid", "complaint", "phone", "address", "email"],
                 staff: ["id", "name", "dept", "shift"],
                 pharmacy: ["id", "name", "stock", "price"]
             };
@@ -1332,6 +1345,9 @@ window.admitPatientToBed = function() {
     const age = parseInt(document.getElementById("admitAge").value);
     const triage = document.getElementById("admitTriage").value;
     const complaint = document.getElementById("admitComplaint").value.trim();
+    const phone = document.getElementById("admitPhone") ? document.getElementById("admitPhone").value.trim() : "";
+    const email = document.getElementById("admitEmail") ? document.getElementById("admitEmail").value.trim() : "";
+    const address = document.getElementById("admitAddress") ? document.getElementById("admitAddress").value.trim() : "";
 
     if (!name || isNaN(age) || !complaint) {
         alert("Please fill in all patient admission fields.");
@@ -1350,7 +1366,10 @@ window.admitPatientToBed = function() {
         bed: selectedBedId,
         bill: 2500, // Admission registration fee
         paid: false,
-        complaint: complaint
+        complaint: complaint,
+        phone: phone,
+        address: address,
+        email: email
     };
 
     // Update DB
@@ -1362,6 +1381,9 @@ window.admitPatientToBed = function() {
     document.getElementById("admitName").value = "";
     document.getElementById("admitAge").value = "";
     document.getElementById("admitComplaint").value = "";
+    if (document.getElementById("admitPhone")) document.getElementById("admitPhone").value = "";
+    if (document.getElementById("admitEmail")) document.getElementById("admitEmail").value = "";
+    if (document.getElementById("admitAddress")) document.getElementById("admitAddress").value = "";
 
     // Sync state
     addSystemLog(`Patient ${name} (${patientId}) admitted successfully to Bed ${selectedBedId}`, "Success");
@@ -2766,6 +2788,9 @@ window.executeDedicatedPatientAdmit = function() {
     const triage = document.getElementById("dedicatedPatTriage").value;
     const type = document.getElementById("dedicatedPatType").value;
     const complaint = document.getElementById("dedicatedPatComplaint").value.trim();
+    const phone = document.getElementById("dedicatedPatPhone") ? document.getElementById("dedicatedPatPhone").value.trim() : "";
+    const email = document.getElementById("dedicatedPatEmail") ? document.getElementById("dedicatedPatEmail").value.trim() : "";
+    const address = document.getElementById("dedicatedPatAddress") ? document.getElementById("dedicatedPatAddress").value.trim() : "";
     const insProvider = document.getElementById("dedicatedPatInsuranceProvider") ? document.getElementById("dedicatedPatInsuranceProvider").value : "None";
     const policyNo = document.getElementById("dedicatedPatPolicyNo") ? document.getElementById("dedicatedPatPolicyNo").value.trim() : "";
 
@@ -2781,7 +2806,10 @@ window.executeDedicatedPatientAdmit = function() {
         age: age,
         triage: triage,
         paid: false,
-        complaint: complaint
+        complaint: complaint,
+        phone: phone,
+        address: address,
+        email: email
     };
 
     if (insProvider !== "None" && policyNo) {
@@ -2829,6 +2857,9 @@ window.executeDedicatedPatientAdmit = function() {
     document.getElementById("dedicatedPatName").value = "";
     document.getElementById("dedicatedPatAge").value = "";
     document.getElementById("dedicatedPatComplaint").value = "";
+    if (document.getElementById("dedicatedPatPhone")) document.getElementById("dedicatedPatPhone").value = "";
+    if (document.getElementById("dedicatedPatEmail")) document.getElementById("dedicatedPatEmail").value = "";
+    if (document.getElementById("dedicatedPatAddress")) document.getElementById("dedicatedPatAddress").value = "";
     if (document.getElementById("dedicatedPatPolicyNo")) document.getElementById("dedicatedPatPolicyNo").value = "";
 
     saveDatabaseState();
