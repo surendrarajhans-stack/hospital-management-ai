@@ -860,21 +860,37 @@ window.processLocalFileImport = function() {
             const headers = Object.keys(importedData[0]).map(h => h.trim().toLowerCase());
             const targetCollection = select.value;
             
-            // Validate headers (case-insensitive)
-            if (targetCollection === "doctors" && !headers.includes("specialty") && !headers.includes("speciality")) {
+            // Validate headers (case-insensitive) using alias mapping
+            const keyAliases = {
+                specialty: ["specialty", "speciality"],
+                complaint: ["complaint", "complaints", "symptom", "symptoms", "diagnosis", "disease"],
+                dept: ["dept", "department", "unit"],
+                stock: ["stock", "quantity", "qty", "inventory", "available"],
+                phone: ["phone", "phone number", "contact", "mobile", "mobile number"],
+                price: ["price", "cost", "rate", "charge"],
+                bill: ["bill", "amount", "fee", "cost", "total"],
+                paid: ["paid", "payment", "status", "is paid", "settled"]
+            };
+
+            const hasDoctorSpecialty = headers.some(h => keyAliases.specialty.includes(h));
+            const hasPatientComplaint = headers.some(h => keyAliases.complaint.includes(h));
+            const hasStaffDept = headers.some(h => keyAliases.dept.includes(h));
+            const hasPharmacyStock = headers.some(h => keyAliases.stock.includes(h));
+
+            if (targetCollection === "doctors" && !hasDoctorSpecialty) {
                 alert("Validation Error: The uploaded sheet is missing the 'specialty' (or 'speciality') column required for Doctors. Please verify your file or select the correct Target Sheet Type.");
                 return;
             }
-            if (targetCollection === "patients" && !headers.includes("complaint")) {
-                alert("Validation Error: The uploaded sheet is missing the 'complaint' column required for Patients. Please verify your file or select the correct Target Sheet Type.");
+            if (targetCollection === "patients" && !hasPatientComplaint) {
+                alert("Validation Error: The uploaded sheet is missing the 'complaint' (or 'complaints') column required for Patients. Please verify your file or select the correct Target Sheet Type.");
                 return;
             }
-            if (targetCollection === "staff" && !headers.includes("dept")) {
-                alert("Validation Error: The uploaded sheet is missing the 'dept' column required for Support Staff. Please verify your file or select the correct Target Sheet Type.");
+            if (targetCollection === "staff" && !hasStaffDept) {
+                alert("Validation Error: The uploaded sheet is missing the 'dept' (or 'department') column required for Support Staff. Please verify your file or select the correct Target Sheet Type.");
                 return;
             }
-            if (targetCollection === "pharmacy" && !headers.includes("stock")) {
-                alert("Validation Error: The uploaded sheet is missing the 'stock' column required for Pharmacy drugs. Please verify your file or select the correct Target Sheet Type.");
+            if (targetCollection === "pharmacy" && !hasPharmacyStock) {
+                alert("Validation Error: The uploaded sheet is missing the 'stock' (or 'quantity') column required for Pharmacy drugs. Please verify your file or select the correct Target Sheet Type.");
                 return;
             }
             
@@ -890,12 +906,12 @@ window.processLocalFileImport = function() {
             
             const normalizedData = importedData.map(row => {
                 const normalizedRow = {};
-                // Map case-insensitive keys to exact model properties
+                // Map case-insensitive keys to exact model properties, checking aliases
                 Object.keys(row).forEach(key => {
-                    const trimmedKey = key.trim();
+                    const trimmedKey = key.trim().toLowerCase();
                     const matchedKey = expectedKeys.find(ek => {
-                        if (ek === "specialty" && trimmedKey.toLowerCase() === "speciality") return true;
-                        return ek.toLowerCase() === trimmedKey.toLowerCase();
+                        const aliases = keyAliases[ek] || [ek];
+                        return aliases.includes(trimmedKey);
                     });
                     if (matchedKey) {
                         let val = row[key];
@@ -905,7 +921,7 @@ window.processLocalFileImport = function() {
                         else if (!isNaN(val) && val !== "" && typeof val === "string") val = Number(val);
                         normalizedRow[matchedKey] = val;
                     } else {
-                        normalizedRow[trimmedKey] = row[key]; // keep as-is if extra field
+                        normalizedRow[key.trim()] = row[key]; // keep as-is if extra field
                     }
                 });
                 return normalizedRow;
