@@ -55,9 +55,9 @@ const MOCK_DB = {
         { id: "DOC-003", name: "Dr. Vikas Sharma", specialty: "Neurology", room: "OPD 202", shift: "Night", phone: "+91 98765 00003", experience: 12 }
     ],
     patients: [
-        { id: "PAT-001", name: "Ramesh Kumar", age: 45, triage: "Stable", bed: "ICU-02", bill: 12500, paid: false, complaint: "Chronic hypertension", phone: "+91 98765 43210", address: "Sector 15, Noida, UP", email: "ramesh.kumar@gmail.com" },
-        { id: "PAT-002", name: "Sita Devi", age: 32, triage: "Under Observation", bed: "GW-05", bill: 4500, paid: false, complaint: "Post-op care, mild fever", phone: "+91 94321 09876", address: "DLF Phase 3, Gurugram, HR", email: "sita.devi@outlook.com" },
-        { id: "PAT-003", name: "Kabir Khan", age: 8, triage: "Stable", bed: "PED-01", bill: 1800, paid: true, complaint: "Acute bronchitis checkup", phone: "+91 91234 56789", address: "Saket, New Delhi", email: "kabir.khan@yahoo.com" }
+        { id: "PAT-001", name: "Ramesh Kumar", age: 45, triage: "Stable", bed: "ICU-02", doctorId: "DOC-001", bill: 12500, paid: false, complaint: "Chronic hypertension", phone: "+91 98765 43210", address: "Sector 15, Noida, UP", email: "ramesh.kumar@gmail.com" },
+        { id: "PAT-002", name: "Sita Devi", age: 32, triage: "Under Observation", bed: "GW-05", doctorId: "DOC-003", bill: 4500, paid: false, complaint: "Post-op care, mild fever", phone: "+91 94321 09876", address: "DLF Phase 3, Gurugram, HR", email: "sita.devi@outlook.com" },
+        { id: "PAT-003", name: "Kabir Khan", age: 8, triage: "Stable", bed: "PED-01", doctorId: "DOC-002", bill: 1800, paid: true, complaint: "Acute bronchitis checkup", phone: "+91 91234 56789", address: "Saket, New Delhi", email: "kabir.khan@yahoo.com" }
     ],
     wards: [
         { id: "ICU-01", type: "ICU", occupied: false, patientId: "" },
@@ -450,7 +450,7 @@ window.switchDashboardView = function(viewId, elementLink = null) {
 };
 
 function populateAllDoctorDropdowns() {
-    const dropdownIds = ["opdDoctor", "dedicatedPatDoctor", "patientChooseDoctor"];
+    const dropdownIds = ["opdDoctor", "dedicatedPatDoctor", "patientChooseDoctor", "admitDoctor"];
     dropdownIds.forEach(id => {
         const select = document.getElementById(id);
         if (select) {
@@ -538,9 +538,9 @@ window.clearAllSystemData = function() {
             { id: "DOC-003", name: "Dr. Vikas Sharma", specialty: "Neurology", room: "OPD 202", shift: "Night", phone: "+91 98765 00003", experience: 12 }
         ];
         MOCK_DB.patients = [
-            { id: "PAT-001", name: "Ramesh Kumar", age: 45, triage: "Stable", bed: "ICU-02", bill: 12500, paid: false, complaint: "Chronic hypertension", phone: "+91 98765 43210", address: "Sector 15, Noida, UP", email: "ramesh.kumar@gmail.com" },
-            { id: "PAT-002", name: "Sita Devi", age: 32, triage: "Under Observation", bed: "GW-05", bill: 4500, paid: false, complaint: "Post-op care, mild fever", phone: "+91 94321 09876", address: "DLF Phase 3, Gurugram, HR", email: "sita.devi@outlook.com" },
-            { id: "PAT-003", name: "Kabir Khan", age: 8, triage: "Stable", bed: "PED-01", bill: 1800, paid: true, complaint: "Acute bronchitis checkup", phone: "+91 91234 56789", address: "Saket, New Delhi", email: "kabir.khan@yahoo.com" }
+            { id: "PAT-001", name: "Ramesh Kumar", age: 45, triage: "Stable", bed: "ICU-02", doctorId: "DOC-001", bill: 12500, paid: false, complaint: "Chronic hypertension", phone: "+91 98765 43210", address: "Sector 15, Noida, UP", email: "ramesh.kumar@gmail.com" },
+            { id: "PAT-002", name: "Sita Devi", age: 32, triage: "Under Observation", bed: "GW-05", doctorId: "DOC-003", bill: 4500, paid: false, complaint: "Post-op care, mild fever", phone: "+91 94321 09876", address: "DLF Phase 3, Gurugram, HR", email: "sita.devi@outlook.com" },
+            { id: "PAT-003", name: "Kabir Khan", age: 8, triage: "Stable", bed: "PED-01", doctorId: "DOC-002", bill: 1800, paid: true, complaint: "Acute bronchitis checkup", phone: "+91 91234 56789", address: "Saket, New Delhi", email: "kabir.khan@yahoo.com" }
         ];
         MOCK_DB.wards = [
             { id: "ICU-01", type: "ICU", occupied: false, patientId: "" },
@@ -1039,13 +1039,17 @@ window.processLocalFileImport = function() {
 window.switchDoctorProfile = function(docId) {
     const doc = MOCK_DB.doctors.find(d => d.id === docId);
     if (doc) {
+        activePatientId = ""; // Reset selected patient when doctor profile changes
+        currentPrescriptionMeds = []; // Reset prescription builder state
         switchRole(1, doc.name, doc.id);
         populateDoctorDashboard();
     }
 };
 
 let activePatientId = "";
-let currentPrescriptionMeds = [];function populateDoctorDashboard() {
+let currentPrescriptionMeds = [];
+
+function populateDoctorDashboard() {
     const docSwitch = document.getElementById("activeDoctorSwitch");
     if (docSwitch) {
         docSwitch.innerHTML = "";
@@ -1063,14 +1067,32 @@ let currentPrescriptionMeds = [];function populateDoctorDashboard() {
     const queue = document.getElementById("doctorPatientQueue");
     if (queue) queue.innerHTML = "";
     
-    // Filter queue: show all if Super Admin, otherwise show if admitted (IPD) OR assigned to this doctor (OPD)
+    // Filter queue: show all if Super Admin, otherwise show ONLY if assigned to this doctor
     const myPatients = MOCK_DB.patients.filter(pat => {
         if (state.roleClearance === 15) return true;
-        return pat.bed || pat.doctorId === state.userId;
+        return pat.doctorId === state.userId;
     });
+
+    // Ensure selected patient actually belongs to this doctor's queue; if not, clear it
+    if (activePatientId && !myPatients.some(pat => pat.id === activePatientId)) {
+        activePatientId = "";
+        currentPrescriptionMeds = [];
+    }
 
     if (myPatients.length === 0) {
         if (queue) queue.innerHTML = `<span class="text-xs text-[#6b7280]">No active patients in queue.</span>`;
+        activePatientId = "";
+        const symptomsEl = document.getElementById("compSymptoms");
+        const triageEl = document.getElementById("compTriage");
+        const badgeEl = document.getElementById("activePatientBadge");
+        if (symptomsEl) symptomsEl.value = "";
+        if (triageEl) triageEl.value = "Stable";
+        if (badgeEl) badgeEl.innerText = "No Patient Selected";
+        
+        const medsCont = document.getElementById("addedMedsContainer");
+        if (medsCont) medsCont.innerHTML = `<span class="text-xs text-[#6b7280]">No medication added yet.</span>`;
+        const warnContainer = document.getElementById("drugInteractionWarningContainer");
+        if (warnContainer) warnContainer.classList.add("hidden");
     } else {
         // Auto-select first patient by default if none selected
         if (!activePatientId && myPatients.length > 0) {
@@ -1542,6 +1564,8 @@ window.admitPatientToBed = function() {
     // Generate new patient ID
     const patientId = `PAT-${Math.floor(100 + Math.random() * 900)}`;
 
+    const docId = document.getElementById("admitDoctor") ? document.getElementById("admitDoctor").value : "";
+
     // Create new patient record
     const newPatient = {
         id: patientId,
@@ -1549,6 +1573,7 @@ window.admitPatientToBed = function() {
         age: age,
         triage: triage,
         bed: selectedBedId,
+        doctorId: docId,
         bill: 2500, // Admission registration fee
         paid: false,
         complaint: complaint,
