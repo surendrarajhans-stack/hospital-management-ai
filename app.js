@@ -795,12 +795,23 @@ function populateMasterPatientsTable() {
         const paymentText = p.paid ? "Paid ✅" : "Unpaid ❌";
         const paymentColor = p.paid ? "text-emerald-400" : "text-red-400";
 
+        let locationText = p.bed ? p.bed : "OPD Walk-in";
+        if (!p.bed && p.doctorId) {
+            const doc = MOCK_DB.doctors.find(d => d.id === p.doctorId);
+            const docLabel = doc ? doc.name : "Assigned Doctor";
+            locationText = `<div class="font-semibold text-xs text-teal-400">OPD Consultation</div>
+                            <div class="text-[10px] text-white font-medium">${docLabel}</div>`;
+            if (p.appointmentDate && p.appointmentTime) {
+                locationText += `<div class="text-[9px] text-[#9ca3af] mt-0.5">${p.appointmentDate} @ ${p.appointmentTime}</div>`;
+            }
+        }
+
         tr.innerHTML = `
             <td class="py-3 font-mono text-xs text-teal-400">${p.id}</td>
             <td class="font-bold text-white">${p.name}</td>
             <td>${p.age} Yrs</td>
             <td><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${triageColor}">${p.triage}</span></td>
-            <td class="font-semibold text-xs">${p.bed ? p.bed : "OPD Walk-in"}</td>
+            <td>${locationText}</td>
             <td>
                 <div class="font-mono text-xs font-semibold text-white">${p.phone || 'N/A'}</div>
                 <div class="text-[10px] text-[#9ca3af]">${p.email || 'No Email'}</div>
@@ -1081,7 +1092,7 @@ let currentPrescriptionMeds = [];function populateDoctorDashboard() {
             if (pat.triage === "Critical") triageColor = "bg-red-500/20 text-red-400";
             else if (pat.triage === "Under Observation") triageColor = "bg-amber-500/20 text-amber-400";
             
-            const locationStr = pat.bed ? `Bed: ${pat.bed}` : 'OPD Walk-in';
+            const locationStr = pat.bed ? `Bed: ${pat.bed}` : (pat.appointmentTime ? `OPD Apt: ${pat.appointmentTime}` : 'OPD Walk-in');
             
             div.innerHTML = `
                 <div>
@@ -1927,6 +1938,15 @@ window.bookPatientAppointment = function() {
         alert("Please select a date for the appointment.");
         return;
     }
+
+    const patientUserId = state.userId || (MOCK_DB.patients.length > 0 ? MOCK_DB.patients[0].id : "");
+    const p = MOCK_DB.patients.find(pat => pat.id === patientUserId);
+    if (p) {
+        p.doctorId = docId;
+        p.appointmentDate = date;
+        p.appointmentTime = time;
+        saveDatabaseState();
+    }
     
     addSystemLog(`Appointment requested with ${doc ? doc.name : 'Doctor'} on ${date} at ${time}`, "Success");
     addNotification("Appointment Requested", `Your visit on ${date} at ${time} has been registered.`, "success");
@@ -1937,6 +1957,9 @@ window.bookPatientAppointment = function() {
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
     document.getElementById("patientChooseDate").value = `${yyyy}-${mm}-${dd}`;
+    
+    populatePatientPortal();
+    populateMasterPatientsTable();
 };
 
 window.triggerPatientBillCheckout = function() {
