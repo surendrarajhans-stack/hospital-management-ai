@@ -1294,6 +1294,26 @@ function checkDrugInteractions() {
             {
                 drugs: ["simvastatin", "amlodipine"],
                 desc: "Amlodipine increases systemic exposure to Simvastatin, raising the risk of statin-induced myopathy. Limit Simvastatin to 20mg daily."
+            },
+            {
+                drugs: ["amiodarone", "warfarin"],
+                desc: "Amiodarone inhibits Warfarin metabolism (via CYP2C9), leading to a rapid increase in INR and extreme bleeding risk. Reduce Warfarin dose by 30-50%."
+            },
+            {
+                drugs: ["spironolactone", "lisinopril"],
+                desc: "Concomitant use of Spironolactone (potassium-sparing diuretic) and Lisinopril (ACE inhibitor) significantly increases the risk of life-threatening Hyperkalemia."
+            },
+            {
+                drugs: ["digoxin", "clarithromycin"],
+                desc: "Clarithromycin inhibits P-glycoprotein, dramatically raising serum Digoxin levels and causing potential Digoxin toxicity (arrhythmias, nausea)."
+            },
+            {
+                drugs: ["ketoconazole", "simvastatin"],
+                desc: "Ketoconazole is a potent CYP3A4 inhibitor that profoundly increases Simvastatin concentration, elevating the risk of severe Rhabdomyolysis."
+            },
+            {
+                drugs: ["ciprofloxacin", "tizanidine"],
+                desc: "Ciprofloxacin significantly increases Tizanidine blood levels (via CYP1A2 inhibition), leading to severe hypotension, bradycardia, and excessive drowsiness."
             }
         ];
 
