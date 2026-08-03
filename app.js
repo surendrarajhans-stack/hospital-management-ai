@@ -389,29 +389,29 @@ window.switchDashboardView = function(viewId, elementLink = null) {
     let badgeInitial = "S";
 
     if (targetId === "view-doctor") {
-        badgeName = "Dr. Surendra Rajhans";
+        badgeName = (state.roleClearance === 1 && state.userName) ? state.userName : "Dr. Surendra Rajhans";
         badgeRole = "Clinical Doctor Desk";
-        badgeInitial = "D";
+        badgeInitial = badgeName.charAt(0).toUpperCase();
     } else if (targetId === "view-nurse") {
-        badgeName = "Sister Anjali";
+        badgeName = (state.roleClearance === 2 && state.userName) ? state.userName : "Sister Anjali";
         badgeRole = "Nurse / Ward Manager";
-        badgeInitial = "N";
+        badgeInitial = badgeName.charAt(0).toUpperCase();
     } else if (targetId === "view-pharmacist") {
-        badgeName = "Pharmacy Desk";
+        badgeName = (state.roleClearance === 3 && state.userName) ? state.userName : "Pharmacy Desk";
         badgeRole = "Pharmacist / Billing";
-        badgeInitial = "P";
+        badgeInitial = badgeName.charAt(0).toUpperCase();
     } else if (targetId === "view-patient") {
-        badgeName = "Ramesh Kumar";
+        badgeName = (state.roleClearance === 4 && state.userName) ? state.userName : "Ramesh Kumar";
         badgeRole = "Patient Care Portal";
-        badgeInitial = "P";
+        badgeInitial = badgeName.charAt(0).toUpperCase();
     } else if (targetId === "view-it-administrator") {
-        badgeName = "IT Director";
+        badgeName = (state.roleClearance === 14 && state.userName) ? state.userName : "IT Director";
         badgeRole = "IT Administrator";
-        badgeInitial = "I";
+        badgeInitial = badgeName.charAt(0).toUpperCase();
     } else if (targetId === "view-super-admin") {
-        badgeName = "Super Admin";
+        badgeName = (state.roleClearance === 15 && state.userName) ? state.userName : "Super Admin";
         badgeRole = "Licensing Authority";
-        badgeInitial = "S";
+        badgeInitial = badgeName.charAt(0).toUpperCase();
     }
 
     if (nameBadge) nameBadge.innerText = badgeName;

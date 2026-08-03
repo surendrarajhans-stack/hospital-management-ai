@@ -18,28 +18,24 @@
             color: #0f766e;
             border-bottom: 2px solid #0f766e;
             padding-bottom: 10px;
-            font-size: 26px;
+            font-size: 28px;
             margin-bottom: 5px;
-        }
-        .subtitle {
-            font-size: 14px;
-            color: #6b7280;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: bold;
         }
         h2 {
             color: #111827;
-            font-size: 18px;
-            margin-top: 25px;
+            font-size: 20px;
+            margin-top: 30px;
             border-bottom: 1px solid #e5e7eb;
             padding-bottom: 5px;
         }
+        h3 {
+            color: #0f766e;
+            font-size: 16px;
+            margin-top: 20px;
+        }
         p, li {
-            font-size: 13.5px;
-            color: #374151;
-            text-align: justify;
+            font-size: 14px;
+            color: #4b5563;
         }
         ul {
             padding-left: 20px;
@@ -47,30 +43,15 @@
         li {
             margin-bottom: 8px;
         }
-        .section-card {
-            border: 1px solid #e5e7eb;
+        .note-box {
+            background-color: #f0fdfa;
             border-left: 4px solid #0f766e;
             padding: 15px;
-            margin: 15px 0;
-            border-radius: 6px;
-            background-color: #fafafa;
+            margin: 20px 0;
+            border-radius: 4px;
         }
-        .card-title {
-            font-weight: bold;
+        .note-box strong {
             color: #0f766e;
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-        .badge {
-            background-color: #f0fdfa;
-            color: #0f766e;
-            border: 1px solid #99f6e4;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: bold;
-            display: inline-block;
-            margin-right: 5px;
         }
         .btn-print {
             display: block;
@@ -82,7 +63,7 @@
             border-radius: 6px;
             font-weight: bold;
             margin-bottom: 30px;
-            font-size: 13px;
+            font-size: 14px;
             cursor: pointer;
             border: none;
         }
@@ -92,7 +73,6 @@
             }
             body {
                 margin: 20px;
-                padding: 0;
             }
         }
     </style>
@@ -102,30 +82,30 @@
     <button class="btn-print" onclick="window.print()">Print App Roadmap (Ctrl + P)</button>
 
     <h1>MEDSPHERE CLINICAL COPILOT</h1>
-    <div class="subtitle">Standalone Mobile App Launch Roadmap & Monetization Blueprint</div>
+    <p style="font-size: 16px; font-weight: bold; color: #4b5563; margin-top: -5px; margin-bottom: 25px;">Standalone Mobile App Launch Roadmap & Monetization Blueprint</p>
     
     <p>A B2B / B2C startup blueprint for packaging MedSphere’s core AI decision-support tools into an independent, lightweight, offline-first mobile application deployable directly on the Google Play Store and Apple App Store.</p>
 
     <h2>1. The Strategic Value Proposition</h2>
-    <div class="section-card">
-        <div class="card-title">💡 Frictionless Mobile Rounds Helper</div>
-        <p>Traditional Hospital Information Systems (HIS) require institutional procurement, months of onboarding, and heavy IT installations. A standalone mobile copilot can be downloaded individually by physicians, residents, and clinical interns on their personal smartphones and used instantly during rounds.</p>
+    <div class="note-box">
+        <strong>💡 Frictionless Mobile Rounds Helper</strong><br>
+        Traditional Hospital Information Systems (HIS) require institutional procurement, months of onboarding, and heavy IT installations. A standalone mobile copilot can be downloaded individually by physicians, residents, and clinical interns on their personal smartphones and used instantly during rounds.
     </div>
 
     <h2>2. Core Feature Matrix</h2>
-    <div class="section-card">
-        <div class="card-title">📱 Phase 1: MVP (Offline Drug-Drug Safety & Lab Matrix)</div>
-        <p>Includes a high-speed search database matching drug combinations of up to 5 medications simultaneously. Works 100% offline to support deep-ward hospital basements where connectivity is unavailable. Features manual input logs for tracking lab reports and highlighting out-of-bound anomalies in red.</p>
+    <div class="note-box">
+        <strong>📱 Phase 1: MVP (Offline Drug-Drug Safety & Lab Matrix)</strong><br>
+        Includes a high-speed search database matching drug combinations of up to 5 medications simultaneously. Works 100% offline to support deep-ward hospital basements where connectivity is unavailable. Features manual input logs for tracking lab reports and highlighting out-of-bound anomalies in red.
     </div>
-    <div class="section-card">
-        <div class="card-title">📸 Phase 2: Camera AI Report Scanner (OCR)</div>
-        <p>Integrates phone camera scanning. The doctor takes a photo of a paper diagnostic report, and the app automatically extracts values, highlights clinical alerts, and drafts clinical explanation briefs.</p>
+    <div class="note-box">
+        <strong>📸 Phase 2: Camera AI Report Scanner (OCR)</strong><br>
+        Integrates phone camera scanning. The doctor takes a photo of a paper diagnostic report, and the app automatically extracts values, highlights clinical alerts, and drafts clinical explanation briefs.
     </div>
 
     <h2>3. Monetization Architecture (Freemium Model)</h2>
     <ul>
-        <li><span class="badge">FREE TIER</span> <strong>Core Lookups:</strong> Unlimited manual drug-drug checks and manual lab anomaly entry tools to drive virality and quick hospital adoption.</li>
-        <li><span class="badge">PREMIUM TIER</span> <strong>Camera Scanner & Case AI:</strong> Priced at ₹199 to ₹499 monthly. Unlocks camera-based report reading, pediatric dose calculators, and AI clinical summaries.</li>
+        <li><strong>FREE TIER (Core Lookups):</strong> Unlimited manual drug-drug checks and manual lab anomaly entry tools to drive virality and quick hospital adoption.</li>
+        <li><strong>PREMIUM TIER (Camera Scanner & Case AI):</strong> Priced at ₹199 to ₹499 monthly. Unlocks camera-based report reading, pediatric dose calculators, and AI clinical summaries.</li>
     </ul>
 
     <h2>4. Technology Stack</h2>

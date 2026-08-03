@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedSphere AI - Real-time Drug-Drug Interaction Safety Matrix</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background-color: #ffffff;
+        }
+        h1 {
+            color: #0f766e;
+            border-bottom: 2px solid #0f766e;
+            padding-bottom: 10px;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        h2 {
+            color: #111827;
+            font-size: 20px;
+            margin-top: 30px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 5px;
+        }
+        h3 {
+            color: #0f766e;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        p, li {
+            font-size: 14px;
+            color: #4b5563;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+        th, td {
+            border: 1px solid #d1d5db;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f3f4f6;
+            color: #111827;
+            font-weight: bold;
+        }
+        .note-box {
+            background-color: #f0fdfa;
+            border-left: 4px solid #0f766e;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .note-box strong {
+            color: #0f766e;
+        }
+        .btn-print {
+            display: block;
+            width: fit-content;
+            background-color: #0f766e;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+        }
+        @media print {
+            .btn-print {
+                display: none;
+            }
+            body {
+                margin: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="btn-print" onclick="window.print()">Print Interaction Handout (Ctrl + P)</button>
+
+    <h1>MEDSPHERE WITH SAI NURSING HOME</h1>
+    <p style="font-size: 16px; font-weight: bold; color: #4b5563; margin-top: -5px; margin-bottom: 25px;">AI Clinical Safety: Configured Drug-Drug Interaction Checklist</p>
+    
+    <p>The following table details the <strong>10 critical drug-drug interaction pairings</strong> configured within the MedSphere AI Clinical Decision Support (CDS) engine. The system automatically cross-analyzes added medications in real-time to alert the consulting practitioner prior to prescription dispatch.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 30%;">Prescribed Pairing</th>
+                <th style="width: 25%;">Clinical Impact</th>
+                <th style="width: 45%;">Detailed Contraindication & Safety Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Sildenafil + Nitroglycerin</strong></td>
+                <td style="color: #b91c1c; font-weight: bold;">Severe Hypotension</td>
+                <td>Profound, life-threatening systemic vasodilation. Dual use is strictly contraindicated.</td>
+            </tr>
+            <tr>
+                <td><strong>Spironolactone + Lisinopril</strong></td>
+                <td style="color: #b91c1c; font-weight: bold;">Hyperkalemia</td>
+                <td>Risk of severe hyperkalemia. Potentially fatal arrhythmias. Close electrolyte monitoring required.</td>
+            </tr>
+            <tr>
+                <td><strong>Aspirin + Warfarin</strong></td>
+                <td style="color: #b91c1c; font-weight: bold;">Bleeding Risk</td>
+                <td>Synergistic antiplatelet and anticoagulant effects. Significantly elevates major bleeding and GI hemorrhage risk.</td>
+            </tr>
+            <tr>
+                <td><strong>Digoxin + Clarithromycin</strong></td>
+                <td style="color: #b91c1c; font-weight: bold;">Digoxin Toxicity</td>
+                <td>Clarithromycin inhibits P-gp, doubling Digoxin exposure. High risk of severe nausea, visual halos, and heart block.</td>
+            </tr>
+            <tr>
+                <td><strong>Ketoconazole + Simvastatin</strong></td>
+                <td style="color: #b91c1c; font-weight: bold;">Rhabdomyolysis</td>
+                <td>Potent CYP3A4 inhibition increases Simvastatin exposure up to 10-fold, raising statin-induced myopathy risk.</td>
+            </tr>
+            <tr>
+                <td><strong>Ciprofloxacin + Tizanidine</strong></td>
+                <td style="color: #b91c1c; font-weight: bold;">Hypotension & Somnolence</td>
+                <td>CYP1A2 inhibition significantly increases Tizanidine levels, causing profound bradycardia and drowsiness.</td>
+            </tr>
+            <tr>
+                <td><strong>Clopidogrel + Omeprazole</strong></td>
+                <td style="color: #d97706; font-weight: bold;">Efficacy Loss</td>
+                <td>Omeprazole inhibits CYP2C19, reducing Clopidogrel activation and elevating thrombosis risk. Use Pantoprazole instead.</td>
+            </tr>
+            <tr>
+                <td><strong>Ibuprofen + Aspirin</strong></td>
+                <td style="color: #d97706; font-weight: bold;">Efficacy Loss</td>
+                <td>Ibuprofen binds competitively to COX-1, blocking the permanent cardioprotective antiplatelet effect of low-dose Aspirin.</td>
+            </tr>
+            <tr>
+                <td><strong>Simvastatin + Amlodipine</strong></td>
+                <td style="color: #d97706; font-weight: bold;">Myopathy Risk</td>
+                <td>Amlodipine increases Simvastatin levels. Limit Simvastatin to a maximum of 20mg daily under concurrent use.</td>
+            </tr>
+            <tr>
+                <td><strong>Amiodarone + Warfarin</strong></td>
+                <td style="color: #b91c1c; font-weight: bold;">Bleeding Risk</td>
+                <td>Amiodarone inhibits CYP2C9, slowing Warfarin clearance and raising bleeding risks. Reduce Warfarin dose by 30-50%.</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>
