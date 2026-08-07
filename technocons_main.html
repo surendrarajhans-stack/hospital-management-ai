@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technoconsultancy and Services — Enterprise AI & MedTech Systems</title>
+    <meta name="description" content="Technoconsultancy and Services is a Govt. of India Registered Unit delivering next-generation Enterprise AI, MedSphere Clinical OS, and MedPath Pathology AI.">
+    <meta name="keywords" content="Technoconsultancy, MedSphere AI, MedPath AI, Hospital OS, EHR India, Pathology AI Scanner, HealthTech Odisha">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --card-bg: #131b2e;
+            --card-hover: #1c2742;
+            --accent-cyan: #06b6d4;
+            --accent-blue: #38bdf8;
+            --accent-purple: #818cf8;
+            --accent-emerald: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #1e293b;
+            --border-highlight: #334155;
+            --gradient-primary: linear-gradient(135deg, #06b6d4 0%, #38bdf8 50%, #818cf8 100%);
+            --shadow-glow: 0 0 25px rgba(6, 182, 212, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Top Notification Bar */
+        .top-notice {
+            background: linear-gradient(90deg, #0f172a, #1e293b, #0f172a);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--accent-blue);
+        }
+
+        .top-notice span {
+            background: rgba(6, 182, 212, 0.15);
+            padding: 0.15rem 0.6rem;
+            border-radius: 20px;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            margin-right: 0.5rem;
+            font-weight: 600;
+        }
+
+        /* Header Navigation */
+        header {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            background: var(--gradient-primary);
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .logo-text h1 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text p {
+            font-size: 0.72rem;
+            color: var(--accent-cyan);
+            font-weight: 500;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .nav-cta {
+            background: var(--gradient-primary);
+            color: white !important;
+            padding: 0.6rem 1.25rem;
+            border-radius: 10px;
+            font-weight: 600 !important;
+            box-shadow: var(--shadow-glow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            padding: 6rem 2rem 4rem 2rem;
+            max-width: 1240px;
+            margin: 0 auto;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, rgba(129, 140, 248, 0.05) 50%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .badge-regd {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--accent-emerald);
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h2 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.25rem;
+            letter-spacing: -1px;
+            max-width: 900px;
+            background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero h2 span {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            max-width: 750px;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            text-decoration: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: var(--shadow-glow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.5);
+        }
+
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--text-main);
+            text-decoration: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            border: 1px solid var(--border-highlight);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--card-hover);
+            border-color: var(--accent-cyan);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            max-width: 1100px;
+            margin: 3rem auto 5rem auto;
+            background: rgba(19, 27, 46, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-item h3 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent-cyan);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-item p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Products Showcase Section */
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title h3 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-title p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .products-grid {
+            max-width: 1240px;
+            margin: 0 auto 6rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 20px 40px -15px rgba(6, 182, 212, 0.2);
+        }
+
+        .card-tag {
+            align-self: flex-start;
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--accent-blue);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1.5rem;
+        }
+
+        .product-card h4 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .product-card h4 i {
+            color: var(--accent-cyan);
+        }
+
+        .product-card p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        .feature-list li i {
+            color: var(--accent-emerald);
+            font-size: 0.9rem;
+        }
+
+        /* Compliance & Trust Section */
+        .compliance-section {
+            background: rgba(15, 23, 42, 0.5);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .compliance-grid {
+            max-width: 1100px;
+            margin: 2rem auto 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .compliance-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.75rem;
+            text-align: left;
+        }
+
+        .compliance-box i {
+            font-size: 2rem;
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+        }
+
+        .compliance-box h5 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .compliance-box p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+
+        /* Contact & Footer */
+        footer {
+            background: #060911;
+            border-top: 1px solid var(--border-color);
+            padding: 4rem 2rem 2rem 2rem;
+        }
+
+        .footer-grid {
+            max-width: 1240px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.5fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-about p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            max-width: 320px;
+        }
+
+        .footer-col h6 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            color: var(--text-main);
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .contact-item i {
+            color: var(--accent-cyan);
+            margin-top: 0.2rem;
+        }
+
+        .footer-bottom {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 900px) {
+            .hero h2 { font-size: 2.2rem; }
+            .products-grid { grid-template-columns: 1fr; }
+            .stats-bar { grid-template-columns: 1fr 1fr; }
+            .compliance-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 600px) {
+            .footer-grid { grid-template-columns: 1fr; }
+            .stats-bar { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Announcement Bar -->
+    <div class="top-notice">
+        <span>GOVT REGD</span> Technoconsultancy and Services is a Government of India Registered Enterprise Unit (Govt Regd.)
+    </div>
+
+    <!-- Header Navigation -->
+    <header>
+        <a href="#" class="logo-container">
+            <div class="logo-icon"><i class="fa-solid fa-microchip"></i></div>
+            <div class="logo-text">
+                <h1>Technoconsultancy</h1>
+                <p>Enterprise AI & MedTech OS</p>
+            </div>
+        </a>
+
+        <ul class="nav-links">
+            <li><a href="#products">Products</a></li>
+            <li><a href="#medsphere">MedSphere AI</a></li>
+            <li><a href="#medpath">MedPath AI</a></li>
+            <li><a href="#compliance">Credentials</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="https://hospital.technocons.com/" target="_blank" class="nav-cta"><i class="fa-solid fa-hospital"></i> Launch MedSphere</a></li>
+        </ul>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="badge-regd">
+                <i class="fa-solid fa-shield-halved"></i> Govt. of India Registered Enterprise Unit
+            </div>
+            <h2>Next-Generation <span>Enterprise Artificial Intelligence</span> & HealthTech Operating Systems</h2>
+            <p>Technoconsultancy and Services engineers zero-install, cloud-native EHRs, AI diagnostic scanners, and custom enterprise software for healthcare institutions and global businesses.</p>
+
+            <div class="hero-buttons">
+                <a href="https://hospital.technocons.com/" target="_blank" class="btn-primary">
+                    <i class="fa-solid fa-stethoscope"></i> Launch MedSphere Clinical OS
+                </a>
+                <a href="https://hospital.technocons.com/pathoai.html" target="_blank" class="btn-secondary">
+                    <i class="fa-solid fa-vial-virus"></i> Launch MedPath AI Portal
+                </a>
+            </div>
+        </section>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <h3>100%</h3>
+                <p>Web-Based (Zero Install)</p>
+            </div>
+            <div class="stat-item">
+                <h3>9</h3>
+                <p>Pathology Biomarker Panels</p>
+            </div>
+            <div class="stat-item">
+                <h3>0%</h3>
+                <p>Hardware Setup Costs</p>
+            </div>
+            <div class="stat-item">
+                <h3>24/7</h3>
+                <p>Cloud Security & Backup</p>
+            </div>
+        </div>
+
+        <!-- Products Section -->
+        <section id="products">
+            <div class="section-title">
+                <h3>Our Flagship Platforms</h3>
+                <p>Deploy state-of-the-art clinical software across your hospitals, OPDs, and diagnostic centers instantly.</p>
+            </div>
+
+            <div class="products-grid">
+                <!-- MedSphere AI Card -->
+                <div class="product-card" id="medsphere">
+                    <div>
+                        <div class="card-tag">Hospital & OPD Clinical OS</div>
+                        <h4><i class="fa-solid fa-hospital-user"></i> MedSphere Clinical OS</h4>
+                        <p>A complete cloud-native hospital operating system built for private clinics, nursing homes, and multispecialty OPDs.</p>
+
+                        <ul class="feature-list">
+                            <li><i class="fa-solid fa-circle-check"></i> 100% Web-Based Electronic Health Records (EHR)</li>
+                            <li><i class="fa-solid fa-circle-check"></i> AI Patient Receptionist & Symptom Advisory Engine</li>
+                            <li><i class="fa-solid fa-circle-check"></i> One-Click OPD Prescription & Rx Print Generator</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Inpatient Ward Bed Management & Live Occupancy</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Integrated Pharmacy, Inventory & Billing Module</li>
+                        </ul>
+                    </div>
+
+                    <a href="https://hospital.technocons.com/" target="_blank" class="btn-primary" style="text-align: center; justify-content: center;">
+                        Open MedSphere Platform <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- MedPath AI Card -->
+                <div class="product-card" id="medpath">
+                    <div>
+                        <div class="card-tag">AI Pathology Diagnostic Engine</div>
+                        <h4><i class="fa-solid fa-microscope"></i> MedPath AI Pathology</h4>
+                        <p>Instant pathology report anomaly scanner and automated clinical triage risk engine for independent diagnostic centers.</p>
+
+                        <ul class="feature-list">
+                            <li><i class="fa-solid fa-circle-check"></i> 9 Biomarker Scanners (Troponin, Creatinine, LFT, HbA1c, WBC, Lipid, Thyroid)</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Automated Diagnostic Anomaly Detection & Triage Risk</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Suggested Corrective Clinical Protocols for Doctors</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Standalone Diagnostic Portal (`pathoai.technocons.com`)</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Custom Lab Letterhead & PDF Export Integration</li>
+                        </ul>
+                    </div>
+
+                    <a href="https://hospital.technocons.com/pathoai.html" target="_blank" class="btn-secondary" style="text-align: center; justify-content: center;">
+                        Open MedPath AI Portal <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Compliance & Security Section -->
+        <section class="compliance-section" id="compliance">
+            <div class="section-title">
+                <h3>Governance, Compliance & Security</h3>
+                <p>Engineered for enterprise reliability, data integrity, and compliance with healthcare standards.</p>
+            </div>
+
+            <div class="compliance-grid">
+                <div class="compliance-box">
+                    <i class="fa-solid fa-building-flag"></i>
+                    <h5>Govt of India Registered</h5>
+                    <p>Technoconsultancy and Services is an officially registered enterprise unit in India under MSME / Govt standards.</p>
+                </div>
+
+                <div class="compliance-box">
+                    <i class="fa-solid fa-lock"></i>
+                    <h5>Enterprise Data Security</h5>
+                    <p>Encrypted data storage on MongoDB Atlas with automated cloud backups and strict access control protocols.</p>
+                </div>
+
+                <div class="compliance-box">
+                    <i class="fa-solid fa-credit-card"></i>
+                    <h5>Stripe Global Payments</h5>
+                    <p>Secured international multi-currency payment infrastructure powered by Stripe for seamless subscriptions.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer & Contact Section -->
+    <footer id="contact">
+        <div class="footer-grid">
+            <div class="footer-about">
+                <div class="logo-container">
+                    <div class="logo-icon"><i class="fa-solid fa-microchip"></i></div>
+                    <div class="logo-text">
+                        <h1>Technoconsultancy</h1>
+                        <p>Enterprise AI & MedTech OS</p>
+                    </div>
+                </div>
+                <p>Pioneering web-based clinical operating systems, AI pathology diagnostics, and enterprise software solutions for healthcare providers worldwide.</p>
+            </div>
+
+            <div class="footer-col">
+                <h6>Platforms</h6>
+                <ul class="footer-links">
+                    <li><a href="https://hospital.technocons.com/" target="_blank">MedSphere Clinical OS</a></li>
+                    <li><a href="https://hospital.technocons.com/pathoai.html" target="_blank">MedPath AI Scanner</a></li>
+                    <li><a href="https://hospital.technocons.com/medsphere_booklet.html" target="_blank">Product Overview Booklet</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h6>Quick Links</h6>
+                <ul class="footer-links">
+                    <li><a href="#products">Flagship Systems</a></li>
+                    <li><a href="#compliance">Credentials</a></li>
+                    <li><a href="#contact">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h6>Corporate HQ</h6>
+                <div class="contact-item">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <div>Nua Sahi, Nayapalli, Bhubaneswar, Odisha – 751012, India</div>
+                </div>
+                <div class="contact-item">
+                    <i class="fa-solid fa-phone"></i>
+                    <div>+91 8926027858</div>
+                </div>
+                <div class="contact-item">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <div><a href="https://wa.me/918926027858" target="_blank" style="color: var(--accent-emerald); text-decoration: none;">WhatsApp: +91 8926027858</a></div>
+                </div>
+                <div class="contact-item">
+                    <i class="fa-solid fa-envelope"></i>
+                    <div>hello@technocons.com</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2026 Technoconsultancy and Services. Govt. of India Registered Unit. All rights reserved.</p>
+            <p>Powered by MedSphere AI Framework</p>
+        </div>
+    </footer>
+
+</body>
+</html>
