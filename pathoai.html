@@ -333,6 +333,11 @@
                     <button class="btn-preset" onclick="loadPreset('renal')">🫘 Renal Panel (Creatinine)</button>
                     <button class="btn-preset" onclick="loadPreset('infection')">🦠 Infection / Sepsis (WBC)</button>
                     <button class="btn-preset" onclick="loadPreset('anemia')">🩸 Complete Blood Count (Hb)</button>
+                    <button class="btn-preset" onclick="loadPreset('liver')">🧪 Liver Function (LFT/SGPT)</button>
+                    <button class="btn-preset" onclick="loadPreset('diabetes')">🍬 Diabetes Panel (HbA1c)</button>
+                    <button class="btn-preset" onclick="loadPreset('electrolytes')">⚡ Electrolytes (K+ / Na+)</button>
+                    <button class="btn-preset" onclick="loadPreset('lipid')">🫀 Lipid Profile (LDL/HDL)</button>
+                    <button class="btn-preset" onclick="loadPreset('thyroid')">🦋 Thyroid Profile (TSH)</button>
                 </div>
 
                 <textarea id="labReportInput" placeholder="Paste laboratory report text here (e.g. Troponin-I: 2.8 ng/mL, Serum Creatinine: 2.1 mg/dL, WBC: 14,500/mcL)..."></textarea>
@@ -396,7 +401,48 @@ Test Name: Complete Blood Count & Iron Panel
 1. Hemoglobin (Hb): 7.2 g/dL (Ref: 12.0 - 15.5 g/dL) [LOW]
 2. Packed Cell Volume (PCV): 24% (Ref: 36% - 46%) [LOW]
 3. Serum Ferritin: 8.5 ng/mL (Ref: 15 - 150 ng/mL) [LOW]
-4. RBC Count: 2.8 Million/mcL [LOW]`
+4. RBC Count: 2.8 Million/mcL [LOW]`,
+
+            liver: `Patient ID: P-60291 | Age: 49 | Sex: Male
+Test Name: Liver Function Test (LFT) Panel
+------------------------------------------------
+1. SGPT / ALT: 145 U/L (Ref: 7 - 45 U/L) [ELEVATED]
+2. SGOT / AST: 110 U/L (Ref: 8 - 40 U/L) [ELEVATED]
+3. Total Bilirubin: 3.2 mg/dL (Ref: 0.2 - 1.2 mg/dL) [ELEVATED]
+4. Alkaline Phosphatase (ALP): 280 U/L (Ref: 44 - 147 U/L) [HIGH]
+5. Symptoms: Scleral icterus, mild right upper quadrant abdominal discomfort.`,
+
+            diabetes: `Patient ID: P-77401 | Age: 52 | Sex: Female
+Test Name: Glycemic & Diabetic Evaluation Panel
+------------------------------------------------
+1. HbA1c (Glycated Hemoglobin): 9.4% (Ref: < 5.7%) [CRITICAL HIGH]
+2. Fasting Plasma Glucose: 215 mg/dL (Ref: 70 - 99 mg/dL) [ELEVATED]
+3. Post-Prandial Glucose (2h): 310 mg/dL (Ref: < 140 mg/dL) [ELEVATED]
+4. Urine Microalbumin: 85 mg/g (Ref: < 30) [HIGH]`,
+
+            electrolytes: `Patient ID: P-33104 | Age: 61 | Sex: Male
+Test Name: Serum Electrolytes & Metabolic Ion Panel
+------------------------------------------------
+1. Serum Potassium (K+): 5.9 mEq/L (Ref: 3.5 - 5.1 mEq/L) [HIGH - ARRHYTHMIA RISK]
+2. Serum Sodium (Na+): 128 mEq/L (Ref: 136 - 145 mEq/L) [HYPONATREMIA]
+3. Serum Chloride: 92 mEq/L (Ref: 98 - 107 mEq/L) [LOW]
+4. ECG Findings: Peaked T-waves observed on lead V2-V4`,
+
+            lipid: `Patient ID: P-91023 | Age: 55 | Sex: Male
+Test Name: Comprehensive Lipid & Cardiovascular Risk Profile
+------------------------------------------------
+1. Total Cholesterol: 275 mg/dL (Ref: < 200 mg/dL) [ELEVATED]
+2. LDL Cholesterol (Direct): 185 mg/dL (Ref: < 100 mg/dL) [HIGH RISK]
+3. Triglycerides: 320 mg/dL (Ref: < 150 mg/dL) [ELEVATED]
+4. HDL Cholesterol: 34 mg/dL (Ref: > 40 mg/dL) [LOW]`,
+
+            thyroid: `Patient ID: P-12490 | Age: 34 | Sex: Female
+Test Name: Comprehensive Thyroid Function Panel
+------------------------------------------------
+1. TSH (Thyroid Stimulating Hormone): 12.8 µIU/mL (Ref: 0.45 - 4.5 µIU/mL) [HIGH]
+2. Free T4 (Thyroxine): 0.52 ng/dL (Ref: 0.82 - 1.77 ng/dL) [LOW]
+3. Free T3 (Triiodothyronine): 1.8 pg/mL (Ref: 2.0 - 4.4 pg/mL) [LOW]
+4. Symptoms: Chronic fatigue, cold intolerance, unexplained weight gain.`
         };
 
         function loadPreset(key) {

@@ -557,7 +557,7 @@ function generateSmartPathologyAnalysis(reportText) {
         rxPlan.push("3. Continuous Bedside Telemetry & ICU monitoring");
         riskLevel = "⚠️ CRITICAL (Cardiovascular Emergency)";
     } else if (text.includes("creatinine") || text.includes("urea") || text.includes("egfr")) {
-        flaggedAnomalies.push("• Renal Biomarker Elevation (Serum Creatinine > 1.4 mg/dL)");
+        flaggedAnomalies.push("• Renal Biomarker Elevation (Serum Creatinine > 1.4 mg/dL / BUN)");
         clinicalRisks.push("• Risk of Acute Kidney Injury (AKI) or Chronic Renal Impairment");
         rxPlan.push("1. Nephrology consultation & Fluid balance monitoring");
         rxPlan.push("2. Avoid nephrotoxic NSAIDs / contrast agents");
@@ -577,6 +577,41 @@ function generateSmartPathologyAnalysis(reportText) {
         rxPlan.push("2. Oral / Parenteral Iron supplementation or Packed RBC transfusion if Hb < 7 g/dL");
         rxPlan.push("3. Dietary enrichment & hematology follow-up");
         riskLevel = "⚠️ MODERATE (Anemia Evaluation Required)";
+    } else if (text.includes("bilirubin") || text.includes("sgpt") || text.includes("alt") || text.includes("sgot") || text.includes("lft")) {
+        flaggedAnomalies.push("• Hepatic Transaminase / Bilirubin Elevation (ALT/SGPT > 45 U/L)");
+        clinicalRisks.push("• Acute Hepatitis, Toxic Drug-Induced Liver Injury, or Biliary Obstruction");
+        rxPlan.push("1. Abdominal Ultrasound (USG Liver & Biliary Tree)");
+        rxPlan.push("2. Review hepatotoxic medications & alcohol intake");
+        rxPlan.push("3. Viral Hepatitis Panel (HBsAg, Anti-HCV)");
+        riskLevel = "⚠️ MODERATE (Hepatic Injury Risk)";
+    } else if (text.includes("hba1c") || text.includes("glucose") || text.includes("sugar") || text.includes("diabet")) {
+        flaggedAnomalies.push("• Glycated Hemoglobin Elevation (HbA1c > 6.5% / Hyperglycemia)");
+        clinicalRisks.push("• Uncontrolled Type 2 Diabetes Mellitus & Microvascular Complication Risk");
+        rxPlan.push("1. Endocrinology OPD consultation & Glycemic control");
+        rxPlan.push("2. Metformin / SGLT2 inhibitor evaluation by physician");
+        rxPlan.push("3. Diabetic Retinopathy & Microalbuminuria screening");
+        riskLevel = "⚠️ MODERATE (Diabetic Glycemic Alert)";
+    } else if (text.includes("potassium") || text.includes("sodium") || text.includes("k+") || text.includes("na+")) {
+        flaggedAnomalies.push("• Serum Electrolyte Imbalance (Hyperkalemia K+ > 5.2 / Hyponatremia)");
+        clinicalRisks.push("• Cardiac Arrhythmia Risk & Neuromuscular Irritability");
+        rxPlan.push("1. Stat Repeat Serum Electrolytes & 12-Lead ECG for T-wave changes");
+        rxPlan.push("2. Review Potassium-sparing diuretics & ACE-inhibitors");
+        rxPlan.push("3. Intravenous fluid & electrolyte correction protocol");
+        riskLevel = "⚠️ HIGH (Electrolyte Arrhythmia Risk)";
+    } else if (text.includes("cholesterol") || text.includes("triglycerides") || text.includes("ldl") || text.includes("lipid")) {
+        flaggedAnomalies.push("• Atherogenic Dyslipidemia (Elevated LDL > 130 mg/dL & Triglycerides)");
+        clinicalRisks.push("• Long-term Atherosclerotic Cardiovascular Disease (ASCVD) Risk");
+        rxPlan.push("1. Initiate Statin Therapy (e.g. Atorvastatin 10-20mg at bedtime)");
+        rxPlan.push("2. Dietary lipid restriction & 30-min daily aerobic exercise");
+        rxPlan.push("3. Repeat Lipid Panel in 8-12 weeks");
+        riskLevel = "⚠️ MILD TO MODERATE (Cardiovascular Risk Factor)";
+    } else if (text.includes("tsh") || text.includes("thyroid") || text.includes("t3") || text.includes("t4")) {
+        flaggedAnomalies.push("• Thyroid Stimulating Hormone Variance (TSH Abnormal)");
+        clinicalRisks.push("• Primary Hypothyroidism / Hyperthyroidism Metabolic Imbalance");
+        rxPlan.push("1. Endocrinology consultation for Thyroxine titration");
+        rxPlan.push("2. Anti-TPO Antibody testing if autoimmune etiology suspected");
+        rxPlan.push("3. Follow-up TSH monitoring in 6 weeks");
+        riskLevel = "⚠️ MILD (Endocrine Metabolic Alert)";
     } else {
         flaggedAnomalies.push("• General Biochemical / Hematological Review Requested");
         clinicalRisks.push("• Mild physiological variance requiring routine clinical tracking");
