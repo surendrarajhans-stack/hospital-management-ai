@@ -627,12 +627,54 @@
             color: var(--text-muted);
         }
 
+        /* Floating Mobile WhatsApp Button */
+        .float-wa-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #25d366;
+            color: white !important;
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6);
+            z-index: 9999;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .float-wa-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 30px rgba(37, 211, 102, 0.8);
+        }
+
         @media (max-width: 900px) {
             .hero h2 { font-size: 2.2rem; }
             .products-grid { grid-template-columns: 1fr; }
             .stats-bar { grid-template-columns: 1fr 1fr; }
             .compliance-grid { grid-template-columns: 1fr; }
             .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .whatsapp-banner {
+                flex-direction: column;
+                text-align: center;
+                padding: 1.5rem 1.25rem;
+                gap: 1.25rem;
+            }
+            .wa-info {
+                flex-direction: column;
+                text-align: center;
+            }
+            .btn-whatsapp {
+                width: 100%;
+                justify-content: center;
+            }
         }
 
         @media (max-width: 600px) {
@@ -892,6 +934,11 @@
             <p>Powered by MedSphere AI Framework</p>
         </div>
     </footer>
+
+    <!-- Floating Mobile WhatsApp Quick Button -->
+    <a href="https://wa.me/918926027858?text=Hello%20Technoconsultancy,%20I%20am%20interested%20in%20MedSphere%20AI%20and%20MedPath%20AI." target="_blank" class="float-wa-btn" title="Chat on WhatsApp (+91 8926027858)">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
 
 </body>
 </html>
