@@ -420,6 +420,127 @@
             color: var(--text-muted);
         }
 
+        /* App UI Mock Preview Container */
+        .app-mock-preview {
+            background: #0b1120;
+            border: 1px solid var(--border-highlight);
+            border-radius: 14px;
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .mock-header {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding-bottom: 0.75rem;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .mock-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .mock-dot.red { background: #ef4444; }
+        .mock-dot.yellow { background: #f59e0b; }
+        .mock-dot.green { background: #10b981; }
+
+        .mock-title {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-left: 0.5rem;
+            font-weight: 600;
+        }
+
+        .mock-body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .mock-stat-pill {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 0.5rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mock-stat-pill span {
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .mock-stat-pill.warning span { color: #f59e0b; }
+        .mock-stat-pill.info span { color: var(--accent-blue); }
+        .mock-stat-pill.success span { color: var(--accent-emerald); }
+
+        /* Direct WhatsApp Action Banner */
+        .whatsapp-banner {
+            max-width: 1240px;
+            margin: 0 auto 4rem auto;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(6, 182, 212, 0.1) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 20px;
+            padding: 2rem 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.1);
+        }
+
+        .wa-info {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .wa-icon {
+            font-size: 3rem;
+            color: #25d366;
+        }
+
+        .wa-info h4 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.25rem;
+        }
+
+        .wa-info p {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+        }
+
+        .btn-whatsapp {
+            background: #25d366;
+            color: white !important;
+            text-decoration: none;
+            padding: 0.85rem 1.75rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+            white-space: nowrap;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-whatsapp:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6);
+        }
+
         /* Contact & Footer */
         footer {
             background: #060911;
@@ -590,6 +711,21 @@
                         <h4><i class="fa-solid fa-hospital-user"></i> MedSphere Clinical OS</h4>
                         <p>A complete cloud-native hospital operating system built for private clinics, nursing homes, and multispecialty OPDs.</p>
 
+                        <!-- App UI Mock Preview -->
+                        <div class="app-mock-preview">
+                            <div class="mock-header">
+                                <span class="mock-dot red"></span>
+                                <span class="mock-dot yellow"></span>
+                                <span class="mock-dot green"></span>
+                                <span class="mock-title"><i class="fa-solid fa-hospital"></i> MedSphere Clinical OS v4.2</span>
+                            </div>
+                            <div class="mock-body">
+                                <div class="mock-stat-pill"><i class="fa-solid fa-user-doctor"></i> Active OPD Queue: <span>14 Patients</span></div>
+                                <div class="mock-stat-pill"><i class="fa-solid fa-bed-pulse"></i> IPD Ward Occupancy: <span>85% (17/20 Beds)</span></div>
+                                <div class="mock-stat-pill success"><i class="fa-solid fa-file-prescription"></i> AI Rx Generator: <span>Ready</span></div>
+                            </div>
+                        </div>
+
                         <ul class="feature-list">
                             <li><i class="fa-solid fa-circle-check"></i> 100% Web-Based Electronic Health Records (EHR)</li>
                             <li><i class="fa-solid fa-circle-check"></i> AI Patient Receptionist & Symptom Advisory Engine</li>
@@ -611,6 +747,21 @@
                         <h4><i class="fa-solid fa-microscope"></i> MedPath AI Pathology</h4>
                         <p>Instant pathology report anomaly scanner and automated clinical triage risk engine for independent diagnostic centers.</p>
 
+                        <!-- App UI Mock Preview -->
+                        <div class="app-mock-preview">
+                            <div class="mock-header">
+                                <span class="mock-dot red"></span>
+                                <span class="mock-dot yellow"></span>
+                                <span class="mock-dot green"></span>
+                                <span class="mock-title"><i class="fa-solid fa-microscope"></i> MedPath AI Pathology Engine</span>
+                            </div>
+                            <div class="mock-body">
+                                <div class="mock-stat-pill warning"><i class="fa-solid fa-triangle-exclamation"></i> Cardiac Troponin I: <span>0.85 ng/mL (High Risk)</span></div>
+                                <div class="mock-stat-pill info"><i class="fa-solid fa-droplet"></i> Diabetes HbA1c: <span>7.2% (Diabetic Control)</span></div>
+                                <div class="mock-stat-pill success"><i class="fa-solid fa-circle-check"></i> 9 Biomarker Panels: <span>Active</span></div>
+                            </div>
+                        </div>
+
                         <ul class="feature-list">
                             <li><i class="fa-solid fa-circle-check"></i> 9 Biomarker Scanners (Troponin, Creatinine, LFT, HbA1c, WBC, Lipid, Thyroid)</li>
                             <li><i class="fa-solid fa-circle-check"></i> Automated Diagnostic Anomaly Detection & Triage Risk</li>
@@ -624,6 +775,20 @@
                         Open MedPath AI Portal <i class="fa-solid fa-arrow-right"></i>
                     </a>
                 </div>
+            </div>
+
+            <!-- Direct WhatsApp Action Banner -->
+            <div class="whatsapp-banner">
+                <div class="wa-info">
+                    <i class="fa-brands fa-whatsapp wa-icon"></i>
+                    <div>
+                        <h4>Instant Clinic & Lab Onboarding Support</h4>
+                        <p>Speak directly with Managing Director Surendra Rajhans for live demonstrations & partner onboarding.</p>
+                    </div>
+                </div>
+                <a href="https://wa.me/918926027858?text=Hello%20Technoconsultancy,%20I%20am%20interested%20in%20MedSphere%20AI%20and%20MedPath%20AI." target="_blank" class="btn-whatsapp">
+                    <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp (+91 8926027858)
+                </a>
             </div>
         </section>
 
